@@ -211,8 +211,9 @@ function setMetricLabel(kind, label) {
 
 function setTabLabel(view, label) {
   const tab = document.querySelector(`.tab[data-view="${view}"]`);
-  const textNode = Array.from(tab.childNodes).find((node) => node.nodeType === Node.TEXT_NODE);
-  if (textNode) textNode.textContent = ` ${label} `;
+  const icon = tab.querySelector("svg, i");
+  const count = tab.querySelector("span");
+  tab.replaceChildren(...[icon, document.createTextNode(` ${label} `), count].filter(Boolean));
 }
 
 function setLabelText(control, label) {

@@ -211,7 +211,15 @@ footer a:hover { color: white; }
   .camera-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 760px) {
-  .topbar { height: 64px; }
+  .topbar { min-height: 64px; height: auto; padding: 10px 14px; gap: 10px; flex-wrap: wrap; }
+  .brand { min-width: 0; flex: 1 1 150px; }
+  .brand-mark { width: 46px; height: 34px; font-size: 19px; }
+  .brand strong { font-size: 21px; }
+  .topbar-actions { flex: 1 1 auto; justify-content: flex-end; gap: 8px; min-width: 0; }
+  .connection { width: 34px; height: 34px; justify-content: center; gap: 0; font-size: 0; }
+  .connection span { flex: 0 0 8px; }
+  .language-button { min-width: 40px; }
+  .icon-button { width: 36px; height: 36px; }
   .brand small, .topbar time { display: none; }
   main { padding-inline: 14px; }
   .overview { min-height: auto; padding: 32px 0 24px; }
@@ -221,7 +229,8 @@ footer a:hover { color: white; }
   .workspace { grid-template-columns: 1fr; }
   .filters { position: static; }
   .camera-grid { grid-template-columns: 1fr; }
-  .tab { flex: 1; justify-content: center; padding-inline: 8px; }
+  .view-tabs { min-width: 0; }
+  .tab { flex: 1 1 0; min-width: 0; justify-content: center; padding-inline: 8px; }
   .table-wrap { margin-inline: -14px; border-inline: 0; }
   td, th { padding-inline: 12px; }
   .incident-detail-panel { padding: 16px 14px 18px; }
