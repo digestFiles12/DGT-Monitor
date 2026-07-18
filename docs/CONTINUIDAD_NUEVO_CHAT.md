@@ -22,8 +22,8 @@
 ### Paths & Environment
 
 ```powershell
-# Navigate
-cd "e:\Proyectos\digestFiles12\DGT-Monitor"
+# Navigate to project root
+cd <project-root>
 
 # Activate venv
 .\.venv\Scripts\Activate.ps1
@@ -91,18 +91,12 @@ $env:REVOKED_KEYS = "revoked1"            # Revoked API keys
 
 ## Git History
 
-```
-bbe714f (HEAD -> feature/initial-oop-architecture)
-  Stabilize test suite: fix QThread blocking, Activity API pagination, SSE async
-  34 tests passing, no errors, git diff --check clean
-
-72f2908 (origin/feature/initial-oop-architecture)
-  Document project handoff and migration state
-
-651c56f Add modular FastAPI and WebSocket adapters
-8ccda9b Build shared DGT domain and application services
-dd0788c Add initial OOP architecture & PyQt GUI
-```
+All commits preserve semantic history:
+- Latest: Stabilize test suite (Phase 7 completion)
+- Previous: Document project handoff and migration state
+- Earlier: Add modular FastAPI and WebSocket adapters
+- Earlier: Build shared DGT domain and application services
+- Earlier: Add initial OOP architecture & PyQt GUI
 
 ---
 
@@ -123,7 +117,7 @@ dd0788c Add initial OOP architecture & PyQt GUI
    ```
 
 3. **Check Render Dashboard**:
-   - Verify `feature/initial-oop-architecture` deployment
+   - Verify current branch deployment
    - Test `/api/health` endpoint
 
 4. **Next Phase**:
@@ -134,12 +128,12 @@ dd0788c Add initial OOP architecture & PyQt GUI
 
 ---
 
-## Repository & Contacts
+## Environment Setup
 
-- **New Project:** `https://github.com/digestFiles12/DGT-Monitor` (Phase 7 complete)
-- **Reference Project:** `https://github.com/digestFiles12/DGT30_GUI` (functional equivalent, read-only)
-- **Workspace:** `e:\Proyectos\digestFiles12\DGT-Monitor`
+- **Workspace Structure:** Root directory contains `pyproject.toml`, `dgt_monitor/`, `dashboard/`, `test/`
+- **Virtual Environment:** `.\.venv` (relative to project root)
 - **Python:** 3.12.x
+- **Repository:** Managed via git with feature branches
 
 ---
 
