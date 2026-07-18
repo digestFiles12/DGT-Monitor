@@ -17,15 +17,15 @@ DGT-Monitor is configured for automatic deployment to Render.com via `render.yam
 1. Go to https://render.com/dashboard
 2. Click **"New +"** → **"Web Service"**
 3. Select **"Deploy existing repo"** or **"Connect repository"**
-4. Authorize GitHub and select `digestFiles12/DGT-Monitor`
-5. Select branch: `feature/initial-oop-architecture`
+4. Authorize GitHub and select the project repository
+5. Select the branch to deploy
 
 ### Step 2: Configure Render Service
 
 Render will auto-detect `render.yaml` and apply configuration:
 
 - **Service Name:** `dgt-monitor`
-- **Runtime:** Python 3.12
+- **Runtime:** Python 3.12 (`PYTHON_VERSION=3.12.0`)
 - **Build Command:** `pip install -e ".[dev]" && pytest test -q && compileall`
 - **Start Command:** `uvicorn dashboard.app:app --host 0.0.0.0 --port $PORT`
 - **Health Check:** `GET /api/health`
@@ -40,6 +40,7 @@ ACTIVITY_API_KEYS=<comma-separated-valid-keys>
 ACTIVITY_REVOKED_API_KEYS=<comma-separated-revoked-keys>
 ACTIVITY_DB_PATH=/tmp/activity.db
 PYTHONUNBUFFERED=1
+PYTHON_VERSION=3.12.0
 ```
 
 Example:

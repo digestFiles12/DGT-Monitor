@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#b91c1c">
+  <meta name="description" content="Monitor operativo de incidencias y cámaras de tráfico">
+  <title>DGT Monitor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="DGT Monitor, inicio">
+      <span class="brand-mark" aria-hidden="true">DGT</span>
+      <span><strong>Monitor</strong><small>Estado de la red viaria</small></span>
+    </a>
+    <div class="topbar-actions">
+      <span class="connection" id="connectionStatus"><span></span>Conectando</span>
+      <time id="lastUpdate" datetime="">Sin actualizar</time>
+      <button class="icon-button" id="refreshButton" type="button" title="Actualizar datos" aria-label="Actualizar datos">
+        <i data-lucide="refresh-cw" aria-hidden="true"></i>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="overview" aria-labelledby="pageTitle">
+      <div>
+        <p class="eyebrow">Panel operativo</p>
+        <h1 id="pageTitle">Tráfico en tiempo real</h1>
+        <p class="overview-copy">Consulta incidencias activas y cámaras de la red estatal desde una única vista.</p>
+      </div>
+      <div class="summary-grid" aria-label="Resumen de incidencias">
+        <article class="metric metric-total"><span>Total</span><strong id="statTotal">--</strong></article>
+        <article class="metric"><span>Accidentes</span><strong id="statAccidents">--</strong></article>
+        <article class="metric"><span>Obras</span><strong id="statRoadworks">--</strong></article>
+        <article class="metric"><span>Obstáculos</span><strong id="statObstructions">--</strong></article>
+      </div>
+    </section>
+
+    <nav class="view-tabs" aria-label="Vistas del monitor">
+      <button class="tab is-active" type="button" data-view="incidents" aria-selected="true">
+        <i data-lucide="triangle-alert" aria-hidden="true"></i> Incidencias <span id="incidentTabCount">0</span>
+      </button>
+      <button class="tab" type="button" data-view="cameras" aria-selected="false">
+        <i data-lucide="camera" aria-hidden="true"></i> Cámaras <span id="cameraTabCount">0</span>
+      </button>
+    </nav>
+
+    <section class="workspace">
+      <aside class="filters" aria-labelledby="filterTitle">
+        <div class="filter-heading">
+          <div><p class="eyebrow">Consulta</p><h2 id="filterTitle">Filtros</h2></div>
+          <button class="text-button" id="clearFilters" type="button">Limpiar</button>
+        </div>
+        <form id="filterForm">
+          <label>Provincia<input id="provinceFilter" name="province" type="search" placeholder="Ej. Madrid" autocomplete="off"></label>
+          <label>Carretera<input id="roadFilter" name="road" type="search" placeholder="Ej. A-6" autocomplete="off"></label>
+          <div id="incidentFilters">
+            <label>Municipio<input id="municipalityFilter" name="municipality" type="search" placeholder="Todos" autocomplete="off"></label>
+            <label>Gravedad<select id="severityFilter" name="severity"><option value="">Todas</option><option value="highest">Muy alta</option><option value="high">Alta</option><option value="medium">Media</option><option value="low">Baja</option></select></label>
+          </div>
+          <div id="cameraFilters" hidden>
+            <label>Punto kilométrico<input id="kmFilter" name="km" type="search" placeholder="Ej. 24.5" autocomplete="off"></label>
+            <label>Máximo de cámaras<select id="limitFilter" name="limit"><option>12</option><option>24</option><option>36</option><option>50</option></select></label>
+          </div>
+          <button class="primary-button" type="submit"><i data-lucide="search" aria-hidden="true"></i> Aplicar filtros</button>
+        </form>
+        <label class="auto-refresh"><input id="autoRefresh" type="checkbox" checked><span>Actualizar cada 2 minutos</span></label>
+      </aside>
+
+      <section class="results" aria-live="polite" aria-busy="true">
+        <div class="results-header">
+          <div><p class="eyebrow" id="resultEyebrow">Red viaria</p><h2 id="resultsTitle">Incidencias activas</h2></div>
+          <span class="result-count" id="resultCount">Cargando...</span>
+        </div>
+
+        <div class="state-panel" id="loadingState">
+          <span class="loader" aria-hidden="true"></span><strong>Consultando datos de tráfico</strong><p>La primera carga puede tardar unos segundos.</p>
+        </div>
+        <div class="state-panel state-error" id="errorState" hidden>
+          <i data-lucide="cloud-off" aria-hidden="true"></i><strong>No se pudieron cargar los datos</strong><p id="errorMessage"></p>
+          <button class="secondary-button" id="retryButton" type="button">Reintentar</button>
+        </div>
+        <div class="state-panel" id="emptyState" hidden>
+          <i data-lucide="search-x" aria-hidden="true"></i><strong>Sin resultados</strong><p>Prueba a ampliar o limpiar los filtros.</p>
+        </div>
+
+        <div class="table-wrap" id="incidentResults" hidden>
+          <table>
+            <thead><tr><th>Gravedad</th><th>Carretera</th><th>Ubicación</th><th>Tipo</th><th>Dirección</th><th>Cámaras</th></tr></thead>
+            <tbody id="incidentRows"></tbody>
+          </table>
+          <div class="load-more-wrap" id="loadMoreWrap" hidden>
+            <button class="secondary-button" id="loadMoreButton" type="button">Mostrar 100 más</button>
+          </div>
+        </div>
+        <div class="camera-grid" id="cameraResults" hidden></div>
+      </section>
+    </section>
+  </main>
+
+  <footer><span>DGT Monitor</span><a href="/docs">API</a><a href="/api/health">Estado del servicio</a></footer>
+</body>
+</html><!-- Legacy dashboard retained for reference.
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f6f5">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="DGT Monitor">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>DGT Monitor | Centro de operaciones</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/static/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/static/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="/static/styles.css?v=2">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <img class="brand-mark" src="/static/icon.svg" alt="">
+        <div>
+          <p class="eyebrow">Red viaria nacional</p>
+          <h1>DGT Monitor</h1>
+        </div>
+      </div>
+      <div class="topbar-meta">
+        <span class="live-label">DATEX II</span>
+        <div class="status" role="status" aria-live="polite">
+          <span id="status-dot" class="dot idle"></span>
+          <span id="status-text">Listo</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <aside class="control-rail">
+        <div class="rail-heading">
+          <span>Control</span>
+          <small>Filtrar red</small>
+        </div>
+
+        <section class="toolbar" aria-label="Filtros">
+          <label><span><i data-lucide="map-pin"></i>Provincia</span><input id="province" type="search" placeholder="Madrid, Valencia..."></label>
+          <label><span><i data-lucide="building-2"></i>Municipio</span><input id="municipality" type="search" placeholder="Municipio"></label>
+          <label><span><i data-lucide="route"></i>Carretera</span><input id="road" type="search" placeholder="A-3, M-40..."></label>
+          <label>
+            <span><i data-lucide="triangle-alert"></i>Severidad</span>
+            <select id="severity">
+              <option value="">Todas</option><option value="highest">Crítica</option><option value="high">Alta</option><option value="medium">Media</option><option value="low">Baja</option>
+            </select>
+          </label>
+          <label>
+            <span><i data-lucide="cctv"></i>Cobertura</span>
+            <select id="camera-filter"><option value="">Todas</option><option value="with">Con cámara</option><option value="without">Sin cámara</option></select>
+          </label>
+          <div class="filter-actions">
+            <button id="refresh" type="button" aria-label="Actualizar datos" title="Actualizar datos"><i data-lucide="refresh-cw"></i></button>
+            <button id="clear" class="secondary" type="button" aria-label="Limpiar filtros" title="Limpiar filtros"><i data-lucide="eraser"></i></button>
+          </div>
+        </section>
+
+        <section class="stats" aria-label="Estadísticas">
+          <div class="rail-heading stats-heading"><span>Resumen</span><small>Selecciona para filtrar</small></div>
+          <button class="stat active" data-kind=""><span><i data-lucide="activity"></i>Total</span><strong id="stat-total">0</strong></button>
+          <button class="stat" data-kind="accident"><span><i data-lucide="car-front"></i>Accidentes</span><strong id="stat-accidents">0</strong></button>
+          <button class="stat" data-kind="roadworks"><span><i data-lucide="construction"></i>Obras</span><strong id="stat-roadworks">0</strong></button>
+          <button class="stat" data-kind="stuck"><span><i data-lucide="wrench"></i>Averías</span><strong id="stat-stuck">0</strong></button>
+          <button class="stat" data-kind="obstruction"><span><i data-lucide="ban"></i>Obstrucciones</span><strong id="stat-obstructions">0</strong></button>
+          <button class="stat" data-kind="weather"><span><i data-lucide="cloud-fog"></i>Clima</span><strong id="stat-weather">0</strong></button>
+        </section>
+      </aside>
+
+      <section class="content" aria-label="Operaciones de tráfico">
+        <section class="table-panel">
+          <div class="panel-title">
+            <div><p class="section-kicker">Actividad de red</p><h2>Incidentes activos</h2></div>
+            <span id="updated-at">Sin actualizar</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th><button class="sort-header" type="button" data-sort="type" aria-label="Ordenar por tipo">Tipo</button></th>
+                  <th><button class="sort-header" type="button" data-sort="id">ID</button></th>
+                  <th><button class="sort-header" type="button" data-sort="road">Carretera</button></th>
+                  <th><button class="sort-header" type="button" data-sort="municipality">Municipio</button></th>
+                  <th><button class="sort-header" type="button" data-sort="province">Provincia</button></th>
+                  <th><button class="sort-header" type="button" data-sort="cause">Causa</button></th>
+                  <th><button class="sort-header" type="button" data-sort="camera">Cám.</button></th>
+                  <th><button class="sort-header" type="button" data-sort="severity">Severidad</button></th>
+                  <th><button class="sort-header" type="button" data-sort="km">Km</button></th>
+                </tr>
+              </thead>
+              <tbody id="incidents-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="camera-strip" aria-label="Cámaras cercanas">
+          <div class="camera-header">
+            <div>
+              <p class="section-kicker">Observación</p>
+              <h2>Cámara próxima</h2>
+              <span id="camera-context">Sin incidente seleccionado</span>
+            </div>
+            <div class="camera-actions">
+              <button id="camera-prev" type="button" aria-label="Cámara anterior" title="Cámara anterior"><i data-lucide="chevron-left"></i></button>
+              <span id="camera-counter">0 / 0</span>
+              <button id="camera-next" type="button" aria-label="Cámara siguiente" title="Cámara siguiente"><i data-lucide="chevron-right"></i></button>
+              <button id="camera-expand" type="button" aria-label="Ampliar cámara" title="Ampliar cámara"><i data-lucide="maximize-2"></i></button>
+            </div>
+          </div>
+          <div class="camera-map-grid">
+            <div class="camera-column">
+              <div class="camera-viewer">
+                <img id="camera-image" alt="Imagen de cámara DGT">
+                <div id="camera-empty" class="camera-empty">Selecciona un incidente para consultar cámaras.</div>
+              </div>
+              <div id="camera-meta" class="camera-meta">Esperando datos de la red.</div>
+            </div>
+            <section class="map-panel" aria-label="Mapa de incidentes y cámaras">
+              <div class="map-title">
+                <div><p class="section-kicker">Contexto geográfico</p><h2>Mapa operativo</h2></div>
+                <span id="map-status">OpenStreetMap</span>
+              </div>
+              <div id="traffic-map"></div>
+            </section>
+          </div>
+        </section>
+
+        <aside class="detail-panel">
+          <div class="detail-heading"><p class="section-kicker">Ficha</p><h2>Detalle del incidente</h2></div>
+          <div id="detail" class="empty">Selecciona una fila para consultar la información completa.</div>
+        </aside>
+      </section>
+    </div>
+  </main>
+  <div id="camera-lightbox" class="camera-lightbox" hidden>
+    <div class="camera-lightbox-inner">
+      <button id="camera-lightbox-close" type="button" aria-label="Cerrar imagen" title="Cerrar imagen"><i data-lucide="x"></i></button>
+      <img id="camera-lightbox-image" alt="Imagen ampliada de cámara DGT">
+    </div>
+  </div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+  <script src="/static/app.js?v=2"></script>
+  <script>window.lucide?.createIcons();</script>
+</body>
+</html>
+-->

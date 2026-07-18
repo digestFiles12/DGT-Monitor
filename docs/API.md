@@ -4,6 +4,10 @@ La aplicación se construye con `dgt_monitor.api.factory.create_app()`. En produ
 
 ## Endpoints
 
+- `GET /`: dashboard web responsive.
+- `GET /manifest.webmanifest`: manifiesto PWA.
+- `GET /sw.js`: service worker del dashboard.
+- `GET /static/*`: assets web versionados por el service worker.
 - `GET /api/health`: estado y hora UTC.
 - `GET /api/incidents`: filtros `province`, `municipality`, `road`, `severity` y `kind`.
 - `GET /api/cameras`: filtros de provincia, carretera, km, coordenadas, límite y distancia kilométrica máxima.
@@ -12,6 +16,10 @@ La aplicación se construye con `dgt_monitor.api.factory.create_app()`. En produ
 Las rutas no descargan ni parsean XML. Obtienen `DgtApplicationService` desde `app.state`, lo que permite sustituir toda la aplicación por un doble en pruebas.
 
 Los errores `DgtError` se traducen a HTTP 502. El WebSocket envía un objeto con `error` sin cerrar la conexión por un fallo transitorio de DGT.
+
+## Dashboard web
+
+El dashboard consume los endpoints REST desde el mismo origen y no contiene lógica de dominio. Incluye vistas de incidencias y cámaras, filtros por ubicación y carretera, estados de carga/error, actualización automática cada 120 segundos y carga progresiva de incidencias. Puede instalarse como PWA y conserva el shell estático en caché; las respuestas de `/api/` nunca se cachean.
 
 ## Desarrollo
 

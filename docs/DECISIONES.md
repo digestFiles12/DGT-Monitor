@@ -2,7 +2,7 @@
 
 ## ADR-001: repositorio nuevo
 
-La refactorización vive en `digestFiles12/DGT-Monitor`, con historial independiente. `DGT30_GUI` es referencia funcional y no se fusiona ni se copia de forma monolítica.
+La refactorización vive en un repositorio independiente. El proyecto legado es solo una referencia funcional y no se fusiona ni se copia de forma monolítica.
 
 ## ADR-002: dependencias dirigidas
 

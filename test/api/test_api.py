@@ -19,6 +19,18 @@ def test_health_and_rest_contracts():
     assert client.get("/api/cameras", params={"limit": 5}).json()["items"][0]["limit"] == 5
 
 
+def test_dashboard_and_pwa_assets_are_served():
+    client = TestClient(create_app(FakeService()))
+
+    dashboard = client.get("/")
+    assert dashboard.status_code == 200
+    assert "DGT Monitor" in dashboard.text
+    assert client.get("/static/styles.css").status_code == 200
+    assert client.get("/static/app.js").status_code == 200
+    assert client.get("/manifest.webmanifest").headers["content-type"].startswith("application/manifest+json")
+    assert client.get("/sw.js").status_code == 200
+
+
 def test_websocket_sends_filtered_payload():
     client = TestClient(create_app(FakeService()))
     with client.websocket_connect("/ws/incidents?province=Madrid&interval=5") as websocket:

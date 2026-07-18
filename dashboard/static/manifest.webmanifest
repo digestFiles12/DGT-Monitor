@@ -1,0 +1,10 @@
+{
+  "name": "DGT Monitor",
+  "short_name": "DGT Monitor",
+  "description": "Monitor operativo de incidencias y cámaras de tráfico",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f6f4",
+  "theme_color": "#b91c1c",
+  "lang": "es"
+}

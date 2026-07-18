@@ -2,7 +2,7 @@
 
 ## Referencia
 
-El comportamiento se consulta en `e:\Proyectos\digestFiles12\DGT30_GUI`, especialmente:
+El comportamiento se consulta en una copia local del proyecto legado, especialmente:
 
 - `DGT_V2.py`: GUI completa, cámaras y diálogos no modales.
 - `dashboard/app.py`: API anterior, caché y cobertura.
