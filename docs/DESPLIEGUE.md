@@ -2,7 +2,7 @@
 
 ## Estado
 
-El wrapper ASGI `dashboard.app:app`, el dashboard web/PWA, `render.yaml` y GitHub Actions están implementados. Render ejecuta la instalación editable, la suite de tests y `compileall` durante el build.
+El wrapper ASGI `dashboard.app:app`, el dashboard web/PWA, `render.yaml` y GitHub Actions están implementados. Render ejecuta la instalación editable, la suite de tests y `compileall` durante el build. Con GitFlow, `release` actua como rama de estabilizacion y `main` como rama de produccion; cualquier despliegue automatico debe apuntar a una de esas ramas, no a ramas `feature/*`.
 
 ## Render
 

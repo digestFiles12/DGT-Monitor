@@ -17,6 +17,7 @@ Estado actual: API FastAPI, dashboard web/PWA con selector ES/EN, filtros comple
 - [Servicios](SERVICIOS.md)
 - [API](API.md)
 - [GUI](GUI.md)
+- [GitFlow](GITFLOW.md)
 - [Pruebas](PRUEBAS.md)
 - [Desarrollo](DESARROLLO.md)
 - [Despliegue](DESPLIEGUE.md)

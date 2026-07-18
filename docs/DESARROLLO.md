@@ -13,9 +13,11 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
 ```
 
-## Flujo GitKraken
+## Flujo GitFlow
 
-Publica commits pequenos, revisa el diff y crea un pull request hacia `main` cuando todas las validaciones esten verdes.
+El repositorio usa GitFlow. Las ramas permanentes son `main` para produccion, `develop` para integracion y `release` para estabilizacion. El trabajo funcional se hace en `feature/<nombre>` desde `develop` y vuelve por pull request. Las entregas se promueven con PR `develop` -> `release` y despues `release` -> `main`.
+
+Consulta [GITFLOW.md](GITFLOW.md) para el detalle de ramas, hotfixes y politica de PRs.
 
 ## Validacion local
 
