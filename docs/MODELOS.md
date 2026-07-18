@@ -6,6 +6,8 @@ Los modelos de dominio viven en `dgt_monitor/core/models.py` y no dependen de Fa
 
 Representa un registro DATEX2 de situación. Incluye identificación, temporalidad, ubicación, causa, severidad, tráfico, coordenadas y cobertura de cámaras. Conserva los campos utilizados por la GUI de referencia y añade etiquetas traducidas para las presentaciones.
 
+Los campos técnicos se nombran en inglés y conservan el valor original de DGT. Las salidas de aplicación/API añaden equivalentes `*_label` localizados, por ejemplo `severity_label`, `type_label`, `cause_label`, `direction_label`, `lane_usage_label` o `information_status_label`.
+
 ## Camera
 
 Representa una cámara DGT con carretera, provincia, punto kilométrico, coordenadas y URL de imagen. `distance_km` y `km_delta` son resultados calculados por un caso de uso y no forman parte de la fuente remota.

@@ -2,7 +2,7 @@
 
 ## IncidentService
 
-Obtiene incidentes mediante un repositorio, aplica caché, filtra por provincia, municipio, carretera, severidad y categoría, y calcula estadísticas.
+Obtiene incidentes mediante un repositorio, aplica caché, filtra por provincia, municipio, carretera, severidad, categoría y cobertura de cámara, y calcula estadísticas.
 
 ## CameraService
 

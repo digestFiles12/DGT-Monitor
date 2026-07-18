@@ -23,6 +23,13 @@
     <div class="topbar-actions">
       <span class="connection" id="connectionStatus"><span></span>Conectando</span>
       <time id="lastUpdate" datetime="">Sin actualizar</time>
+      <div class="language-switch" role="group" aria-label="Seleccionar idioma">
+        <button class="language-button is-active" type="button" data-language="es" aria-pressed="true" title="Español"><i data-lucide="languages" aria-hidden="true"></i><span>ES</span></button>
+        <button class="language-button" type="button" data-language="en" aria-pressed="false" title="English"><i data-lucide="languages" aria-hidden="true"></i><span>EN</span></button>
+      </div>
+      <button class="icon-button" id="themeButton" type="button" title="Activar modo oscuro" aria-label="Activar modo oscuro" aria-pressed="false">
+        <i data-lucide="moon" aria-hidden="true"></i>
+      </button>
       <button class="icon-button" id="refreshButton" type="button" title="Actualizar datos" aria-label="Actualizar datos">
         <i data-lucide="refresh-cw" aria-hidden="true"></i>
       </button>
@@ -37,19 +44,21 @@
         <p class="overview-copy">Consulta incidencias activas y cámaras de la red estatal desde una única vista.</p>
       </div>
       <div class="summary-grid" aria-label="Resumen de incidencias">
-        <article class="metric metric-total"><span>Total</span><strong id="statTotal">--</strong></article>
-        <article class="metric"><span>Accidentes</span><strong id="statAccidents">--</strong></article>
-        <article class="metric"><span>Obras</span><strong id="statRoadworks">--</strong></article>
-        <article class="metric"><span>Obstáculos</span><strong id="statObstructions">--</strong></article>
+        <button class="metric metric-total is-active" type="button" data-kind=""><span>Total</span><strong id="statTotal">--</strong></button>
+        <button class="metric metric-accidents" type="button" data-kind="accident"><span>Accidentes</span><strong id="statAccidents">--</strong></button>
+        <button class="metric metric-roadworks" type="button" data-kind="roadworks"><span>Obras</span><strong id="statRoadworks">--</strong></button>
+        <button class="metric metric-stuck" type="button" data-kind="stuck"><span>Averías</span><strong id="statStuck">--</strong></button>
+        <button class="metric metric-obstructions" type="button" data-kind="obstruction"><span>Obstrucciones</span><strong id="statObstructions">--</strong></button>
+        <button class="metric metric-weather" type="button" data-kind="weather"><span>Clima</span><strong id="statWeather">--</strong></button>
       </div>
     </section>
 
     <nav class="view-tabs" aria-label="Vistas del monitor">
       <button class="tab is-active" type="button" data-view="incidents" aria-selected="true">
-        <i data-lucide="triangle-alert" aria-hidden="true"></i> Incidencias <span id="incidentTabCount">0</span>
+        <i data-lucide="triangle-alert" aria-hidden="true"></i><span class="tab-label">Incidencias</span><span class="tab-count" id="incidentTabCount">0</span>
       </button>
       <button class="tab" type="button" data-view="cameras" aria-selected="false">
-        <i data-lucide="camera" aria-hidden="true"></i> Cámaras <span id="cameraTabCount">0</span>
+        <i data-lucide="camera" aria-hidden="true"></i><span class="tab-label">Cámaras</span><span class="tab-count" id="cameraTabCount">0</span>
       </button>
     </nav>
 
@@ -65,6 +74,7 @@
           <div id="incidentFilters">
             <label>Municipio<input id="municipalityFilter" name="municipality" type="search" placeholder="Todos" autocomplete="off"></label>
             <label>Gravedad<select id="severityFilter" name="severity"><option value="">Todas</option><option value="highest">Muy alta</option><option value="high">Alta</option><option value="medium">Media</option><option value="low">Baja</option></select></label>
+            <label>Cámara<select id="cameraCoverageFilter" name="camera"><option value="">Todas</option><option value="with">Con cámara</option><option value="without">Sin cámara</option></select></label>
           </div>
           <div id="cameraFilters" hidden>
             <label>Punto kilométrico<input id="kmFilter" name="km" type="search" placeholder="Ej. 24.5" autocomplete="off"></label>
