@@ -1,5 +1,9 @@
+import pytest
+
+from dgt_monitor.core.exceptions import DgtParseError
 from dgt_monitor.infrastructure.cache import TtlCache
 from dgt_monitor.infrastructure.parsers import CameraParser, IncidentParser
+from dgt_monitor.infrastructure.parsers.base import Datex2Parser
 
 
 INCIDENT_XML = """<payload xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -38,3 +42,58 @@ def test_cache_loads_once_and_returns_isolated_values():
 
     assert calls == [1]
     assert second == [1]
+
+
+def test_cache_invalidate_forces_reload():
+    calls = []
+    cache = TtlCache[list[int]](60)
+
+    cache.get_or_load("items", lambda: calls.append(1) or [1])
+    cache.invalidate("items")
+    cache.get_or_load("items", lambda: calls.append(2) or [2])
+
+    assert calls == [1, 2]
+
+
+def test_cache_clear_removes_all_entries():
+    calls = []
+    cache = TtlCache[list[int]](60)
+
+    cache.get_or_load("a", lambda: calls.append("a") or [1])
+    cache.get_or_load("b", lambda: calls.append("b") or [2])
+    cache.clear()
+    cache.get_or_load("a", lambda: calls.append("a2") or [10])
+
+    assert "a2" in calls
+
+
+def test_parsers_raise_on_invalid_xml():
+    with pytest.raises(DgtParseError):
+        IncidentParser().parse("not valid xml <<<")
+    with pytest.raises(DgtParseError):
+        CameraParser().parse("not valid xml <<<")
+
+
+def test_incident_parser_skips_situation_without_record():
+    xml = """<payload xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<situation id="empty-sit"></situation></payload>"""
+    incidents = IncidentParser().parse(xml)
+    assert incidents == []
+
+
+def test_incident_parser_appends_detailed_cause():
+    xml = """<payload xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<situation id="sit-2">
+<situationRecord id="rec-2" version="1" xsi:type="WeatherRelatedRoadConditions">
+<causeType>weatherRelatedRoadConditions</causeType>
+<detailedCauseType><value>fog</value></detailedCauseType>
+<roadName>AP-7</roadName><province>Valencia</province>
+</situationRecord></situation></payload>"""
+    incident = IncidentParser().parse(xml)[0]
+    assert incident.cause == "weatherRelatedRoadConditions - fog"
+    assert "Niebla" in incident.cause_label
+
+
+def test_datex2_optional_float_returns_none_for_invalid():
+    assert Datex2Parser.optional_float("not-a-number") is None
+    assert Datex2Parser.optional_float("") is None

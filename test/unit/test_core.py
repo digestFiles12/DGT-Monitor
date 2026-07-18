@@ -26,3 +26,7 @@ def test_text_translation_and_location_helpers():
 def test_haversine_distance_for_nearby_points():
     distance = DistanceCalculator().haversine_km(40.4168, -3.7038, 40.4170, -3.7040)
     assert 0 < distance < 0.1
+
+
+def test_parse_kilometer_point_returns_none_for_nonnumeric():
+    assert parse_kilometer_point("no hay número aquí") is None
