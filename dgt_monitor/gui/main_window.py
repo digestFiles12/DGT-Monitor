@@ -26,6 +26,7 @@ from PyQt6.QtWidgets import (
 
 from dgt_monitor.application.facade import DgtApplicationService
 from dgt_monitor.core.models import IncidentFilters
+from dgt_monitor.gui.dialogs import CamerasDialog
 from dgt_monitor.gui.workers import IncidentLoadWorker
 
 
@@ -38,6 +39,8 @@ class MainWindow(QMainWindow):
         self._thread: QThread | None = None
         self._worker: IncidentLoadWorker | None = None
         self._items: list[dict[str, Any]] = []
+        self._selected_incident: dict[str, Any] | None = None
+        self._camera_dialogs: list[CamerasDialog] = []
         self.setWindowTitle("DGT Monitor")
         self.resize(1280, 780)
         self.setMinimumSize(900, 600)
@@ -139,8 +142,12 @@ class MainWindow(QMainWindow):
         self.detail = QTextBrowser()
         self.detail.setOpenExternalLinks(True)
         self.detail.setHtml("<p>Selecciona una incidencia para consultar sus datos.</p>")
+        self.cameras_button = QPushButton("Ver cámaras")
+        self.cameras_button.setEnabled(False)
+        self.cameras_button.clicked.connect(self.open_cameras_dialog)
         detail_layout.addWidget(detail_title)
         detail_layout.addWidget(self.detail)
+        detail_layout.addWidget(self.cameras_button)
         splitter.addWidget(detail_frame)
         splitter.setSizes((900, 320))
         root_layout.addWidget(splitter, 1)
@@ -199,8 +206,12 @@ class MainWindow(QMainWindow):
     def _show_selection(self) -> None:
         row = self.table.currentRow()
         if row < 0 or row >= len(self._items):
+            self._selected_incident = None
+            self.cameras_button.setEnabled(False)
             return
         incident = self._items[row]
+        self._selected_incident = incident
+        self.cameras_button.setEnabled(True)
         fields = (
             ("Carretera", incident.get("road")),
             ("Punto kilométrico", incident.get("km")),
@@ -213,6 +224,19 @@ class MainWindow(QMainWindow):
         )
         rows = "".join(f"<tr><th>{name}</th><td>{value or '--'}</td></tr>" for name, value in fields)
         self.detail.setHtml(f"<table>{rows}</table>")
+
+    def open_cameras_dialog(self) -> CamerasDialog | None:
+        if not self._selected_incident:
+            return None
+        dialog = CamerasDialog(self._service, self._selected_incident, self)
+        self._camera_dialogs.append(dialog)
+        dialog.destroyed.connect(lambda _=None, item=dialog: self._forget_camera_dialog(item))
+        dialog.show()
+        return dialog
+
+    def _forget_camera_dialog(self, dialog: CamerasDialog) -> None:
+        if dialog in self._camera_dialogs:
+            self._camera_dialogs.remove(dialog)
 
     def _show_error(self, message: str) -> None:
         self.status_label.setText("Sin conexión")
@@ -229,6 +253,8 @@ class MainWindow(QMainWindow):
         self.load_completed.emit()
 
     def closeEvent(self, event) -> None:
+        for dialog in list(self._camera_dialogs):
+            dialog.close()
         if self._thread and self._thread.isRunning():
             self._thread.quit()
             self._thread.wait(1000)

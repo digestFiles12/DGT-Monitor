@@ -7,12 +7,15 @@ La primera versión modular de la GUI está operativa. Consume `DgtApplicationSe
 ```text
 dgt_monitor/gui/
   __main__.py
+  dialogs/{__init__,cameras}.py
   entrypoints.py
   main_window.py
   workers.py
 ```
 
 `MainWindow` ofrece filtros por provincia, municipio, carretera y gravedad, tarjetas estadísticas, tabla seleccionable y panel de detalle. `IncidentLoadWorker` ejecuta la carga fuera del hilo de interfaz y propaga payload, error y finalización mediante señales.
+
+`CamerasDialog` muestra cámaras cercanas de una incidencia seleccionada en un diálogo no modal. Construye `CameraFilters` con carretera, provincia, punto kilométrico y coordenadas de la incidencia, ejecuta `CameraLoadWorker` en `QThread` y mantiene vivas las referencias hasta la finalización.
 
 ## Ejecución
 
@@ -35,7 +38,6 @@ dgt_monitor/gui/
 
 ## Pendiente
 
-- Worker y diálogo no modal para cámaras cercanas.
-- Visor de imágenes con conservación de aspecto.
+- Descarga/visor asíncrono de imágenes con conservación de aspecto.
 - Temporizador configurable y registro de actividad visible.
 - Wrappers de compatibilidad de escritorio.

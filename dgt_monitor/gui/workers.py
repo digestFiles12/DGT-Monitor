@@ -3,7 +3,7 @@
 from PyQt6.QtCore import QObject, pyqtSignal, pyqtSlot
 
 from dgt_monitor.application.facade import DgtApplicationService
-from dgt_monitor.core.models import IncidentFilters
+from dgt_monitor.core.models import CameraFilters, IncidentFilters
 
 
 class IncidentLoadWorker(QObject):
@@ -20,6 +20,26 @@ class IncidentLoadWorker(QObject):
     def run(self) -> None:
         try:
             self.loaded.emit(self._service.get_incident_payload(self._filters))
+        except Exception as exc:
+            self.error.emit(str(exc))
+        finally:
+            self.finished.emit()
+
+
+class CameraLoadWorker(QObject):
+    loaded = pyqtSignal(object)
+    error = pyqtSignal(str)
+    finished = pyqtSignal()
+
+    def __init__(self, service: DgtApplicationService, filters: CameraFilters) -> None:
+        super().__init__()
+        self._service = service
+        self._filters = filters
+
+    @pyqtSlot()
+    def run(self) -> None:
+        try:
+            self.loaded.emit(self._service.get_cameras(self._filters))
         except Exception as exc:
             self.error.emit(str(exc))
         finally:
