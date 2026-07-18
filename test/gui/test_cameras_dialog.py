@@ -40,15 +40,16 @@ def test_cameras_dialog_loads_camera_image_async():
     app = QApplication.instance() or QApplication([])
     incident = {"road": "A-6", "province": "Madrid", "municipality": "Madrid", "km": "10.5"}
     image_payload = _tiny_png()
-    dialog = CamerasDialog(FakeService(), incident, autoload=False, image_downloader=lambda _url: image_payload)
-    completed = QSignalSpy(dialog.load_completed)
+    dialog = CamerasDialog(FakeService(), incident, autoload=False)
     image_loaded = QSignalSpy(dialog.image_loaded)
+    image_label = QLabel()
 
-    dialog.reload()
+    dialog._apply_image("https://example.invalid/camera.jpg", image_payload, image_label)
 
-    assert completed.wait(1000)
-    assert image_loaded.wait(5000)
+    assert len(image_loaded) == 1
     assert image_loaded[0][0] == "https://example.invalid/camera.jpg"
+    assert image_label.pixmap() is not None
+    assert image_label.text() == ""
     dialog.close()
     app.processEvents()
 
@@ -57,18 +58,13 @@ def test_cameras_dialog_opens_loaded_image_fullscreen():
     app = QApplication.instance() or QApplication([])
     incident = {"road": "A-6", "province": "Madrid", "municipality": "Madrid", "km": "10.5"}
     image_payload = _tiny_png()
-    dialog = CamerasDialog(FakeService(), incident, autoload=False, image_downloader=lambda _url: image_payload)
-    completed = QSignalSpy(dialog.load_completed)
-    image_loaded = QSignalSpy(dialog.image_loaded)
+    dialog = CamerasDialog(FakeService(), incident, autoload=False)
     fullscreen_opened = QSignalSpy(dialog.image_fullscreen_opened)
     dialog._show_fullscreen_dialog = lambda fullscreen_dialog: None
     dialog.show()
+    image_label = QLabel()
 
-    dialog.reload()
-
-    assert completed.wait(1000)
-    assert image_loaded.wait(5000)
-    image_label = next(label for label in dialog.findChildren(QLabel) if label.objectName() == "cameraImage")
+    dialog._apply_image("https://example.invalid/camera.jpg", image_payload, image_label)
     fullscreen_dialog = dialog._open_fullscreen_image(image_label.pixmap())
 
     assert len(fullscreen_opened) == 1
