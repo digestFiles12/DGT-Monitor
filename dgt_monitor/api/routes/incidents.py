@@ -19,8 +19,10 @@ def incidents(
     road: str | None = None,
     severity: str | None = None,
     kind: str | None = None,
+    camera: str | None = None,
+    lang: str = "es",
 ) -> dict:
-    return service.get_incident_payload(IncidentFilters(province, municipality, road, severity, kind))
+    return service.get_incident_payload(IncidentFilters(province, municipality, road, severity, kind, camera), language=lang)
 
 
 @router.websocket("/ws/incidents")
@@ -30,13 +32,14 @@ async def incidents_websocket(websocket: WebSocket) -> None:
     interval = max(5, min(int(query.get("interval", "120")), 300))
     filters = IncidentFilters(
         query.get("province"), query.get("municipality"), query.get("road"),
-        query.get("severity"), query.get("kind"),
+        query.get("severity"), query.get("kind"), query.get("camera"),
     )
+    language = query.get("lang", "es")
     service: DgtApplicationService = websocket.app.state.dgt_service
     try:
         while True:
             try:
-                payload = await asyncio.to_thread(service.get_incident_payload, filters)
+                payload = await asyncio.to_thread(service.get_incident_payload, filters, False, language)
                 payload.update(transport="websocket", refresh_interval_seconds=interval)
                 await websocket.send_json(payload)
             except DgtError as exc:

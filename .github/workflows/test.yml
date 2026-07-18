@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [feature/initial-oop-architecture, main]
+    branches: [main, develop, release, "feature/**", "release/**", "hotfix/**"]
   pull_request:
-    branches: [feature/initial-oop-architecture, main]
+    branches: [develop, release, main]
 
 jobs:
   test:
@@ -47,11 +47,11 @@ jobs:
     name: Deploy to Render
     runs-on: ubuntu-latest
     needs: test
-    if: github.ref == 'refs/heads/feature/initial-oop-architecture' && github.event_name == 'push'
+    if: (github.ref == 'refs/heads/release' || github.ref == 'refs/heads/main') && github.event_name == 'push'
     
     steps:
       - name: Trigger Render deployment
         run: |
           echo "Render will auto-deploy from render.yaml on push"
-          echo "Branch: feature/initial-oop-architecture"
+          echo "Branch: ${GITHUB_REF_NAME}"
           echo "Health check: GET /api/health"

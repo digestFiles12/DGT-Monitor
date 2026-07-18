@@ -18,12 +18,14 @@ from PyQt6.QtWidgets import (
 
 from dgt_monitor.application.facade import DgtApplicationService
 from dgt_monitor.core.models import CameraFilters
+from dgt_monitor.gui.theme import ThemeName, camera_dialog_stylesheet, next_theme, normalize_theme
 from dgt_monitor.gui.workers import CameraLoadWorker, ImageLoadWorker
 
 
 class CamerasDialog(QDialog):
     load_completed = pyqtSignal()
     image_loaded = pyqtSignal(str)
+    image_fullscreen_opened = pyqtSignal()
 
     def __init__(
         self,
@@ -32,6 +34,7 @@ class CamerasDialog(QDialog):
         parent: QWidget | None = None,
         autoload: bool = True,
         image_downloader: Callable[[str], bytes] | None = None,
+        theme: str = "light",
     ) -> None:
         super().__init__(parent)
         self._service = service
@@ -40,7 +43,9 @@ class CamerasDialog(QDialog):
         self._thread: QThread | None = None
         self._worker: CameraLoadWorker | None = None
         self._image_jobs: list[tuple[QThread, ImageLoadWorker]] = []
+        self._fullscreen_dialogs: list[QDialog] = []
         self._items: list[dict[str, Any]] = []
+        self._theme: ThemeName = normalize_theme(theme)
         self.setModal(False)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)
         self.setWindowTitle(self._title_for_incident())
@@ -87,6 +92,10 @@ class CamerasDialog(QDialog):
         header.addStretch()
         self.refresh_button = QPushButton("Actualizar")
         self.refresh_button.clicked.connect(self.reload)
+        self.theme_button = QPushButton("Modo oscuro")
+        self.theme_button.clicked.connect(self.toggle_theme)
+        self._sync_theme_button()
+        header.addWidget(self.theme_button)
         header.addWidget(self.refresh_button)
         layout.addLayout(header)
 
@@ -173,6 +182,17 @@ class CamerasDialog(QDialog):
         self._thread = None
         self.load_completed.emit()
 
+    def toggle_theme(self) -> None:
+        self.set_theme(next_theme(self._theme))
+
+    def set_theme(self, theme: str) -> None:
+        self._theme = normalize_theme(theme)
+        self._sync_theme_button()
+        self._apply_style()
+
+    def _sync_theme_button(self) -> None:
+        self.theme_button.setText("Modo claro" if self._theme == "dark" else "Modo oscuro")
+
     def _load_image(self, url: str, label: QLabel) -> None:
         thread = QThread(self)
         worker = ImageLoadWorker(url, self._image_downloader)
@@ -191,9 +211,27 @@ class CamerasDialog(QDialog):
         if pixmap.loadFromData(image_bytes):
             label.setPixmap(pixmap.scaledToWidth(460, Qt.TransformationMode.SmoothTransformation))
             label.setText("")
+            label.setCursor(Qt.CursorShape.PointingHandCursor)
+            label.setToolTip("Abrir imagen a pantalla completa")
+            label.mousePressEvent = lambda _event, image=QPixmap(pixmap): self._open_fullscreen_image(image)
         else:
             label.setText("Imagen no disponible")
         self.image_loaded.emit(url)
+
+    def _open_fullscreen_image(self, pixmap: QPixmap) -> QDialog:
+        dialog = _FullscreenImageDialog(pixmap, self)
+        self._fullscreen_dialogs.append(dialog)
+        dialog.destroyed.connect(lambda _=None, item=dialog: self._forget_fullscreen_dialog(item))
+        self._show_fullscreen_dialog(dialog)
+        self.image_fullscreen_opened.emit()
+        return dialog
+
+    def _show_fullscreen_dialog(self, dialog: QDialog) -> None:
+        dialog.showFullScreen()
+
+    def _forget_fullscreen_dialog(self, dialog: QDialog) -> None:
+        if dialog in self._fullscreen_dialogs:
+            self._fullscreen_dialogs.remove(dialog)
 
     def _forget_image_job(self, item: tuple[QThread, ImageLoadWorker]) -> None:
         thread, worker = item
@@ -215,6 +253,8 @@ class CamerasDialog(QDialog):
                 widget.deleteLater()
 
     def closeEvent(self, event) -> None:
+        for dialog in list(self._fullscreen_dialogs):
+            dialog.close()
         if self._thread and self._thread.isRunning():
             self._thread.quit()
             self._thread.wait(1000)
@@ -253,14 +293,43 @@ class CamerasDialog(QDialog):
         return text or None
 
     def _apply_style(self) -> None:
-        self.setStyleSheet("""
-            QDialog { background: #f4f6f5; color: #17212b; font-family: 'Segoe UI'; font-size: 13px; }
-            QLabel#dialogTitle { font-size: 20px; font-weight: 700; }
-            QLabel#dialogSubtitle, QLabel#statusLabel, QLabel#cameraMeta { color: #64717d; }
-            QScrollArea { border: 0; background: transparent; }
-            QFrame#cameraCard { background: white; border: 1px solid #d7dde1; border-radius: 3px; }
-            QLabel#cameraTitle { font-size: 16px; font-weight: 700; color: #b91c1c; }
-            QLabel#cameraImage { color: #475569; background: #eef1f2; padding: 8px; border-radius: 3px; }
-            QPushButton { min-height: 34px; padding: 0 14px; background: white; border: 1px solid #aeb7be; border-radius: 3px; font-weight: 600; }
-            QPushButton:hover { border-color: #17212b; }
-        """)
+        self.setStyleSheet(camera_dialog_stylesheet(self._theme))
+
+
+class _FullscreenImageDialog(QDialog):
+    def __init__(self, pixmap: QPixmap, parent: QWidget | None = None) -> None:
+        super().__init__(parent)
+        self._pixmap = pixmap
+        self.setWindowTitle("Imagen de cámara")
+        self.setStyleSheet("QDialog { background: #03070c; } QLabel { background: #03070c; }")
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.image_label = QLabel()
+        self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.image_label.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.image_label.setToolTip("Cerrar")
+        layout.addWidget(self.image_label)
+        self._sync_pixmap()
+
+    def resizeEvent(self, event) -> None:
+        super().resizeEvent(event)
+        self._sync_pixmap()
+
+    def keyPressEvent(self, event) -> None:
+        if event.key() == Qt.Key.Key_Escape:
+            self.close()
+            return
+        super().keyPressEvent(event)
+
+    def mousePressEvent(self, event) -> None:
+        self.close()
+        super().mousePressEvent(event)
+
+    def _sync_pixmap(self) -> None:
+        if self.width() <= 0 or self.height() <= 0:
+            return
+        self.image_label.setPixmap(self._pixmap.scaled(
+            self.size(),
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation,
+        ))

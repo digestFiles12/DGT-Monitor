@@ -6,7 +6,6 @@ from PyQt6.QtCore import QThread, Qt, pyqtSignal
 from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import (
     QComboBox,
-    QFormLayout,
     QFrame,
     QGridLayout,
     QHBoxLayout,
@@ -27,6 +26,7 @@ from PyQt6.QtWidgets import (
 from dgt_monitor.application.facade import DgtApplicationService
 from dgt_monitor.core.models import IncidentFilters
 from dgt_monitor.gui.dialogs import CamerasDialog
+from dgt_monitor.gui.theme import ThemeName, main_window_stylesheet, next_theme, normalize_theme
 from dgt_monitor.gui.workers import IncidentLoadWorker
 
 
@@ -41,6 +41,8 @@ class MainWindow(QMainWindow):
         self._items: list[dict[str, Any]] = []
         self._selected_incident: dict[str, Any] | None = None
         self._camera_dialogs: list[CamerasDialog] = []
+        self._theme: ThemeName = "light"
+        self._kind_filter = ""
         self.setWindowTitle("DGT Monitor")
         self.resize(1280, 780)
         self.setMinimumSize(900, 600)
@@ -69,7 +71,10 @@ class MainWindow(QMainWindow):
         self.status_label.setObjectName("connectionStatus")
         self.refresh_button = QPushButton("Actualizar")
         self.refresh_button.clicked.connect(self.reload)
+        self.theme_button = QPushButton("Modo oscuro")
+        self.theme_button.clicked.connect(self.toggle_theme)
         header.addWidget(self.status_label)
+        header.addWidget(self.theme_button)
         header.addWidget(self.refresh_button)
         root_layout.addLayout(header)
 
@@ -89,33 +94,47 @@ class MainWindow(QMainWindow):
         self.severity_input.addItem("Alta", "high")
         self.severity_input.addItem("Media", "medium")
         self.severity_input.addItem("Baja", "low")
-        for widget in (self.province_input, self.municipality_input, self.road_input, self.severity_input):
+        self.camera_input = QComboBox()
+        self.camera_input.addItem("Todas las cámaras", "")
+        self.camera_input.addItem("Con cámara", "with")
+        self.camera_input.addItem("Sin cámara", "without")
+        for widget in (self.province_input, self.municipality_input, self.road_input, self.severity_input, self.camera_input):
             controls_layout.addWidget(widget)
         apply_button = QPushButton("Aplicar filtros")
         apply_button.setObjectName("primaryButton")
         apply_button.clicked.connect(self.reload)
         controls_layout.addWidget(apply_button)
+        clear_button = QPushButton("Limpiar")
+        clear_button.clicked.connect(self.clear_filters)
+        controls_layout.addWidget(clear_button)
         root_layout.addWidget(controls)
 
         stats = QGridLayout()
         stats.setSpacing(12)
         self.stat_labels: dict[str, QLabel] = {}
+        self.stat_buttons: dict[str, QPushButton] = {}
         for column, (key, label) in enumerate((
             ("total", "Total"),
             ("accidents", "Accidentes"),
             ("roadworks", "Obras"),
+            ("stuck", "Averías"),
             ("obstructions", "Obstáculos"),
             ("weather", "Clima"),
         )):
-            card = QFrame()
+            card = QPushButton()
             card.setObjectName("statCard")
+            card.setProperty("kind", self._kind_for_stat(key))
+            card.clicked.connect(lambda _checked=False, kind=self._kind_for_stat(key): self._set_kind_filter(kind))
             card_layout = QVBoxLayout(card)
-            card_layout.addWidget(QLabel(label))
+            card_layout.addWidget(QLabel(label), alignment=Qt.AlignmentFlag.AlignCenter)
             value = QLabel("--")
             value.setObjectName("statValue")
+            value.setAlignment(Qt.AlignmentFlag.AlignCenter)
             card_layout.addWidget(value)
             self.stat_labels[key] = value
+            self.stat_buttons[key] = card
             stats.addWidget(card, 0, column)
+        self._sync_stat_buttons()
         root_layout.addLayout(stats)
 
         splitter = QSplitter(Qt.Orientation.Horizontal)
@@ -156,7 +175,8 @@ class MainWindow(QMainWindow):
         self.setTabOrder(self.province_input, self.municipality_input)
         self.setTabOrder(self.municipality_input, self.road_input)
         self.setTabOrder(self.road_input, self.severity_input)
-        self.setTabOrder(self.severity_input, self.refresh_button)
+        self.setTabOrder(self.severity_input, self.camera_input)
+        self.setTabOrder(self.camera_input, self.refresh_button)
 
     def reload(self) -> None:
         if self._thread and self._thread.isRunning():
@@ -166,6 +186,8 @@ class MainWindow(QMainWindow):
             municipality=self.municipality_input.text().strip() or None,
             road=self.road_input.text().strip().upper() or None,
             severity=self.severity_input.currentData() or None,
+            kind=self._kind_filter or None,
+            camera=self.camera_input.currentData() or None,
         )
         self.refresh_button.setEnabled(False)
         self.status_label.setText("Actualizando...")
@@ -203,6 +225,41 @@ class MainWindow(QMainWindow):
                 self.table.setItem(row, column, item)
         self.status_label.setText(f"En línea · {len(self._items)} incidencias")
 
+    def clear_filters(self) -> None:
+        self.province_input.clear()
+        self.municipality_input.clear()
+        self.road_input.clear()
+        self.severity_input.setCurrentIndex(0)
+        self.camera_input.setCurrentIndex(0)
+        self._set_kind_filter("", reload=False)
+        self.reload()
+
+    def _set_kind_filter(self, kind: str, reload: bool = True) -> None:
+        self._kind_filter = kind
+        self._sync_stat_buttons()
+        if reload:
+            self.reload()
+
+    def _sync_stat_buttons(self) -> None:
+        for key, button in self.stat_buttons.items():
+            active = self._kind_for_stat(key) == self._kind_filter
+            button.setProperty("active", active)
+            style = button.style()
+            if style:
+                style.unpolish(button)
+                style.polish(button)
+
+    @staticmethod
+    def _kind_for_stat(key: str) -> str:
+        return {
+            "total": "",
+            "accidents": "accident",
+            "roadworks": "roadworks",
+            "stuck": "stuck",
+            "obstructions": "obstruction",
+            "weather": "weather",
+        }[key]
+
     def _show_selection(self) -> None:
         row = self.table.currentRow()
         if row < 0 or row >= len(self._items):
@@ -228,7 +285,7 @@ class MainWindow(QMainWindow):
     def open_cameras_dialog(self) -> CamerasDialog | None:
         if not self._selected_incident:
             return None
-        dialog = CamerasDialog(self._service, self._selected_incident, self)
+        dialog = CamerasDialog(self._service, self._selected_incident, self, theme=self._theme)
         self._camera_dialogs.append(dialog)
         dialog.destroyed.connect(lambda _=None, item=dialog: self._forget_camera_dialog(item))
         dialog.show()
@@ -252,6 +309,16 @@ class MainWindow(QMainWindow):
         self._thread = None
         self.load_completed.emit()
 
+    def toggle_theme(self) -> None:
+        self.set_theme(next_theme(self._theme))
+
+    def set_theme(self, theme: str) -> None:
+        self._theme = normalize_theme(theme)
+        self.theme_button.setText("Modo claro" if self._theme == "dark" else "Modo oscuro")
+        self._apply_style()
+        for dialog in list(self._camera_dialogs):
+            dialog.set_theme(self._theme)
+
     def closeEvent(self, event) -> None:
         for dialog in list(self._camera_dialogs):
             dialog.close()
@@ -269,21 +336,4 @@ class MainWindow(QMainWindow):
         return QColor({"highest": "#b91c1c", "high": "#dc2626", "medium": "#b45309", "low": "#15803d"}.get(value.lower(), "#475569"))
 
     def _apply_style(self) -> None:
-        self.setStyleSheet("""
-            QMainWindow, QWidget { background: #f4f6f5; color: #17212b; font-family: 'Segoe UI'; font-size: 13px; }
-            QLabel#eyebrow { color: #b91c1c; font-size: 11px; font-weight: 700; }
-            QLabel#title { font-size: 30px; font-weight: 700; }
-            QLabel#sectionTitle { font-size: 18px; font-weight: 700; }
-            QLabel#connectionStatus { color: #475569; font-weight: 600; padding: 0 10px; }
-            QFrame#panel, QFrame#statCard { background: white; border: 1px solid #d7dde1; border-radius: 3px; }
-            QFrame#statCard QLabel#statValue { color: #b91c1c; font-size: 26px; font-weight: 700; }
-            QLineEdit, QComboBox { min-height: 36px; padding: 0 10px; background: white; border: 1px solid #b8c1c8; border-radius: 3px; }
-            QLineEdit:focus, QComboBox:focus { border-color: #b91c1c; }
-            QPushButton { min-height: 36px; padding: 0 16px; background: white; border: 1px solid #aeb7be; border-radius: 3px; font-weight: 600; }
-            QPushButton:hover { border-color: #17212b; }
-            QPushButton#primaryButton { background: #b91c1c; color: white; border: 0; }
-            QPushButton#primaryButton:hover { background: #991b1b; }
-            QTableWidget { background: white; alternate-background-color: #f8fafb; border: 1px solid #d7dde1; gridline-color: #e2e7ea; selection-background-color: #fee2e2; selection-color: #17212b; }
-            QHeaderView::section { min-height: 34px; background: #e9edef; border: 0; border-right: 1px solid #d7dde1; padding: 0 8px; font-weight: 700; }
-            QTextBrowser { background: white; border: 0; }
-        """)
+        self.setStyleSheet(main_window_stylesheet(self._theme))

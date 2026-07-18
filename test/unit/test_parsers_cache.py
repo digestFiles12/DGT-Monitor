@@ -1,3 +1,4 @@
+from dgt_monitor.core.localization import Translator
 from dgt_monitor.infrastructure.cache import TtlCache
 from dgt_monitor.infrastructure.parsers import CameraParser, IncidentParser
 
@@ -26,6 +27,13 @@ def test_parsers_return_domain_models():
     assert incident.latitude == 40.4168
     assert camera.id == "cam-1"
     assert camera.image_url.endswith("cam.jpg")
+
+
+def test_incident_parser_accepts_english_translator():
+    incident = IncidentParser(translator=Translator("en")).parse(INCIDENT_XML)[0]
+
+    assert incident.type_label == "Accident"
+    assert incident.cause_label == "Accident"
 
 
 def test_cache_loads_once_and_returns_isolated_values():
