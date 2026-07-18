@@ -12,11 +12,11 @@ Reimplementar DGT Monitor con programacion orientada a objetos, separando domini
 4. [x] Implementar servicios compartidos de incidentes y camaras.
 5. [x] Implementar dashboard FastAPI, WebSocket y PWA.
 6. [~] Implementar GUI PyQt6 modular y dialogos no modales. Ventana, filtros, estadísticas, tabla, detalle, diálogo no modal de cámaras cercanas y visor asíncrono de imágenes completados; wrappers, temporizador y registro visible pendientes.
-7. [~] Completar pruebas, CI, despliegue y documentacion. Suite actual con 43 tests, Render y Actions configurados; quedan smoke manual y cierre de wrappers.
+7. [~] Completar pruebas, CI, despliegue y documentacion. Suite actual con 48 tests, Render y Actions configurados; quedan smoke manual y cierre de wrappers.
 
 ## Estado actual
 
-El flujo compartido, la API modular, el dashboard web/PWA y la GUI modular ya funcionan. La GUI carga incidencias, cámaras e imágenes en `QThread`, filtra mediante modelos de dominio y presenta estadísticas, tabla, detalle, cámaras cercanas y miniaturas sin duplicar lógica de aplicación. El dashboard web se sirve desde `/` para Render.
+El flujo compartido, la API modular, el dashboard web/PWA y la GUI modular ya funcionan. La GUI carga incidencias, cámaras e imágenes en `QThread`, filtra mediante modelos de dominio y presenta filtros completos, estadísticas clicables, tabla, detalle, cámaras cercanas, miniaturas, visor fullscreen y modo claro/oscuro sin duplicar lógica de aplicación. El dashboard web se sirve desde `/` para Render e incluye los mismos filtros/celdas, modo claro/oscuro persistente y visor fullscreen de cámaras.
 
 ## Compatibilidad
 

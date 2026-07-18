@@ -12,9 +12,9 @@ Phase 7 architecture refactoring and the later dashboard/GUI increments are comp
 - ✅ Implements a clean layered architecture (domain → infrastructure → application → API/GUI)
 - ✅ Provides thread-safe activity logging with dual backends (in-memory or SQLite)
 - ✅ Exposes REST API with WebSocket and Server-Sent Events
-- ✅ Serves a responsive dashboard web/PWA from `/`
-- ✅ Includes a modular PyQt6 GUI with non-modal camera dialog and async image loading
-- ✅ Includes comprehensive test coverage (43 tests, all passing)
+- ✅ Serves a responsive dashboard web/PWA from `/` with complete filters, clickable stat cells, light/dark mode and fullscreen camera image viewer
+- ✅ Includes a modular PyQt6 GUI with complete filters, clickable stat cells, non-modal camera dialog, async image loading, fullscreen viewer and light/dark mode
+- ✅ Includes comprehensive test coverage (48 tests, all passing)
 - ✅ Is deployable to Render with configured CI/CD
 - ✅ Has updated handoff and operational documentation
 
@@ -147,7 +147,7 @@ Phase 7 architecture refactoring and the later dashboard/GUI increments are comp
 
 ---
 
-## Test Suite: 43/43 Passing ✅
+## Test Suite: 48/48 Passing ✅
 
 ### Test Categories
 
@@ -266,7 +266,7 @@ Configuration in `.github/workflows/test.yml`:
 | `docs/CONTINUIDAD_NUEVO_CHAT.md` | ✅ | Onboarding template |
 | `docs/DECISIONES.md` | ✅ | Architectural decisions recorded |
 | `docs/DESPLIEGUE.md` | ✅ | Render configuration, env vars |
-| `docs/PRUEBAS.md` | ✅ | 43 tests, execution, validation |
+| `docs/PRUEBAS.md` | ✅ | 48 tests, execution, validation |
 | `docs/PHASE_7_COMPLETED.md` | ✅ | This document (handoff reference) |
 
 ---
@@ -298,7 +298,7 @@ python -m pip install -e ".[dev]"
 ### Validate Current State
 
 ```powershell
-# Run full test suite (43 tests)
+# Run full test suite (48 tests)
 python -m pytest test -q
 
 # Compile check (no errors)
@@ -314,7 +314,7 @@ git log --oneline -5
 
 ### What's Ready
 
-- ✅ **All 43 tests passing** with comprehensive coverage
+- ✅ **All 48 tests passing** with comprehensive coverage
 - ✅ **Phase 7 architecture complete** with activity system, API auth, deployment
 - ✅ **Render deployment configured** with CI/CD pipeline
 - ✅ **Documentation complete** for handoff to next phase or new developer

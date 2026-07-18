@@ -2,7 +2,7 @@
 
 ## Estado
 
-La suite actual contiene 43 pruebas y cubre modelos, texto, distancia, parsers, caché, servicios, fachada, REST, WebSocket, Activity API, dashboard/PWA y GUI PyQt6 offscreen.
+La suite actual contiene 48 pruebas y cubre modelos, texto, distancia, parsers, caché, servicios, fachada, REST, WebSocket, Activity API, dashboard/PWA con filtros completos/modo oscuro y GUI PyQt6 offscreen con filtros completos y visor fullscreen de cámaras.
 
 ## Comandos
 

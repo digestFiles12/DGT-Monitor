@@ -44,10 +44,17 @@ class IncidentService:
             "obstruction": "obstruction" in cause,
             "weather": any(word in cause for word in ("weather", "fog", "snow", "flooding", "ice", "rain")),
         }
+        camera_matches = {
+            None: True,
+            "": True,
+            "with": item.has_camera_coverage,
+            "without": not item.has_camera_coverage,
+        }
         return (
             matches_text(item.province, filters.province)
             and matches_text(item.municipality, filters.municipality)
             and matches_text(item.road, filters.road)
             and (not filters.severity or item.severity.casefold() == filters.severity.casefold())
             and kind_matches.get(filters.kind, True)
+            and camera_matches.get(filters.camera, True)
         )

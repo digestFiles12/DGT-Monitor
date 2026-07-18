@@ -42,7 +42,7 @@ class IncidentParser(Datex2Parser):
             start_time=get("overallStartTime"), end_time=get("overallEndTime"),
             severity=get("severity") or self.text(situation, "overallSeverity"), type=incident_type,
             type_label=self._translator.translate(incident_type), cause=cause,
-            cause_label=" - ".join(self._translator.translate(part.strip()) for part in cause.split(" - ")),
+            cause_label=self._translator.translate_compound(cause),
             road=self._cleaner.clean(get("roadName")) or "Desconocida", destination=self._cleaner.clean(get("roadDestination")),
             municipality=self._cleaner.clean(get("municipality")), province=self._cleaner.clean(get("province")),
             community=self._cleaner.clean(get("autonomousCommunity")), km=get("kilometerPoint"),

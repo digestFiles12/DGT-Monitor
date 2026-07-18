@@ -85,6 +85,7 @@ class IncidentFilters:
     road: str | None = None
     severity: str | None = None
     kind: str | None = None
+    camera: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

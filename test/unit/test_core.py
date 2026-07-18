@@ -18,6 +18,15 @@ def test_models_serialize_stable_contract():
 def test_text_translation_and_location_helpers():
     assert TextCleaner().clean("ValÃ©ncia") == "Valéncia"
     assert Translator().translate("highest") == "Crítica"
+    assert Translator("en").translate("highest") == "Critical"
+    assert Translator().translate("RoadOrCarriagewayOrLaneManagement") == "Gestión de vía o carril"
+    assert Translator("en").translate("RoadOrCarriagewayOrLaneManagement") == "Road, carriageway or lane management"
+    assert Translator().translate("positive") == "Sentido positivo"
+    assert Translator().translate("Lanes Deviated") == "Carriles desviados"
+    assert Translator().translate("unknownFutureCode") == "Unknown Future Code"
+    assert Translator().translate(None) == "Sin dato"
+    assert Translator().translate("N/A") == "Sin dato"
+    assert Translator("en").translate(None) == "N/A"
     assert normalize_road("AP-7") == "AP7"
     assert parse_kilometer_point("PK 12+500") == 12.5
     assert parse_kilometer_point("330,2") == 330.2

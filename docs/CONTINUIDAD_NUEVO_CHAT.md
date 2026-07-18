@@ -7,11 +7,11 @@
 ## Status: proyecto operativo
 
 - ✅ API FastAPI, WebSocket, SSE y Activity API operativas
-- ✅ Dashboard web/PWA servido desde `/` y desplegable en Render
-- ✅ GUI PyQt6 modular con incidencias, dialogo de camaras e imagenes asincronas
+- ✅ Dashboard web/PWA servido desde `/`, con filtros completos, celdas estadísticas clicables, modo claro/oscuro, visor fullscreen de cámaras y desplegable en Render
+- ✅ GUI PyQt6 modular con filtros completos, celdas estadísticas clicables, incidencias, dialogo de camaras, imagenes asincronas, visor fullscreen y modo claro/oscuro
 - ✅ Activity system con backend en memoria o SQLite
 - ✅ Render y GitHub Actions configurados
-- ✅ 43 tests pasando
+- ✅ 48 tests pasando
 
 **See `docs/PHASE_7_COMPLETED.md` for complete project status and handoff documentation.**
 
@@ -35,7 +35,7 @@ python --version
 ### Validate State (Always First)
 
 ```powershell
-# 43 tests should pass
+# 48 tests should pass
 python -m pytest test -q
 
 # No compilation errors
@@ -82,7 +82,7 @@ $env:ACTIVITY_REVOKED_API_KEYS = "revoked1"  # Revoked API keys
 | `docs/PLAN_REFACTORIZACION.md` | Refactoring phases (1-7) |
 | `docs/ARQUITECTURA.md` | Layered architecture diagram |
 | `docs/PHASE_7_COMPLETED.md` | **← MAIN HANDOFF DOC: Exact current status** |
-| `docs/PRUEBAS.md` | Test suite (43 tests, execution) |
+| `docs/PRUEBAS.md` | Test suite (48 tests, execution) |
 | `docs/DESPLIEGUE.md` | Render configuration, env vars |
 | `docs/DECISIONES.md` | Architectural constraints & decisions |
 
