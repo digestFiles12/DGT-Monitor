@@ -23,7 +23,7 @@ gui = [
 dev = [
   "dgt-monitor[web,gui]",
   "pytest>=8.0.0",
-  "httpx>=0.28.0",
+  "httpx2>=0.28.0",
 ]
 
 [tool.setuptools.packages.find]
