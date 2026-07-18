@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1a73e8" />
+  <meta name="description" content="Monitor de incidentes y cámaras de tráfico de la DGT" />
+  <title>DGT Monitor</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/static/icons/icon-192.png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="/static/icons/icon-192.png" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>DGT Monitor</h1>
+    <span id="status-badge" class="badge badge--connecting">Conectando…</span>
+  </header>
+
+  <main class="app-main">
+    <section class="filters">
+      <form id="filter-form" class="filter-form">
+        <label>
+          Provincia
+          <input type="text" id="filter-province" name="province" placeholder="Madrid" />
+        </label>
+        <label>
+          Carretera
+          <input type="text" id="filter-road" name="road" placeholder="A-6" />
+        </label>
+        <label>
+          Gravedad
+          <select id="filter-severity" name="severity">
+            <option value="">Todas</option>
+            <option value="high">Alta</option>
+            <option value="medium">Media</option>
+            <option value="low">Baja</option>
+          </select>
+        </label>
+        <button type="submit" class="btn btn--primary">Filtrar</button>
+        <button type="button" id="refresh-btn" class="btn">Actualizar</button>
+      </form>
+    </section>
+
+    <section class="stats" id="stats-section" aria-live="polite">
+      <div class="stat-card">
+        <span class="stat-value" id="stat-total">—</span>
+        <span class="stat-label">Total</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="stat-high">—</span>
+        <span class="stat-label">Alta gravedad</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="stat-updated">—</span>
+        <span class="stat-label">Última actualización</span>
+      </div>
+    </section>
+
+    <section class="incidents-section">
+      <h2>Incidentes</h2>
+      <div id="incidents-list" class="incidents-list" aria-live="polite">
+        <p class="placeholder">Cargando incidentes…</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

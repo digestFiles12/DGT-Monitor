@@ -2,9 +2,9 @@
 
 ## Estado
 
-El wrapper ASGI `dashboard.app:app` está implementado. Aún faltan frontend/PWA, `render.yaml` y archivos de requisitos de despliegue.
+El wrapper ASGI `dashboard.app:app` está implementado con frontend PWA, manifest y service worker incluidos.
 
-## Render previsto
+## Render
 
 ```yaml
 services:
@@ -16,7 +16,7 @@ services:
     startCommand: python -m uvicorn dashboard.app:app --host 0.0.0.0 --port $PORT
 ```
 
-Antes de publicar se debe verificar `/api/health`, REST, WebSocket seguro `wss`, manifest, service worker e iconos. El intervalo WebSocket predeterminado es 120 segundos para reducir carga en Render.
+Antes de publicar se debe verificar `/` (HTML), `/api/health`, REST, WebSocket seguro `wss`, `/manifest.webmanifest`, `/sw.js` e iconos en `/static/icons/`. El intervalo WebSocket predeterminado es 120 segundos para reducir carga en Render.
 
 ## Desarrollo local
 

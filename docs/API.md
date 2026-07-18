@@ -4,6 +4,10 @@ La aplicación se construye con `dgt_monitor.api.factory.create_app()`. En produ
 
 ## Endpoints
 
+- `GET /`: dashboard PWA (HTML).
+- `GET /manifest.webmanifest`: manifiesto PWA.
+- `GET /sw.js`: service worker.
+- `GET /static/*`: assets estáticos del dashboard (CSS, JS, iconos).
 - `GET /api/health`: estado y hora UTC.
 - `GET /api/incidents`: filtros `province`, `municipality`, `road`, `severity` y `kind`.
 - `GET /api/cameras`: filtros de provincia, carretera, km, coordenadas, límite y distancia kilométrica máxima.

@@ -18,10 +18,10 @@ Usa este texto al abrir un chat nuevo:
 
 ## Estado Git verificado
 
-- Rama activa: `feature/initial-oop-architecture`.
-- Remoto seguido: `origin/feature/initial-oop-architecture`.
-- Último commit: `651c56f Add modular FastAPI and WebSocket adapters`.
-- Commit anterior estable: `8ccda9b Build shared DGT domain and application services`.
+- Rama activa: `copilot/delegate-to-cloud-agent`.
+- Remoto seguido: `origin/copilot/delegate-to-cloud-agent`.
+- Último commit: Fase 5 PWA completada (dashboard estático, service worker, manifiesto e iconos).
+- Commit anterior estable: `72f2908 Document project handoff and migration state`.
 - El repositorio estaba limpio y sincronizado al crear este documento.
 
 ## Entorno
@@ -40,7 +40,7 @@ Usa este texto al abrir un chat nuevo:
 Última validación completa:
 
 ```text
-9 passed
+15 passed
 compileall correcto
 ```
 
@@ -85,6 +85,10 @@ Las pruebas no acceden a la red DGT.
 
 - `create_app(service=None)` inyectable.
 - CORS configurado.
+- `GET /` — dashboard PWA (HTML).
+- `GET /manifest.webmanifest` — manifiesto PWA.
+- `GET /sw.js` — service worker.
+- `GET /static/*` — assets estáticos (CSS, JS, iconos).
 - `GET /api/health`.
 - `GET /api/incidents`.
 - `GET /api/cameras`.
@@ -108,29 +112,29 @@ dgt_monitor/
   api/routes/{health,incidents,cameras}.py
   gui/__init__.py
 dashboard/{__init__,app}.py
+dashboard/static/{index.html,styles.css,app.js,manifest.webmanifest,sw.js}
+dashboard/static/icons/{icon-192.png,icon-512.png}
 test/unit/{test_core,test_parsers_cache}.py
 test/integration/test_facade.py
 test/api/test_api.py
+test/pwa/test_pwa.py
 ```
 
 ## Siguiente incremento exacto
 
-Completar la fase 5 con dashboard estático y PWA:
+Iniciar la fase 6: GUI PyQt6 modular según `docs/GUI.md`.
 
-1. Consultar `DGT30_GUI/dashboard/static/` como referencia visual y funcional.
-2. Crear `DGT-Monitor/dashboard/static/index.html`, `styles.css`, `app.js`, `manifest.webmanifest`, `sw.js` e iconos.
-3. Crear rutas para `/`, `/manifest.webmanifest` y `/sw.js`, y montar `/static` desde la app factory.
-4. Mantener la API y WebSocket actuales; el frontend solo los consume.
-5. Añadir pruebas de rutas PWA y assets.
+1. Crear la ventana principal `MainWindow` con `QTabWidget` (incidentes y cámaras).
+2. Implementar `IncidentWorker` y `CameraWorker` como `QThread` que llamen al servicio de aplicación.
+3. Implementar widgets de lista y detalle no modales.
+4. Conectar señales (`dataReady`, `errorOccurred`) a los slots de la vista.
+5. Añadir tests offscreen con `QApplication` headless.
 6. Ejecutar suite y compilación.
-7. Actualizar `docs/API.md`, `docs/DESPLIEGUE.md`, este documento y el plan.
+7. Actualizar `docs/CONTINUIDAD_NUEVO_CHAT.md` y el plan.
 8. Crear un commit separado y publicarlo.
-
-Después de PWA, iniciar la GUI modular según `docs/GUI.md`.
 
 ## Pendientes globales
 
-- Dashboard HTML/CSS/JS/PWA.
 - GUI PyQt6 modular completa.
 - Wrappers raíz `DGT.py` y `DGT_V2.py`.
 - Workers QThread de incidentes, cámaras e imágenes.
