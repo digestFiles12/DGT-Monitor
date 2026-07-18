@@ -1,0 +1,13 @@
+README.md
+pyproject.toml
+dgt_monitor/__init__.py
+dgt_monitor.egg-info/PKG-INFO
+dgt_monitor.egg-info/SOURCES.txt
+dgt_monitor.egg-info/dependency_links.txt
+dgt_monitor.egg-info/requires.txt
+dgt_monitor.egg-info/top_level.txt
+dgt_monitor/api/__init__.py
+dgt_monitor/application/__init__.py
+dgt_monitor/core/__init__.py
+dgt_monitor/gui/__init__.py
+dgt_monitor/infrastructure/__init__.py

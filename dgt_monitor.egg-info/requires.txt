@@ -1,0 +1,13 @@
+requests>=2.32.0
+
+[dev]
+dgt-monitor[gui,web]
+pytest>=8.0.0
+httpx>=0.28.0
+
+[gui]
+PyQt6>=6.7.0
+
+[web]
+fastapi>=0.116.0
+uvicorn[standard]>=0.35.0

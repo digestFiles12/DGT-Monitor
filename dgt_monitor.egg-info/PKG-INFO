@@ -1,0 +1,30 @@
+Metadata-Version: 2.4
+Name: dgt-monitor
+Version: 0.1.0
+Summary: Monitor modular de incidentes y camaras de trafico de la DGT
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: requests>=2.32.0
+Provides-Extra: web
+Requires-Dist: fastapi>=0.116.0; extra == "web"
+Requires-Dist: uvicorn[standard]>=0.35.0; extra == "web"
+Provides-Extra: gui
+Requires-Dist: PyQt6>=6.7.0; extra == "gui"
+Provides-Extra: dev
+Requires-Dist: dgt-monitor[gui,web]; extra == "dev"
+Requires-Dist: pytest>=8.0.0; extra == "dev"
+Requires-Dist: httpx>=0.28.0; extra == "dev"
+
+# DGT Monitor
+
+Aplicacion modular para consultar incidentes y camaras de trafico de la DGT desde una GUI PyQt6 y un dashboard FastAPI/PWA.
+
+El proyecto esta siendo implementado desde cero con arquitectura orientada a objetos. Consulta [docs/INDEX.md](docs/INDEX.md) para ver el plan y la documentacion tecnica.
+
+## Desarrollo
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+.\.venv\Scripts\python.exe -m pytest
+```
