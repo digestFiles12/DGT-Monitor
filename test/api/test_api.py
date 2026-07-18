@@ -70,11 +70,12 @@ def test_dashboard_and_pwa_assets_are_served():
     assert "disconnectedFallback" in app_js.text
     assert "isUnavailableCameraImage" in app_js.text
     assert "createIncidentDetailRow" in app_js.text
+    assert "formatHumanDateTime" in app_js.text
     assert "detailLabels" in app_js.text
     assert client.get("/manifest.webmanifest").headers["content-type"].startswith("application/manifest+json")
     service_worker = client.get("/sw.js")
     assert service_worker.status_code == 200
-    assert "dgt-monitor-v14" in service_worker.text
+    assert "dgt-monitor-v16" in service_worker.text
 
 
 def test_websocket_sends_filtered_payload():

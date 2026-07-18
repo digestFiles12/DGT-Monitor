@@ -18,6 +18,7 @@ const incidentDetailFields = [
   "environment_type_label", "road_condition_type_label", "location_description", "geographic_descriptor",
   "has_camera_coverage", "camera_coverage_count", "nearest_camera_km_delta"
 ];
+const timeDetailFields = new Set(["creation_time", "start_time", "end_time"]);
 
 const detailLabels = {
   es: {
@@ -211,9 +212,7 @@ function setMetricLabel(kind, label) {
 
 function setTabLabel(view, label) {
   const tab = document.querySelector(`.tab[data-view="${view}"]`);
-  const icon = tab.querySelector("svg, i");
-  const count = tab.querySelector("span");
-  tab.replaceChildren(...[icon, document.createTextNode(` ${label} `), count].filter(Boolean));
+  tab.querySelector(".tab-label").textContent = label;
 }
 
 function setLabelText(control, label) {
@@ -406,8 +405,16 @@ function createIncidentDetailRow(incident) {
 function formatDetailValue(key, value) {
   if (value === null || value === undefined || value === "") return "";
   if (typeof value === "boolean") return value ? uiText("yes") : uiText("no");
+  if (timeDetailFields.has(key)) return formatHumanDateTime(value);
   if (key === "nearest_camera_km_delta" && Number.isFinite(Number(value))) return `${Number(value).toFixed(3)} PK`;
   return String(value);
+}
+
+function formatHumanDateTime(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  const locale = state.language === "en" ? "en-GB" : "es-ES";
+  return new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(date);
 }
 
 function detailLabel(key) {
@@ -1266,8 +1273,8 @@ function renderDetail(incident) {
     <div class="detail-row"><span>Causa</span>${escapeHtml(incident.cause_label || incident.cause || "N/A")}</div>
     <div class="detail-row"><span>Severidad</span>${escapeHtml(incident.severity_label || "N/A")}</div>
     <div class="detail-row"><span>Dirección</span>${escapeHtml(incident.direction_label || "N/A")}</div>
-    <div class="detail-row"><span>Inicio</span>${escapeHtml(incident.start_time || "N/A")}</div>
-    <div class="detail-row"><span>Fin previsto</span>${escapeHtml(incident.end_time || "N/A")}</div>
+    <div class="detail-row"><span>Inicio</span>${escapeHtml(formatDetailValue("start_time", incident.start_time) || "N/A")}</div>
+    <div class="detail-row"><span>Fin previsto</span>${escapeHtml(formatDetailValue("end_time", incident.end_time) || "N/A")}</div>
     <div class="detail-row"><span>Mapa</span>${mapsLink}</div>
     <div class="detail-row"><span>Fuente</span>${escapeHtml(incident.source || "DGT")}</div>
   `;
