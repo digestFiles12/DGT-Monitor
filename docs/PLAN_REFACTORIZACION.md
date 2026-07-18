@@ -6,13 +6,17 @@ Reimplementar DGT Monitor con programacion orientada a objetos, separando domini
 
 ## Fases
 
-1. Crear paquete, configuracion y documentacion base.
-2. Implementar modelos, contratos y utilidades de dominio.
-3. Implementar cliente HTTP, parsers DATEX2, repositorios y cache TTL.
-4. Implementar servicios compartidos de incidentes y camaras.
+1. [x] Crear paquete, configuracion y documentacion base.
+2. [x] Implementar modelos, contratos y utilidades de dominio.
+3. [x] Implementar cliente HTTP, parsers DATEX2, repositorios y cache TTL.
+4. [x] Implementar servicios compartidos de incidentes y camaras.
 5. Implementar dashboard FastAPI, WebSocket y PWA.
 6. Implementar GUI PyQt6 modular y dialogos no modales.
 7. Completar pruebas, CI, despliegue y documentacion.
+
+## Estado actual
+
+El primer flujo completo ya funciona sin frameworks: repositorios, parsers, cache, servicios y fachada producen payloads serializables usando dobles de prueba y XML local. La siguiente fase es adaptar esta fachada a FastAPI mediante una app factory inyectable.
 
 ## Compatibilidad
 
