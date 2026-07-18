@@ -2,7 +2,7 @@
 
 ## Estado
 
-La suite actual contiene 9 pruebas y cubre modelos, texto, distancia, parsers, caché, servicios, fachada, REST y WebSocket.
+La suite actual contiene 43 pruebas y cubre modelos, texto, distancia, parsers, caché, servicios, fachada, REST, WebSocket, Activity API, dashboard/PWA y GUI PyQt6 offscreen.
 
 ## Comandos
 
@@ -11,7 +11,9 @@ La suite actual contiene 9 pruebas y cubre modelos, texto, distancia, parsers, c
 .\.venv\Scripts\python.exe -m pytest test\unit -q
 .\.venv\Scripts\python.exe -m pytest test\integration -q
 .\.venv\Scripts\python.exe -m pytest test\api -q
+$env:QT_QPA_PLATFORM='offscreen'; .\.venv\Scripts\python.exe -m pytest test\gui -q
 .\.venv\Scripts\python.exe -m compileall -q dgt_monitor dashboard
+git diff --check
 ```
 
 ## Reglas
@@ -20,7 +22,7 @@ La suite actual contiene 9 pruebas y cubre modelos, texto, distancia, parsers, c
 - Inyectar repositorios o fachada falsos.
 - Añadir una prueba de contrato por cada endpoint/ruta PWA.
 - Para GUI usar `QT_QPA_PLATFORM=offscreen` cuando sea posible.
-- Mantener un checklist manual para ventanas no modales, imágenes y cierre de threads.
+- Mantener un checklist manual para ventanas no modales, imágenes, cierre de threads y Render.
 
 ## Riesgos que deben cubrirse
 
@@ -31,3 +33,5 @@ La suite actual contiene 9 pruebas y cubre modelos, texto, distancia, parsers, c
 - Límites y filtros API.
 - Ciclo de vida QThread.
 - Aspect ratio y carga fallida de imágenes.
+- Activity API: autenticación, revocación, SSE, CSV y paginación.
+- Dashboard/PWA: rutas estáticas, service worker y manifest.

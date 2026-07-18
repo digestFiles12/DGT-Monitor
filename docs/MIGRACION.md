@@ -1,14 +1,8 @@
 # Migración desde DGT30_GUI
 
-## Referencia
+## Referencia funcional
 
-El comportamiento se consulta en una copia local del proyecto legado, especialmente:
-
-- `DGT_V2.py`: GUI completa, cámaras y diálogos no modales.
-- `dashboard/app.py`: API anterior, caché y cobertura.
-- `dashboard/static/`: dashboard/PWA que debe preservarse visualmente.
-- `test/test_dashboard_app.py`: contratos anteriores de API y WebSocket.
-- `render.yaml`: configuración de despliegue anterior.
+La migración conserva comportamientos esperados de la aplicación anterior: GUI de escritorio, cámaras cercanas, diálogos no modales, dashboard/PWA, API, WebSocket y despliegue Render. No se conserva ninguna dependencia directa con rutas privadas ni con código monolítico.
 
 ## Mapeo actual
 
@@ -26,9 +20,14 @@ El comportamiento se consulta en una copia local del proyecto legado, especialme
 ## Compatibilidad pendiente
 
 - Crear wrappers `DGT.py` y `DGT_V2.py` sobre `gui.entrypoints`.
-- Preservar filtros, estadísticas, selección, detalles y log de la GUI.
-- Preservar búsqueda, orden, visualización de cámaras y mapas.
-- Mantener diálogos no modales con referencias vivas.
-- Preservar rutas PWA y frontend responsive.
+- Añadir temporizador configurable y log visible de actividad en la GUI.
+- Completar paridad final de búsqueda/orden avanzado si se requiere.
+
+## Compatibilidad ya implementada
+
+- Filtros, estadísticas, selección y detalle de incidencias en GUI.
+- Diálogo no modal de cámaras cercanas con referencias vivas.
+- Carga asincrona de miniaturas de cámaras.
+- Rutas PWA y frontend responsive servidos desde `/`.
 
 No debe copiarse lógica de red, parsing, filtros, distancia o caché a GUI/API.

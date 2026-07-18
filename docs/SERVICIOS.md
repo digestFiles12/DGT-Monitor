@@ -12,8 +12,14 @@ Obtiene cámaras mediante caché, filtra por ubicación y punto kilométrico, ca
 
 Es la fachada compartida por FastAPI y PyQt6. Sus métodos actuales son:
 
-- `get_incident_payload()`: devuelve fecha, total, estadísticas e incidentes serializados.
-- `get_cameras()`: devuelve fecha, total y cámaras serializadas.
+- `get_incident_payload(filters=None)`: devuelve fecha, total, estadísticas e incidentes serializados.
+- `get_cameras(filters=None)`: devuelve fecha, total y cámaras serializadas.
+
+La GUI y la API pasan filtros de dominio (`IncidentFilters`, `CameraFilters`) a esta fachada. Ningún widget ni ruta descarga XML ni instancia repositorios directamente.
+
+## Activity service
+
+El sistema de actividad registra eventos en memoria o SQLite según `ACTIVITY_DB_PATH`. La API expone paginación, SSE, limpieza y export CSV con autenticación por `X-API-Key`.
 
 ## Caché
 

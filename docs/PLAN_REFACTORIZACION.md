@@ -11,16 +11,16 @@ Reimplementar DGT Monitor con programacion orientada a objetos, separando domini
 3. [x] Implementar cliente HTTP, parsers DATEX2, repositorios y cache TTL.
 4. [x] Implementar servicios compartidos de incidentes y camaras.
 5. [x] Implementar dashboard FastAPI, WebSocket y PWA.
-6. [~] Implementar GUI PyQt6 modular y dialogos no modales. Ventana, filtros, estadísticas, tabla, detalle, diálogo no modal de cámaras cercanas y visor asíncrono de imágenes completados; wrappers y temporizador pendientes.
-7. Completar pruebas, CI, despliegue y documentacion.
+6. [~] Implementar GUI PyQt6 modular y dialogos no modales. Ventana, filtros, estadísticas, tabla, detalle, diálogo no modal de cámaras cercanas y visor asíncrono de imágenes completados; wrappers, temporizador y registro visible pendientes.
+7. [~] Completar pruebas, CI, despliegue y documentacion. Suite actual con 43 tests, Render y Actions configurados; quedan smoke manual y cierre de wrappers.
 
 ## Estado actual
 
-El flujo compartido, la API modular, el dashboard web y la primera GUI modular ya funcionan. La GUI carga incidencias, cámaras e imágenes en `QThread`, filtra mediante modelos de dominio y presenta estadísticas, tabla, detalle, cámaras cercanas y miniaturas sin duplicar lógica de aplicación.
+El flujo compartido, la API modular, el dashboard web/PWA y la GUI modular ya funcionan. La GUI carga incidencias, cámaras e imágenes en `QThread`, filtra mediante modelos de dominio y presenta estadísticas, tabla, detalle, cámaras cercanas y miniaturas sin duplicar lógica de aplicación. El dashboard web se sirve desde `/` para Render.
 
 ## Compatibilidad
 
-Los puntos de entrada `DGT.py`, `DGT_V2.py` y `dashboard/app.py` se conservaran como wrappers pequenos sobre la arquitectura nueva.
+`dashboard/app.py` ya se conserva como wrapper ASGI estable. Quedan por crear los wrappers de escritorio `DGT.py` y `DGT_V2.py` sobre `gui.entrypoints`.
 
 ## Criterios de aceptacion
 

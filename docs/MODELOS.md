@@ -14,6 +14,8 @@ Representa una cámara DGT con carretera, provincia, punto kilométrico, coorden
 
 `IncidentFilters` y `CameraFilters` son valores inmutables que transportan criterios hacia los servicios. `IncidentStats` contiene los seis contadores compartidos por GUI y dashboard.
 
+Los filtros son el contrato comun entre FastAPI, dashboard web y GUI PyQt6: las capas de presentacion solo construyen estos valores y la fachada aplica las reglas de filtrado.
+
 ## Serialización
 
 Los modelos de salida implementan `to_dict()`. Este método es el contrato explícito con FastAPI y evita que el dominio dependa de Pydantic o de detalles de la interfaz.

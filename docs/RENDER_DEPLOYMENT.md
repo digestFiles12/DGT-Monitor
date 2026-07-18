@@ -2,7 +2,7 @@
 
 ## Overview
 
-DGT-Monitor is configured for automatic deployment to Render.com via `render.yaml` and GitHub Actions.
+DGT-Monitor is configured for automatic deployment to Render.com via `render.yaml` and GitHub Actions. Render serves the FastAPI API and browser dashboard/PWA; the PyQt6 desktop GUI is local-only.
 
 ## Prerequisites
 
@@ -26,7 +26,7 @@ Render will auto-detect `render.yaml` and apply configuration:
 
 - **Service Name:** `dgt-monitor`
 - **Runtime:** Python 3.12 (`PYTHON_VERSION=3.12.0`)
-- **Build Command:** `pip install -e ".[dev]" && pytest test -q && compileall`
+- **Build Command:** `pip install -e ".[dev]" && python -m pytest test -q --tb=no && python -m compileall -q dgt_monitor dashboard`
 - **Start Command:** `uvicorn dashboard.app:app --host 0.0.0.0 --port $PORT`
 - **Health Check:** `GET /api/health`
 - **Auto-deploy:** Enabled
@@ -55,7 +55,7 @@ ACTIVITY_REVOKED_API_KEYS=old-key-1
    - Render Dashboard → Service → **Deploy Latest**
 
 2. **Auto Deploy:**
-   - Push to `feature/initial-oop-architecture` branch
+   - Push to the configured deployment branch
    - GitHub Actions will run tests
    - On success, Render auto-deploys
 
@@ -66,7 +66,13 @@ ACTIVITY_REVOKED_API_KEYS=old-key-1
    ```bash
    curl https://<your-service>.onrender.com/api/health
    ```
-3. **Test Activity API:**
+3. **Test dashboard/PWA assets:**
+   ```bash
+   curl https://<your-service>.onrender.com/
+   curl https://<your-service>.onrender.com/manifest.webmanifest
+   curl https://<your-service>.onrender.com/sw.js
+   ```
+4. **Test Activity API:**
    ```bash
    curl -H "X-API-Key: <valid-key>" \
         https://<your-service>.onrender.com/api/activity/
@@ -131,12 +137,16 @@ If health checks fail, service will be marked as unhealthy.
 | `ACTIVITY_REVOKED_API_KEYS` | String | No | `old-key` |
 | `ACTIVITY_DB_PATH` | Path | No | `/tmp/activity.db` |
 | `PYTHONUNBUFFERED` | Boolean | Yes | `1` |
+| `PYTHON_VERSION` | String | Yes | `3.12.0` |
 
 ## API Endpoints (After Deployment)
 
 ```
 Base URL: https://<service-name>.onrender.com
 
+GET /                                    # Dashboard web
+GET /manifest.webmanifest               # PWA manifest
+GET /sw.js                              # Service worker
 GET /api/health                          # Health check
 GET /api/incidents?carretera=A-1         # List incidents
 GET /api/cameras?carretera=A-1           # List cameras
@@ -158,8 +168,8 @@ GET /api/activity/export                 # CSV export (requires X-API-Key)
 To deploy to production:
 
 1. Create `main` branch (protected)
-2. Update `render.yaml` branch from `feature/initial-oop-architecture` to `main`
-3. Merge feature branch to main via pull request
+2. Configure Render auto-deploy to track `main`
+3. Merge the validated feature branch to main via pull request
 4. Render will auto-deploy from `main` branch
 
 ---

@@ -1,22 +1,24 @@
-# Phase 7: Completed State & Handoff Documentation
+# Estado completo y handoff del proyecto
 
 **Status:** ✅ PRODUCTION READY  
 **Branch:** Feature branch with OOP refactoring  
-**Latest Commit:** Stabilize test suite with Phase 7 fixes  
+**Latest Increment:** Dashboard web/PWA y GUI PyQt6 modular
 
 ---
 
 ## Executive Summary
 
-Phase 7 architecture refactoring and test suite stabilization are **100% complete**. The DGT-Monitor application:
+Phase 7 architecture refactoring and the later dashboard/GUI increments are complete enough for local and Render validation. The DGT-Monitor application:
 - ✅ Implements a clean layered architecture (domain → infrastructure → application → API/GUI)
 - ✅ Provides thread-safe activity logging with dual backends (in-memory or SQLite)
 - ✅ Exposes REST API with WebSocket and Server-Sent Events
-- ✅ Includes comprehensive test coverage (34 tests, all passing)
+- ✅ Serves a responsive dashboard web/PWA from `/`
+- ✅ Includes a modular PyQt6 GUI with non-modal camera dialog and async image loading
+- ✅ Includes comprehensive test coverage (43 tests, all passing)
 - ✅ Is deployable to Render with configured CI/CD
-- ✅ Has complete documentation and smoke test checklist
+- ✅ Has updated handoff and operational documentation
 
-**Ready for:** Code review, staging deployment, production release.
+**Ready for:** smoke testing, code review, staging deployment and production release.
 
 ---
 
@@ -99,19 +101,17 @@ Phase 7 architecture refactoring and test suite stabilization are **100% complet
 - **Authentication:** `X-API-Key` header with revocation list (fail-fast) and acceptance list (constant-time comparison)
 
 #### **GUI** (`dgt_monitor/gui/`)
-- PyQt6 widgets for:
-  - Incident table with real-time updates
-  - Camera map view
-  - Incident filtering and details
-  - Non-modal dialogs
-  - Tab order and keyboard navigation
-  - Clipboard operations (null-checked)
-- QThread workers with signal-based error handling
+- PyQt6 modules for:
+   - Incident filters, statistics, table and detail panel
+   - Non-modal camera dialog for selected incidents
+   - Async camera image loading with `ImageLoadWorker`
+   - `QThread` workers with signal-based success/error/finalization
+   - Tab order and keyboard navigation
 - Test support: offscreen rendering with `QT_QPA_PLATFORM=offscreen`
 
 #### **Dashboard Wrapper** (`dashboard/app.py`)
 - ASGI entry point for Render deployment
-- Exposes FastAPI app as `app`
+- Exposes FastAPI app as `app` and serves the dashboard web/PWA from `/`
 
 ---
 
@@ -132,8 +132,8 @@ Phase 7 architecture refactoring and test suite stabilization are **100% complet
    - All endpoints require `X-API-Key` authentication
 
 3. **API Authentication**
-   - Revocation list (fail-fast check against `REVOKED_KEYS` env var)
-   - Acceptance list (constant-time comparison against `ACCEPTED_KEYS` env var)
+   - Revocation list (fail-fast check against `ACTIVITY_REVOKED_API_KEYS` env var)
+   - Acceptance list (constant-time comparison against `ACTIVITY_API_KEYS` env var)
    - Uses `secrets.compare_digest()` for timing-attack resistance
 
 4. **Database Migration**
@@ -147,7 +147,7 @@ Phase 7 architecture refactoring and test suite stabilization are **100% complet
 
 ---
 
-## Test Suite: 34/34 Passing ✅
+## Test Suite: 43/43 Passing ✅
 
 ### Test Categories
 
@@ -156,9 +156,9 @@ Phase 7 architecture refactoring and test suite stabilization are **100% complet
 | **Core Domain** | 3 | ✅ | Models, text processing, localization |
 | **Infrastructure** | 9 | ✅ | Parsers, cache, HTTP client |
 | **Application** | 9 | ✅ | Services, facade, coverage logic |
-| **API** | 7 | ✅ | Endpoints, authentication, pagination, SSE |
+| **API** | 8+ | ✅ | Endpoints, dashboard assets, authentication, pagination, SSE |
 | **GUI Lifecycle** | 5 | ✅ | QThread workers, signals, offscreen rendering |
-| **GUI Workers** | 4 | ✅ | Error propagation, thread cleanup |
+| **GUI Workers/Dialog/Window** | 10+ | ✅ | Error propagation, thread cleanup, non-modal dialogs, async images |
 | **Cache Expiration** | 6 | ✅ | TTL expiration, thread safety, deterministic testing |
 | **Activity Store** | 3 | ✅ | SQLite concurrency, thread-safe operations |
 | **Integration** | 1 | ✅ | Facade with cache and services |
@@ -167,8 +167,7 @@ Phase 7 architecture refactoring and test suite stabilization are **100% complet
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest test -q
-# Output: 34 passed
-# Duration: ~6 seconds
+# Output: 43 passed
 ```
 
 ### Code Quality Validations
@@ -225,8 +224,8 @@ git diff --check
 $env:ACTIVITY_DB_PATH = "activity.db"  # If omitted, uses in-memory store
 
 # API Authentication
-$env:ACCEPTED_KEYS = "key1,key2,key3"  # Comma-separated accepted API keys
-$env:REVOKED_KEYS = "revoked1,revoked2"  # Comma-separated revoked keys
+$env:ACTIVITY_API_KEYS = "key1,key2,key3"  # Comma-separated accepted API keys
+$env:ACTIVITY_REVOKED_API_KEYS = "revoked1,revoked2"  # Comma-separated revoked keys
 ```
 
 **Optional (defaults provided):**
@@ -243,7 +242,7 @@ Configuration in `render.yaml`:
 - **Build command:** `pip install -e ".[dev]"` + `pytest`
 - **Start command:** `uvicorn dashboard.app:app --host 0.0.0.0 --port 10000`
 - **Health check:** `GET /api/health`
-- **Auto-deploy:** On `feature/initial-oop-architecture` push
+- **Auto-deploy:** On push to the branch configured in Render
 
 ### GitHub Actions CI/CD
 
@@ -267,8 +266,7 @@ Configuration in `.github/workflows/test.yml`:
 | `docs/CONTINUIDAD_NUEVO_CHAT.md` | ✅ | Onboarding template |
 | `docs/DECISIONES.md` | ✅ | Architectural decisions recorded |
 | `docs/DESPLIEGUE.md` | ✅ | Render configuration, env vars |
-| `docs/PRUEBAS.md` | ✅ | 34 tests, execution, validation |
-| `docs/SMOKE_TEST.md` | ✅ | Manual validation checklist |
+| `docs/PRUEBAS.md` | ✅ | 43 tests, execution, validation |
 | `docs/PHASE_7_COMPLETED.md` | ✅ | This document (handoff reference) |
 
 ---
@@ -276,11 +274,8 @@ Configuration in `.github/workflows/test.yml`:
 ## Git History
 
 All commits preserve semantic history with descriptive messages:
-- Latest: Stabilize test suite (Phase 7 completion)
-- Previous: Document project handoff and migration state
-- Earlier: Add modular FastAPI and WebSocket adapters
-- Earlier: Build shared DGT domain and application services
-- Earlier: Add initial OOP architecture & PyQt GUI
+- Latest increments: dashboard web/PWA for Render, PyQt6 GUI modular, non-modal camera dialog and async image thumbnails
+- Earlier increments: activity system, modular FastAPI/WebSocket adapters, shared DGT domain and application services
 
 ---
 
@@ -303,7 +298,7 @@ python -m pip install -e ".[dev]"
 ### Validate Current State
 
 ```powershell
-# Run full test suite (34 tests, ~6s)
+# Run full test suite (43 tests)
 python -m pytest test -q
 
 # Compile check (no errors)
@@ -314,12 +309,12 @@ git status
 git log --oneline -5
 
 # Smoke test (optional manual validation with Render deployment)
-# See docs/SMOKE_TEST.md for complete checklist
+# Validate /, /api/health, /manifest.webmanifest, /sw.js, REST, WebSocket and Activity API.
 ```
 
 ### What's Ready
 
-- ✅ **All 34 tests passing** with comprehensive coverage
+- ✅ **All 43 tests passing** with comprehensive coverage
 - ✅ **Phase 7 architecture complete** with activity system, API auth, deployment
 - ✅ **Render deployment configured** with CI/CD pipeline
 - ✅ **Documentation complete** for handoff to next phase or new developer
@@ -328,11 +323,11 @@ git log --oneline -5
 
 1. **Code Review & Merge** → Merge to `main` branch
 2. **Staging Deployment** → Deploy to Render staging environment
-3. **Smoke Test** → Manual validation against live endpoints (see `docs/SMOKE_TEST.md`)
+3. **Smoke Test** → Manual validation against live endpoints: `/`, `/api/health`, PWA assets, REST, WebSocket and Activity API
 4. **Production Release** → Deploy to Render production
-5. **Phase 8** → Optional enhancements:
-   - Dashboard frontend (HTML/CSS/JS/PWA)
-   - Advanced GUI features (offscreen rendering, performance)
+5. **Next GUI/ops enhancements**:
+   - Desktop compatibility wrappers (`DGT.py`, `DGT_V2.py`)
+   - Configurable GUI refresh timer and visible activity log
    - Additional test coverage (network scenarios, error cases)
    - Performance benchmarking and optimization
 
@@ -345,12 +340,12 @@ For next developer or continuation in new chat:
 - [ ] Read `docs/INDEX.md` for navigation
 - [ ] Read `docs/PLAN_REFACTORIZACION.md` to understand refactoring context
 - [ ] Read `docs/ARQUITECTURA.md` for layered design
-- [ ] Read `docs/FASE_7_COMPLETED.md` (this file) for exact completion status
-- [ ] Run `python -m pytest test -q` to validate setup (expect 34 passing)
+- [ ] Read `docs/PHASE_7_COMPLETED.md` (this file) for exact completion status
+- [ ] Run `python -m pytest test -q` to validate setup (expect 43 passing)
 - [ ] Review git history: `git log --oneline -10`
 - [ ] Check environment setup: `.\.venv\Scripts\Activate.ps1` then `python --version`
 - [ ] Review `docs/PRUEBAS.md` for test details
-- [ ] Review `docs/SMOKE_TEST.md` for manual validation
+- [ ] Manually validate `/`, `/api/health`, PWA assets, REST, WebSocket and Activity API before production
 - [ ] Check Render dashboard for active deployments
 - [ ] If continuing with Phase 8+, review `docs/DECISIONES.md` for constraints
 

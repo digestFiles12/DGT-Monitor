@@ -4,16 +4,16 @@
 
 ---
 
-## Status: Phase 7 ✅ COMPLETE
+## Status: proyecto operativo
 
-- ✅ 34 tests passing
-- ✅ Activity system (API + SQLite + auth) implemented
-- ✅ Render deployment configured
-- ✅ GitHub Actions CI/CD operational
-- ✅ All documentation updated
-- ✅ Ready for code review, staging, production
+- ✅ API FastAPI, WebSocket, SSE y Activity API operativas
+- ✅ Dashboard web/PWA servido desde `/` y desplegable en Render
+- ✅ GUI PyQt6 modular con incidencias, dialogo de camaras e imagenes asincronas
+- ✅ Activity system con backend en memoria o SQLite
+- ✅ Render y GitHub Actions configurados
+- ✅ 43 tests pasando
 
-**See `docs/PHASE_7_COMPLETED.md` for complete phase closure documentation.**
+**See `docs/PHASE_7_COMPLETED.md` for complete project status and handoff documentation.**
 
 ---
 
@@ -35,7 +35,7 @@ python --version
 ### Validate State (Always First)
 
 ```powershell
-# 34 tests should pass
+# 43 tests should pass
 python -m pytest test -q
 
 # No compilation errors
@@ -67,9 +67,9 @@ API (FastAPI) → Application (Services) → Infrastructure (Cache/Parsers/HTTP)
 # Activity store backend
 $env:ACTIVITY_DB_PATH = "activity.db"     # If omitted: in-memory
 
-# API authentication
-$env:ACCEPTED_KEYS = "key1,key2"          # Accepted API keys
-$env:REVOKED_KEYS = "revoked1"            # Revoked API keys
+# Activity API authentication
+$env:ACTIVITY_API_KEYS = "key1,key2"          # Accepted API keys
+$env:ACTIVITY_REVOKED_API_KEYS = "revoked1"  # Revoked API keys
 ```
 
 ---
@@ -81,22 +81,16 @@ $env:REVOKED_KEYS = "revoked1"            # Revoked API keys
 | `docs/INDEX.md` | Navigation hub |
 | `docs/PLAN_REFACTORIZACION.md` | Refactoring phases (1-7) |
 | `docs/ARQUITECTURA.md` | Layered architecture diagram |
-| `docs/PHASE_7_COMPLETED.md` | **← MAIN HANDOFF DOC: Exact Phase 7 status** |
-| `docs/PRUEBAS.md` | Test suite (34 tests, execution) |
-| `docs/SMOKE_TEST.md` | Manual validation checklist |
+| `docs/PHASE_7_COMPLETED.md` | **← MAIN HANDOFF DOC: Exact current status** |
+| `docs/PRUEBAS.md` | Test suite (43 tests, execution) |
 | `docs/DESPLIEGUE.md` | Render configuration, env vars |
 | `docs/DECISIONES.md` | Architectural constraints & decisions |
 
 ---
 
-## Git History
+## Recent history
 
-All commits preserve semantic history:
-- Latest: Stabilize test suite (Phase 7 completion)
-- Previous: Document project handoff and migration state
-- Earlier: Add modular FastAPI and WebSocket adapters
-- Earlier: Build shared DGT domain and application services
-- Earlier: Add initial OOP architecture & PyQt GUI
+La rama conserva commits separados por incremento: dashboard web para Render, GUI PyQt6 modular, dialogo no modal de camaras y carga asincrona de imagenes.
 
 ---
 
@@ -111,20 +105,19 @@ All commits preserve semantic history:
 2. **Verify Setup**:
    ```powershell
    .\.venv\Scripts\Activate.ps1
-   python -m pytest test -q          # expect 34 passed
+   python -m pytest test -q          # expect 43 passed
    python -m compileall -q dgt_monitor dashboard
    git status                         # should be clean
    ```
 
 3. **Check Render Dashboard**:
    - Verify current branch deployment
-   - Test `/api/health` endpoint
+   - Test `/` and `/api/health`
 
 4. **Next Phase**:
-   - Code review (if not yet done)
-   - Merge to `main`
-   - Smoke test on staging
-   - Production deployment
+   - Wrappers de compatibilidad de escritorio (`DGT.py`, `DGT_V2.py`)
+   - Temporizador configurable y registro visible en GUI
+   - Smoke test manual en Render
 
 ---
 

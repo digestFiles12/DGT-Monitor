@@ -14,6 +14,8 @@ Las URL, cabeceras, timeout y tiempos de caché están centralizados en `dgt_mon
 3. `IncidentParser` y `CameraParser` buscan tags por sufijo para tolerar namespaces DATEX2.
 4. Los parsers devuelven modelos de dominio, nunca diccionarios sin tipo.
 
+FastAPI, el dashboard web y la GUI PyQt6 reciben datos ya normalizados desde `DgtApplicationService`; ninguna capa de presentacion descarga ni parsea DATEX2.
+
 Un XML mal formado produce `DgtParseError`. Los campos opcionales ausentes usan valores seguros y las coordenadas inválidas se convierten en `None`.
 
 ## Pruebas

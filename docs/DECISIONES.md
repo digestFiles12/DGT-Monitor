@@ -1,8 +1,8 @@
 # Decisiones arquitectónicas
 
-## ADR-001: repositorio nuevo
+## ADR-001: refactorizacion aislada
 
-La refactorización vive en un repositorio independiente. El proyecto legado es solo una referencia funcional y no se fusiona ni se copia de forma monolítica.
+La refactorización mantiene una arquitectura nueva y no copia código legado de forma monolítica. Las referencias históricas se documentan solo como comportamiento esperado.
 
 ## ADR-002: dependencias dirigidas
 
@@ -14,7 +14,7 @@ El dominio usa dataclasses, no `Union[dict, objeto]`. La compatibilidad JSON se 
 
 ## ADR-004: inyección explícita
 
-No se usan singletons globales. `build_application()` crea producción y `create_app(service=...)` permite dobles de prueba. La GUI recibirá la misma fachada por constructor.
+No se usan singletons globales para la aplicacion principal. `build_application()` crea producción y `create_app(service=...)` permite dobles de prueba. La GUI recibe la misma fachada por constructor. La actividad conserva una fachada global pequeña por compatibilidad operativa, con store intercambiable.
 
 ## ADR-005: caché concurrente
 
@@ -26,7 +26,11 @@ Una cámara cubre un incidente si comparte carretera normalizada, provincia comp
 
 ## ADR-007: compatibilidad de entradas
 
-Render seguirá usando `dashboard.app:app`. Al implementar GUI se crearán wrappers pequeños `DGT.py` y `DGT_V2.py`; no se restaurará código monolítico.
+Render seguirá usando `dashboard.app:app`. Los wrappers pequeños `DGT.py` y `DGT_V2.py` se crearán sobre `gui.entrypoints`; no se restaurará código monolítico.
+
+## ADR-009: Render no ejecuta PyQt6
+
+Render sirve FastAPI y el dashboard web/PWA. La GUI PyQt6 queda como entrada local de escritorio y se valida con tests offscreen.
 
 ## ADR-008: pruebas herméticas
 
