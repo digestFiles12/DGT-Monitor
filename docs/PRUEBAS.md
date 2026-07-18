@@ -2,7 +2,7 @@
 
 ## Estado
 
-La suite actual contiene 48 pruebas y cubre modelos, texto, distancia, parsers, caché, servicios, fachada, REST, WebSocket, Activity API, dashboard/PWA con filtros completos/modo oscuro y GUI PyQt6 offscreen con filtros completos y visor fullscreen de cámaras.
+La suite actual contiene 50 pruebas y cubre modelos, texto, distancia, parsers, caché, servicios, fachada, REST, WebSocket, Activity API, dashboard/PWA con filtros completos, modo oscuro, selector ES/EN, fallback localizado de imágenes de cámara y estado sin cobertura con icono, y GUI PyQt6 offscreen con filtros completos y visor fullscreen de cámaras.
 
 ## Comandos
 
@@ -34,4 +34,4 @@ git diff --check
 - Ciclo de vida QThread.
 - Aspect ratio y carga fallida de imágenes.
 - Activity API: autenticación, revocación, SSE, CSV y paginación.
-- Dashboard/PWA: rutas estáticas, service worker y manifest.
+- Dashboard/PWA: rutas estáticas, service worker, manifest, selector de idioma, fallback de imágenes y estados de cobertura de cámara.

@@ -1,6 +1,6 @@
 # Documentacion de DGT Monitor
 
-Estado actual: API FastAPI, dashboard web/PWA con selector ES/EN, filtros completos, celdas estadísticas, filas de incidencia desplegables, botón/desplegable de cámaras por incidencia, modo oscuro y visor modal de cámaras ampliable a fullscreen, despliegue Render y GUI PyQt6 modular con los mismos filtros/celdas, modo oscuro y visor fullscreen operativos. La suite automatizada actual contiene 48 tests.
+Estado actual: API FastAPI, dashboard web/PWA con selector ES/EN, filtros completos, celdas estadísticas, filas de incidencia desplegables, botón/desplegable de cámaras por incidencia, icono rojo de cámara tachada para incidencias sin cobertura, modo oscuro y visor modal de cámaras ampliable a fullscreen con fallback visual localizado, despliegue Render y GUI PyQt6 modular con los mismos filtros/celdas, modo oscuro y visor fullscreen operativos. La suite automatizada actual contiene 50 tests.
 
 **START HERE:**
 - [Continuidad para un nuevo chat](CONTINUIDAD_NUEVO_CHAT.md) - Quick-start (leer primero al reanudar)
