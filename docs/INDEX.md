@@ -1,6 +1,10 @@
 # Documentacion de DGT Monitor
 
-- [Continuidad para un nuevo chat](CONTINUIDAD_NUEVO_CHAT.md) - leer primero al reanudar
+**START HERE:**
+- [Continuidad para un nuevo chat](CONTINUIDAD_NUEVO_CHAT.md) - Quick-start (leer primero al reanudar)
+- [Phase 7 Completed Status](PHASE_7_COMPLETED.md) - **MAIN HANDOFF DOC: Complete Phase 7 status & checklist**
+
+**Core Documentation:**
 - [Plan de refactorizacion](PLAN_REFACTORIZACION.md)
 - [Arquitectura](ARQUITECTURA.md)
 - [Decisiones](DECISIONES.md)
