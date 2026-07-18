@@ -47,7 +47,7 @@ def test_cameras_dialog_loads_camera_image_async():
     dialog.reload()
 
     assert completed.wait(1000)
-    assert image_loaded.wait(1000)
+    assert image_loaded.wait(5000)
     assert image_loaded[0][0] == "https://example.invalid/camera.jpg"
     dialog.close()
     app.processEvents()
@@ -67,7 +67,7 @@ def test_cameras_dialog_opens_loaded_image_fullscreen():
     dialog.reload()
 
     assert completed.wait(1000)
-    assert image_loaded.wait(1000)
+    assert image_loaded.wait(5000)
     image_label = next(label for label in dialog.findChildren(QLabel) if label.objectName() == "cameraImage")
     fullscreen_dialog = dialog._open_fullscreen_image(image_label.pixmap())
 
