@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: dgt-monitor
+    runtime: python
+    pythonVersion: "3.12"
+    buildCommand: pip install -e ".[dev]" && python -m pytest test -q --tb=no && python -m compileall -q dgt_monitor dashboard
+    startCommand: uvicorn dashboard.app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: ACTIVITY_API_KEYS
+        scope: runtime
+        value: ""  # Configure in Render dashboard
+      - key: ACTIVITY_REVOKED_API_KEYS
+        scope: runtime
+        value: ""  # Configure in Render dashboard
+      - key: ACTIVITY_DB_PATH
+        scope: runtime
+        value: "/tmp/activity.db"  # Temporary storage per deployment
+    healthCheckPath: /api/health
+    healthCheckInterval: 30
+    initialDelaySeconds: 10
+    maxShutdownDelay: 30
+    memoryMB: 512
+    cpuCount: 0.5
+    autoDeploy: true
+    repo: "https://github.com/digestFiles12/DGT-Monitor.git"
+    branch: feature/initial-oop-architecture
