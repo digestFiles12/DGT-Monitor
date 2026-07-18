@@ -2,7 +2,7 @@
 
 Aplicacion modular para consultar incidentes y camaras de trafico de la DGT desde una GUI PyQt6 y un dashboard FastAPI/PWA.
 
-El proyecto esta siendo implementado desde cero con arquitectura orientada a objetos. Consulta [docs/INDEX.md](docs/INDEX.md) para ver el plan y la documentacion tecnica.
+El proyecto esta siendo implementado desde cero con arquitectura orientada a objetos. Consulta [docs/INDEX.md](docs/INDEX.md) para ver el plan y la documentacion tecnica. Para reanudar el trabajo en otro chat, empieza por [docs/CONTINUIDAD_NUEVO_CHAT.md](docs/CONTINUIDAD_NUEVO_CHAT.md).
 
 ## Desarrollo
 
