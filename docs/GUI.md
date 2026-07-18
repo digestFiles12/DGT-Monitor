@@ -17,6 +17,8 @@ dgt_monitor/gui/
 
 `CamerasDialog` muestra cámaras cercanas de una incidencia seleccionada en un diálogo no modal. Construye `CameraFilters` con carretera, provincia, punto kilométrico y coordenadas de la incidencia, ejecuta `CameraLoadWorker` en `QThread` y mantiene vivas las referencias hasta la finalización.
 
+Las imágenes de cámaras se descargan con `ImageLoadWorker` en segundo plano. El diálogo renderiza miniaturas con `QPixmap`, conserva aspecto mediante escalado suave y muestra un estado legible cuando la imagen no está disponible.
+
 ## Ejecución
 
 ```powershell
@@ -38,6 +40,5 @@ dgt_monitor/gui/
 
 ## Pendiente
 
-- Descarga/visor asíncrono de imágenes con conservación de aspecto.
 - Temporizador configurable y registro de actividad visible.
 - Wrappers de compatibilidad de escritorio.

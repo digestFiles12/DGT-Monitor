@@ -1,7 +1,7 @@
 from PyQt6.QtTest import QSignalSpy
 
 from dgt_monitor.core.models import CameraFilters, IncidentFilters
-from dgt_monitor.gui.workers import CameraLoadWorker, IncidentLoadWorker
+from dgt_monitor.gui.workers import CameraLoadWorker, ImageLoadWorker, IncidentLoadWorker
 
 
 class FakeService:
@@ -49,4 +49,16 @@ def test_camera_worker_emits_filtered_payload():
     worker.run()
 
     assert loaded[0][0]["items"] == [{"road": "A-6", "km": "10.5"}]
+    assert len(finished) == 1
+
+
+def test_image_worker_emits_downloaded_bytes():
+    worker = ImageLoadWorker("https://example.invalid/camera.jpg", lambda _url: b"image-bytes")
+    loaded = QSignalSpy(worker.loaded)
+    finished = QSignalSpy(worker.finished)
+
+    worker.run()
+
+    assert loaded[0][0] == "https://example.invalid/camera.jpg"
+    assert loaded[0][1] == b"image-bytes"
     assert len(finished) == 1

@@ -32,3 +32,26 @@ def test_cameras_dialog_loads_nearby_cameras():
     assert "1 cámaras" in dialog.status_label.text()
     dialog.close()
     app.processEvents()
+
+
+def test_cameras_dialog_loads_camera_image_async():
+    app = QApplication.instance() or QApplication([])
+    incident = {"road": "A-6", "province": "Madrid", "municipality": "Madrid", "km": "10.5"}
+    dialog = CamerasDialog(FakeService(), incident, autoload=False, image_downloader=lambda _url: _tiny_png())
+    completed = QSignalSpy(dialog.load_completed)
+    image_loaded = QSignalSpy(dialog.image_loaded)
+
+    dialog.reload()
+
+    assert completed.wait(1000)
+    assert image_loaded.wait(1000)
+    assert image_loaded[0][0] == "https://example.invalid/camera.jpg"
+    dialog.close()
+    app.processEvents()
+
+
+def _tiny_png() -> bytes:
+    return bytes.fromhex(
+        "89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c489"
+        "0000000d49444154789c6360f8ffff3f0005fe02fea7cd2db40000000049454e44ae426082"
+    )
