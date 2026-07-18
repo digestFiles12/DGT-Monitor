@@ -11,3 +11,13 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
 .\.venv\Scripts\python.exe -m pytest
 ```
+
+## Ejecución
+
+```powershell
+# Dashboard web
+.\.venv\Scripts\python.exe -m uvicorn dashboard.app:app --reload
+
+# Aplicación de escritorio
+.\.venv\Scripts\python.exe -m dgt_monitor.gui
+```

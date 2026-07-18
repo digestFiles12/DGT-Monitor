@@ -11,12 +11,12 @@ Reimplementar DGT Monitor con programacion orientada a objetos, separando domini
 3. [x] Implementar cliente HTTP, parsers DATEX2, repositorios y cache TTL.
 4. [x] Implementar servicios compartidos de incidentes y camaras.
 5. [x] Implementar dashboard FastAPI, WebSocket y PWA.
-6. Implementar GUI PyQt6 modular y dialogos no modales.
+6. [~] Implementar GUI PyQt6 modular y dialogos no modales. Ventana, worker de incidencias, filtros, estadísticas, tabla y detalle completados; cámaras y diálogos pendientes.
 7. Completar pruebas, CI, despliegue y documentacion.
 
 ## Estado actual
 
-El flujo compartido, la API modular y el dashboard web ya funcionan. FastAPI dispone de app factory inyectable, endpoints REST, WebSocket, PWA y wrapper ASGI estable. El dashboard ofrece filtros, estadísticas, tabla con carga progresiva, galería de cámaras y actualización automática.
+El flujo compartido, la API modular, el dashboard web y la primera GUI modular ya funcionan. La GUI carga incidencias en `QThread`, filtra mediante modelos de dominio y presenta estadísticas, tabla y detalle sin duplicar lógica de aplicación.
 
 ## Compatibilidad
 
