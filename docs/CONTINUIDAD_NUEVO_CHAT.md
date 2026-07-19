@@ -8,9 +8,10 @@ Este documento es el punto de entrada para reanudar el proyecto con el contexto 
 
 - Fecha de cierre: 2026-07-19.
 - Rama de integracion actual: `develop`.
-- Release en preparacion: `20260719.02`, PR `develop` -> `main`.
-- Tag publicado: `20260719.02`, creado sobre el commit `6d72ed5`.
-- Release anterior en `main`: `v20260719.01`.
+- `develop`: actualizado en `020f0b1` tras la PR #12 `feature/GUI` -> `develop`.
+- `release`: actualizada desde `develop` y usada para promocion estable.
+- `main`: actualizado mediante PR #13 `release` -> `main`, merge commit `5d75d6f91ba3b79c72c6d0ab2632621873d54f7c`.
+- Tag publicado: `20260719.06`, creado sobre el merge commit final de `main`.
 - API FastAPI, WebSocket, SSE y Activity API operativas.
 - Dashboard web/PWA servido desde `/`, con filtros completos, busqueda `contains`/`exact`/`regex`, celdas estadisticas clicables, mapa sincronizado, scroll general e interno, modo claro/oscuro, icono rojo de camara tachada sin cobertura, fallback localizado para imagenes no disponibles, visor fullscreen de camaras y desplegable en Render.
 - GUI PyQt6 modular con filtros completos, modo de busqueda contiene/exacta/regex, celdas estadisticas clicables, incidencias, dialogo de camaras alineado con el rango compartido de cobertura, imagenes asincronas, visor fullscreen y modo claro/oscuro.
@@ -95,19 +96,23 @@ Comprobaciones visuales importantes:
 
 Ramas principales:
 
-- `main`: produccion. Contiene la release anterior `v20260719.01` hasta que se mergee `20260719.02`.
-- `develop`: integracion diaria y origen de la PR `Release 20260719.02` hacia `main`.
-- `release`: estabilizacion cuando se use flujo completo GitFlow.
+- `main`: produccion. Contiene la release `20260719.06` tras mergear PR #13.
+- `develop`: integracion diaria. Actualmente contiene PR #12 y esta alineada con la funcionalidad publicada.
+- `release`: estabilizacion permanente. Fue actualizada desde `develop` y promocionada a `main` por PR #13.
 
 PRs relevantes:
 
+- PR #13: `release` -> `main`, release `20260719.06`, mergeada.
+- PR #12: `feature/GUI` -> `develop`, mejoras de GUI y fix del visor fullscreen, mergeada.
 - PR #9: `feature/scroll` -> `develop`, integrada con filtros exact/regex, cobertura, scroll y fix de sintaxis.
 - PR #10: `develop` -> `main`, release `20260719.02`.
 - PR #5: `Release v20260719.01`, `develop` -> `main`, mergeada anteriormente.
 
 Tags relevantes:
 
-- `20260719.02`: tag solicitado para la release actual.
+- `20260719.06`: tag actual de produccion sobre `main` (`5d75d6f91ba3b79c72c6d0ab2632621873d54f7c`).
+- `20260719.05` y `20260719.04`: tags sobre el estado de `develop` tras PR #12.
+- `20260719.02`: tag de release documental/dashboard anterior.
 - `v20260719.02`: tag previo existente sobre el estado anterior de `develop`.
 - `v20260719.01`: release anterior en `main`.
 
