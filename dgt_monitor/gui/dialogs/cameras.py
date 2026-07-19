@@ -214,10 +214,15 @@ class CamerasDialog(QDialog):
             label.setText("")
             label.setCursor(Qt.CursorShape.PointingHandCursor)
             label.setToolTip("Abrir imagen a pantalla completa")
-            label.mousePressEvent = lambda _event, image=QPixmap(pixmap): self._open_fullscreen_image(image)
+            label.mousePressEvent = self._fullscreen_click_handler(QPixmap(pixmap))
         else:
             label.setText("Imagen no disponible")
         self.image_loaded.emit(url)
+
+    def _fullscreen_click_handler(self, pixmap: QPixmap):
+        def open_fullscreen(_event) -> None:
+            self._open_fullscreen_image(pixmap)
+        return open_fullscreen
 
     def _open_fullscreen_image(self, pixmap: QPixmap) -> QDialog:
         dialog = _FullscreenImageDialog(pixmap, self)

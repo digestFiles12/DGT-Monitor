@@ -72,10 +72,10 @@ def test_cameras_dialog_opens_loaded_image_fullscreen():
     image_label = QLabel()
 
     dialog._apply_image("https://example.invalid/camera.jpg", image_payload, image_label)
-    fullscreen_dialog = dialog._open_fullscreen_image(image_label.pixmap())
+    result = image_label.mousePressEvent(None)
 
     assert len(fullscreen_opened) == 1
-    assert fullscreen_dialog in dialog._fullscreen_dialogs
+    assert result is None
     assert dialog._fullscreen_dialogs
     dialog.close()
     app.processEvents()
