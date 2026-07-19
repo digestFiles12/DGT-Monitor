@@ -10,9 +10,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="/static/styles.css?v=51">
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
-  <script src="/static/app.js" defer></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+  <script src="/static/app.js?v=51" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -37,38 +39,38 @@
   </header>
 
   <main>
-    <section class="overview" aria-labelledby="pageTitle">
-      <div>
-        <p class="eyebrow">Panel operativo</p>
-        <h1 id="pageTitle">Tráfico en tiempo real</h1>
-        <p class="overview-copy">Consulta incidencias activas y cámaras de la red estatal desde una única vista.</p>
-      </div>
+    <section class="overview" aria-label="Resumen de incidencias">
       <div class="summary-grid" aria-label="Resumen de incidencias">
         <button class="metric metric-total is-active" type="button" data-kind=""><span>Total</span><strong id="statTotal">--</strong></button>
         <button class="metric metric-accidents" type="button" data-kind="accident"><span>Accidentes</span><strong id="statAccidents">--</strong></button>
         <button class="metric metric-roadworks" type="button" data-kind="roadworks"><span>Obras</span><strong id="statRoadworks">--</strong></button>
         <button class="metric metric-stuck" type="button" data-kind="stuck"><span>Averías</span><strong id="statStuck">--</strong></button>
         <button class="metric metric-obstructions" type="button" data-kind="obstruction"><span>Obstrucciones</span><strong id="statObstructions">--</strong></button>
-        <button class="metric metric-weather" type="button" data-kind="weather"><span>Clima</span><strong id="statWeather">--</strong></button>
+        <button class="metric metric-weather" type="button" data-kind="weather"><span>Meteorología</span><strong id="statWeather">--</strong></button>
       </div>
     </section>
 
     <nav class="view-tabs" aria-label="Vistas del monitor">
+      <button class="filter-toggle" id="filterToggle" type="button" aria-controls="filtersPanel" aria-expanded="true" aria-label="Ocultar filtros" title="Ocultar filtros"><i data-lucide="panel-left-close" aria-hidden="true"></i></button>
       <button class="tab is-active" type="button" data-view="incidents" aria-selected="true">
         <i data-lucide="triangle-alert" aria-hidden="true"></i><span class="tab-label">Incidencias</span><span class="tab-count" id="incidentTabCount">0</span>
       </button>
       <button class="tab" type="button" data-view="cameras" aria-selected="false">
         <i data-lucide="camera" aria-hidden="true"></i><span class="tab-label">Cámaras</span><span class="tab-count" id="cameraTabCount">0</span>
       </button>
+      <button class="tab" type="button" data-view="map" aria-selected="false">
+        <i data-lucide="map" aria-hidden="true"></i><span class="tab-label">Mapa</span><span class="tab-count" id="mapTabCount">0</span>
+      </button>
     </nav>
 
-    <section class="workspace">
-      <aside class="filters" aria-labelledby="filterTitle">
+    <section class="workspace" id="workspace">
+      <aside class="filters" id="filtersPanel" aria-labelledby="filterTitle">
         <div class="filter-heading">
           <div><p class="eyebrow">Consulta</p><h2 id="filterTitle">Filtros</h2></div>
           <button class="text-button" id="clearFilters" type="button">Limpiar</button>
         </div>
         <form id="filterForm">
+          <label>Modo de búsqueda<select id="matchModeFilter" name="match_mode"><option value="contains">Contiene</option><option value="exact">Exacta</option><option value="regex">Regex</option></select></label>
           <label>Provincia<input id="provinceFilter" name="province" type="search" placeholder="Ej. Madrid" autocomplete="off"></label>
           <label>Carretera<input id="roadFilter" name="road" type="search" placeholder="Ej. A-6" autocomplete="off"></label>
           <div id="incidentFilters">
@@ -78,6 +80,7 @@
           </div>
           <div id="cameraFilters" hidden>
             <label>Punto kilométrico<input id="kmFilter" name="km" type="search" placeholder="Ej. 24.5" autocomplete="off"></label>
+            <label class="inline-check">Incidencia con cámara<input id="cameraIncidentFilter" name="incident_coverage" type="checkbox" value="true"></label>
             <label>Máximo de cámaras<select id="limitFilter" name="limit"><option>12</option><option>24</option><option>36</option><option>50</option></select></label>
           </div>
           <button class="primary-button" type="submit"><i data-lucide="search" aria-hidden="true"></i> Aplicar filtros</button>
@@ -112,6 +115,19 @@
           </div>
         </div>
         <div class="camera-grid" id="cameraResults" hidden></div>
+        <div class="map-results" id="mapResults" hidden>
+          <section class="map-shell" aria-label="Mapa de incidencias y cámaras">
+            <div class="map-panel" id="trafficMap"></div>
+            <aside class="map-detail" id="mapDetail" aria-live="polite">
+              <section class="map-window map-detail-window">
+                <p class="eyebrow">OpenStreetMap</p>
+                <h3>Selecciona un punto</h3>
+                <p>Elige una incidencia o cámara en el mapa para ver sus detalles.</p>
+              </section>
+            </aside>
+          </section>
+          <p class="map-status" id="mapStatus">OpenStreetMap</p>
+        </div>
       </section>
     </section>
   </main>

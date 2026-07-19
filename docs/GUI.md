@@ -1,6 +1,6 @@
 # GUI PyQt6
 
-La GUI modular está operativa. Consume `DgtApplicationService` mediante workers en `QThread`, sin incluir parsing, repositorios ni caché en los widgets. Incluye modo claro/oscuro en la ventana principal y en el dialogo de camaras. El dashboard web complementario muestra las incidencias sin cobertura con un icono de camara tachada rojo y reemplaza imagenes de camara no disponibles por un fallback visual localizado.
+La GUI modular esta operativa. Consume `DgtApplicationService` mediante workers en `QThread`, sin incluir parsing, repositorios ni cache en los widgets. Incluye modo claro/oscuro en la ventana principal y en el dialogo de camaras. El dashboard web complementario muestra las incidencias sin cobertura con un icono de camara tachada rojo, reemplaza imagenes de camara no disponibles por un fallback visual localizado y anade busqueda exacta/regex, filtro de camaras con incidencia y scroll general/interno.
 
 ## Estructura actual
 
@@ -13,7 +13,9 @@ dgt_monitor/gui/
   workers.py
 ```
 
-`MainWindow` ofrece filtros por provincia, municipio, carretera, gravedad y cobertura de cámara, tarjetas estadísticas clicables por tipo, tabla seleccionable, panel de detalle y acceso a cámaras cercanas. En el dashboard web, el contador de cámaras de cada incidencia es accionable: abre la cámara directamente cuando solo hay una y muestra un desplegable cuando hay varias. `IncidentLoadWorker` ejecuta la carga fuera del hilo de interfaz y propaga payload, error y finalización mediante señales.
+`MainWindow` ofrece filtros por provincia, municipio, carretera, gravedad y cobertura de camara, tarjetas estadisticas clicables por tipo, tabla seleccionable, panel de detalle y acceso a camaras cercanas. En el dashboard web, el contador de camaras de cada incidencia es accionable: abre la camara directamente cuando solo hay una y muestra un desplegable cuando hay varias. `IncidentLoadWorker` ejecuta la carga fuera del hilo de interfaz y propaga payload, error y finalizacion mediante senales.
+
+El dashboard web no reemplaza a la GUI, pero comparte la misma fachada. Sus controles adicionales (`match_mode`, `incident_coverage`, mapa y scroll responsive) deben mantenerse en servicios/API antes de replicarse en escritorio; no deben implementarse como logica aislada en JavaScript.
 
 `CamerasDialog` muestra cámaras cercanas de una incidencia seleccionada en un diálogo no modal. Construye `CameraFilters` con carretera, provincia, punto kilométrico y coordenadas de la incidencia, ejecuta `CameraLoadWorker` en `QThread` y mantiene vivas las referencias hasta la finalización.
 
@@ -43,4 +45,5 @@ El tema visual se centraliza en `dgt_monitor.gui.theme` y se aplica tanto a `Mai
 ## Pendiente
 
 - Temporizador configurable y registro de actividad visible.
+- Replicar en la GUI de escritorio, si se decide, el modo exact/regex y el filtro de camaras con incidencia ya disponibles en el dashboard/API.
 - Wrappers de compatibilidad de escritorio.

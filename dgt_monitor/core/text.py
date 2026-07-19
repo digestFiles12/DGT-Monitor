@@ -16,8 +16,18 @@ class TextCleaner:
         return text
 
 
-def matches_text(value: str | None, needle: str | None) -> bool:
-    return not needle or needle.casefold() in (value or "").casefold()
+def matches_text(value: str | None, needle: str | None, mode: str = "contains") -> bool:
+    if not needle:
+        return True
+    haystack = value or ""
+    if mode == "exact":
+        return haystack.casefold() == needle.casefold()
+    if mode == "regex":
+        try:
+            return re.search(needle, haystack, re.IGNORECASE) is not None
+        except re.error:
+            return False
+    return needle.casefold() in haystack.casefold()
 
 
 def normalize_road(value: str | None) -> str:
