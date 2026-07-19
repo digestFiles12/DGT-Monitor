@@ -6,7 +6,7 @@ DGT_CAMERAS_URL = "https://nap.dgt.es/datex2/v3/dgt/DevicePublication/camaras_da
 HTTP_TIMEOUT_SECONDS = 15
 INCIDENT_CACHE_SECONDS = 120
 CAMERA_CACHE_SECONDS = 300
-CAMERA_MATCH_RANGE_KM = 1.0
+CAMERA_MATCH_RANGE_KM = 2.0
 
 HTTP_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
