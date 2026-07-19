@@ -63,6 +63,7 @@ class DgtApplicationService:
             road=filters.road,
             severity=filters.severity,
             camera=filters.camera,
+            match_mode=filters.match_mode,
         )
 
     def get_cameras(self, filters: CameraFilters | None = None, refresh: bool = False) -> dict[str, Any]:
