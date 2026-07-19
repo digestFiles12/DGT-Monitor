@@ -36,3 +36,4 @@ def cameras(
         max_distance_km=max_distance_km,
         incident_coverage=incident_coverage,
         match_mode=match_mode,
+    ))
