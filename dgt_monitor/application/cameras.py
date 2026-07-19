@@ -28,12 +28,9 @@ class CameraService:
         for camera in cameras:
             province_match = matches_text(camera.province, filters.province)
             road_match = matches_text(camera.road, filters.road)
-            if filters.province and filters.road:
-                if not province_match and not road_match:
-                    continue
-            elif filters.province and not province_match:
+            if filters.province and not province_match:
                 continue
-            elif filters.road and not road_match:
+            if filters.road and not road_match:
                 continue
             camera_km = parse_kilometer_point(camera.km)
             km_delta = abs(camera_km - incident_km) if camera_km is not None and incident_km is not None else None
@@ -44,6 +41,8 @@ class CameraService:
                 distance_km = self._distance.haversine_km(
                     filters.latitude, filters.longitude, camera.latitude, camera.longitude  # type: ignore[arg-type]
                 )
+                if filters.max_distance_km is not None and distance_km > filters.max_distance_km:
+                    continue
             results.append(replace(camera, km_delta=km_delta, distance_km=distance_km))
         results.sort(key=lambda item: item.distance_km if item.distance_km is not None else float("inf"))
         return results if filters.limit is None else results[:filters.limit]

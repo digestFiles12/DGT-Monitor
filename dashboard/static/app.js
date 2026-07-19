@@ -10,6 +10,7 @@ const state = {
   map: null,
   incidentLayer: null,
   cameraLayer: null,
+  requestId: 0,
 };
 
 const incidentDetailFields = [
@@ -290,6 +291,7 @@ function updateFilterToggle() {
 }
 
 async function loadCurrentView() {
+  const requestId = ++state.requestId;
   showState("loading");
   elements.refreshButton.classList.add("is-loading");
   try {
@@ -298,17 +300,20 @@ async function loadCurrentView() {
     const response = await fetch(`${endpoint}?${params.toString()}`, { headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(response.status === 502 ? uiText("serverUnavailable") : uiText("serverStatus", response.status));
     const payload = await response.json();
+    if (requestId !== state.requestId) return;
     if (state.view === "cameras") renderCameras(payload);
-    else if (state.view === "map") await renderMap(payload);
+    else if (state.view === "map") await renderMap(payload, requestId);
     else renderIncidents(payload);
+    if (requestId !== state.requestId) return;
     updateTimestamp(payload.updated_at);
     setConnection(true);
   } catch (error) {
+    if (requestId !== state.requestId) return;
     elements.errorMessage.textContent = error.message || uiText("connectionRetry");
     showState("error");
     setConnection(false);
   } finally {
-    elements.refreshButton.classList.remove("is-loading");
+    if (requestId === state.requestId) elements.refreshButton.classList.remove("is-loading");
   }
 }
 
@@ -330,7 +335,7 @@ function buildParams() {
 }
 
 function addParam(params, key, value) {
-  const clean = value.trim();
+  const clean = String(value ?? "").trim();
   if (clean) params.set(key, clean);
 }
 
@@ -492,9 +497,11 @@ function renderCameras(payload) {
   showState(state.cameras.length ? "cameras" : "empty");
 }
 
-async function renderMap(incidentPayload) {
-  state.incidents = incidentPayload.items || [];
-  const cameraPayload = await fetchMapCameras();
+async function renderMap(incidentPayload, requestId) {
+  const incidents = incidentPayload.items || [];
+  const cameraPayload = await fetchMapCameras(incidents);
+  if (requestId !== state.requestId) return;
+  state.incidents = incidents;
   state.cameras = cameraPayload.items || [];
   elements.incidentTabCount.textContent = incidentPayload.count ?? state.incidents.length;
   elements.cameraTabCount.textContent = cameraPayload.count ?? state.cameras.length;
@@ -505,10 +512,49 @@ async function renderMap(incidentPayload) {
   showState(state.incidents.length || state.cameras.length ? "map" : "empty");
 }
 
-async function fetchMapCameras() {
+async function fetchMapCameras(incidents) {
+  const scopes = mapCameraScopes(incidents);
+  if (!scopes.length) return { count: 0, items: [] };
+  const payloads = await Promise.all(scopes.map(fetchMapCameraScope));
+  const cameras = new Map();
+  payloads.flatMap((payload) => payload.items || []).forEach((camera) => {
+    const key = camera.id || [camera.province, camera.road, camera.km, camera.image_url].join("|");
+    if (!cameras.has(key)) cameras.set(key, camera);
+  });
+  return { updated_at: payloads[0]?.updated_at, count: cameras.size, items: Array.from(cameras.values()) };
+}
+
+function mapCameraScopes(incidents) {
+  const road = elements.roadFilter.value.trim().toUpperCase();
+  if (road) return [{ road }];
+  const municipality = elements.municipalityFilter.value.trim();
+  if (municipality) return mapMunicipalityCameraScopes(incidents);
+  const province = elements.provinceFilter.value.trim();
+  if (province) return [{ province }];
+  return [{}];
+}
+
+function mapMunicipalityCameraScopes(incidents) {
+  const scopes = new Map();
+  incidents.forEach((incident) => {
+    const latitude = Number(incident.latitude);
+    const longitude = Number(incident.longitude);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
+    const key = `${latitude.toFixed(4)}|${longitude.toFixed(4)}`;
+    scopes.set(key, { latitude, longitude, maxDistanceKm: 25 });
+  });
+  return Array.from(scopes.values());
+}
+
+async function fetchMapCameraScope(scope) {
   const params = new URLSearchParams();
-  addParam(params, "province", elements.provinceFilter.value);
-  addParam(params, "road", elements.roadFilter.value.toUpperCase());
+  addParam(params, "province", scope.province);
+  addParam(params, "road", scope.road);
+  if (Number.isFinite(scope.latitude) && Number.isFinite(scope.longitude)) {
+    params.set("lat", String(scope.latitude));
+    params.set("lon", String(scope.longitude));
+    params.set("max_distance_km", String(scope.maxDistanceKm));
+  }
   params.set("all", "true");
   const response = await fetch(`/api/cameras?${params.toString()}`, { headers: { Accept: "application/json" } });
   if (!response.ok) throw new Error(response.status === 502 ? uiText("serverUnavailable") : uiText("serverStatus", response.status));

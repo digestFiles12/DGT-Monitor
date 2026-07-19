@@ -26,6 +26,8 @@ class FakeCameraRepository:
         return [
             Camera(id="near", road="A-3", province="Madrid", km="13", image_url="https://example.test/near.jpg", latitude=40.417, longitude=-3.704),
             Camera(id="far", road="A-3", province="Madrid", km="48", image_url="https://example.test/far.jpg"),
+            Camera(id="same-road-other-province", road="A-3", province="Valencia", km="13", image_url="https://example.test/wrong-province.jpg"),
+            Camera(id="same-province-other-road", road="A-4", province="Madrid", km="13", image_url="https://example.test/wrong-road.jpg"),
         ]
 
 
@@ -95,3 +97,11 @@ def test_facade_filters_cameras_by_kilometer_and_distance():
     assert payload["items"][0]["id"] == "near"
     assert payload["items"][0]["km_delta"] == 0.5
     assert payload["items"][0]["distance_km"] < 0.1
+
+
+def test_facade_requires_camera_province_and_road_when_both_filters_are_present():
+    facade, _, _ = build_facade()
+
+    payload = facade.get_cameras(CameraFilters(province="Madrid", road="A-3", limit=None))
+
+    assert {item["id"] for item in payload["items"]} == {"near", "far"}

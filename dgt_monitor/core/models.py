@@ -97,3 +97,4 @@ class CameraFilters:
     longitude: float | None = None
     limit: int | None = 12
     max_km_delta: float = 1.0
+    max_distance_km: float | None = None
