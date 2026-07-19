@@ -212,6 +212,7 @@ footer a:hover { color: white; }
   .camera-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 760px) {
+  body { padding-bottom: calc(58px + env(safe-area-inset-bottom)); }
   .topbar { min-height: 64px; height: auto; padding: 10px 14px; gap: 10px; flex-wrap: wrap; }
   .brand { min-width: 0; flex: 1 1 150px; }
   .brand-mark { width: 46px; height: 34px; font-size: 19px; }
@@ -252,4 +253,7 @@ footer a:hover { color: white; }
   .incident-detail-panel { padding: 16px 14px 18px; }
   .incident-detail-heading { display: grid; }
   .incident-detail-grid { grid-template-columns: 1fr; }
+  footer { position: fixed; inset: auto 0 0; z-index: 45; min-height: calc(54px + env(safe-area-inset-bottom)); padding: 0 14px env(safe-area-inset-bottom); gap: 18px; box-shadow: 0 -10px 28px rgba(0, 0, 0, .24); }
+  footer span { min-width: 0; }
+  footer a { white-space: nowrap; }
 }
