@@ -257,3 +257,45 @@ footer a:hover { color: white; }
   footer span { min-width: 0; }
   footer a { white-space: nowrap; }
 }
+
+@media (max-width: 760px) and (orientation: portrait) {
+  .table-wrap { margin-inline: 0; overflow: visible; background: transparent; border: 0; box-shadow: none; }
+  .table-wrap::after { content: none; }
+  table, tbody { display: block; width: 100%; min-width: 0; }
+  thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  #incidentRows { display: grid; gap: 10px; }
+  .incident-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; padding: 12px; background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow); }
+  .incident-row:hover, .incident-row.is-expanded { background: var(--panel); }
+  .incident-row td { display: grid; gap: 4px; width: auto !important; padding: 0; border: 0; background: transparent !important; box-shadow: none !important; position: static !important; white-space: normal; }
+  .incident-row td::before { color: var(--muted); font-size: 10px; font-weight: 700; text-transform: uppercase; }
+  .incident-row td:nth-child(1)::before { content: "Gravedad"; }
+  .incident-row td:nth-child(2)::before { content: "Carretera"; }
+  .incident-row td:nth-child(3)::before { content: "Ubicación"; }
+  .incident-row td:nth-child(4)::before { content: "Tipo"; }
+  .incident-row td:nth-child(5)::before { content: "Dirección"; }
+  .incident-row td:nth-child(6)::before { content: "Cámaras"; }
+  .incident-row td:nth-child(3), .incident-row td:nth-child(4), .incident-row td:nth-child(5), .incident-row td:nth-child(6) { grid-column: 1 / -1; }
+  .incident-detail-row { display: block; margin-top: -10px; }
+  .incident-detail-row[hidden] { display: none; }
+  .incident-detail-row td { display: block; width: auto; padding: 0; border: 0; white-space: normal; }
+  .incident-detail-panel { width: auto; max-width: none; padding: 14px 12px 16px; background: var(--subtle); border: 1px solid var(--line); border-top: 0; }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  main { padding-inline: 12px; }
+  .table-wrap { margin-inline: 0; overflow-x: hidden; }
+  .table-wrap::after { content: none; }
+  table { width: 100%; min-width: 0; table-layout: fixed; font-size: 13px; }
+  th, td { padding: 9px 7px; white-space: normal; }
+  th:nth-child(1), td:nth-child(1) { width: 14%; }
+  th:nth-child(2), td:nth-child(2) { width: 14%; }
+  th:nth-child(3), td:nth-child(3) { width: 27%; }
+  th:nth-child(4), td:nth-child(4) { width: 20%; }
+  th:nth-child(5), td:nth-child(5) { width: 15%; }
+  th:nth-child(6), td:nth-child(6) { width: 10%; }
+  .road { font-size: 17px; }
+  .location { min-width: 0; }
+  .badge { padding-inline: 6px; }
+  .coverage-button { padding-inline: 8px; }
+  .incident-detail-panel { width: auto; max-width: none; }
+}
