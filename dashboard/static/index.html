@@ -11,10 +11,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="/static/styles.css?v=42">
+  <link rel="stylesheet" href="/static/styles.css?v=49">
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-  <script src="/static/app.js?v=42" defer></script>
+  <script src="/static/app.js?v=49" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -79,6 +79,7 @@
           </div>
           <div id="cameraFilters" hidden>
             <label>Punto kilométrico<input id="kmFilter" name="km" type="search" placeholder="Ej. 24.5" autocomplete="off"></label>
+            <label class="inline-check">Incidencia con cámara<input id="cameraIncidentFilter" name="incident_coverage" type="checkbox" value="true"></label>
             <label>Máximo de cámaras<select id="limitFilter" name="limit"><option>12</option><option>24</option><option>36</option><option>50</option></select></label>
           </div>
           <button class="primary-button" type="submit"><i data-lucide="search" aria-hidden="true"></i> Aplicar filtros</button>

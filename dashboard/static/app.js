@@ -60,7 +60,7 @@ const uiCopy = {
     total: "Total", accidents: "Accidentes", roadworks: "Obras", stuck: "Averías", obstructions: "Obstrucciones", weather: "Meteorología",
     incidents: "Incidencias", cameras: "Cámaras", map: "Mapa", query: "Consulta", filters: "Filtros", hideFilters: "Ocultar filtros", showFilters: "Mostrar filtros", clear: "Limpiar", province: "Provincia",
     road: "Carretera", location: "Ubicación", type: "Tipo", direction: "Dirección", municipality: "Municipio", severity: "Gravedad", camera: "Cámara", kilometerPoint: "Punto kilométrico",
-    cameraLimit: "Máximo de cámaras", all: "Todas", withCamera: "Con cámara", withoutCamera: "Sin cámara", severityHighest: "Muy alta", severityHigh: "Alta", severityMedium: "Media", severityLow: "Baja", applyFilters: "Aplicar filtros", autoRefresh: "Actualizar cada 2 minutos", roadNetwork: "Red viaria",
+    cameraLimit: "Máximo de cámaras", cameraIncidentCoverage: "Incidencia con cámara", all: "Todas", withCamera: "Con cámara", withoutCamera: "Sin cámara", severityHighest: "Muy alta", severityHigh: "Alta", severityMedium: "Media", severityLow: "Baja", applyFilters: "Aplicar filtros", autoRefresh: "Actualizar cada 2 minutos", roadNetwork: "Red viaria",
     visualObservation: "Observación visual", activeIncidents: "Incidencias activas", trafficCameras: "Cámaras de tráfico", loadingTitle: "Consultando datos de tráfico",
     loadingText: "La primera carga puede tardar unos segundos.", errorTitle: "No se pudieron cargar los datos", retry: "Reintentar", emptyTitle: "Sin resultados",
     emptyText: "Prueba a ampliar o limpiar los filtros.", api: "API", serviceStatus: "Estado del servicio", unknownSeverity: "Sin dato",
@@ -80,7 +80,7 @@ const uiCopy = {
     total: "Total", accidents: "Accidents", roadworks: "Roadworks", stuck: "Breakdowns", obstructions: "Obstructions", weather: "Weather",
     incidents: "Incidents", cameras: "Cameras", map: "Map", query: "Query", filters: "Filters", hideFilters: "Hide filters", showFilters: "Show filters", clear: "Clear", province: "Province",
     road: "Road", location: "Location", type: "Type", direction: "Direction", municipality: "Municipality", severity: "Severity", camera: "Camera", kilometerPoint: "Kilometer point",
-    cameraLimit: "Maximum cameras", all: "All", withCamera: "With camera", withoutCamera: "Without camera", severityHighest: "Critical", severityHigh: "High", severityMedium: "Medium", severityLow: "Low", applyFilters: "Apply filters", autoRefresh: "Refresh every 2 minutes", roadNetwork: "Road network",
+    cameraLimit: "Maximum cameras", cameraIncidentCoverage: "Incident with camera", all: "All", withCamera: "With camera", withoutCamera: "Without camera", severityHighest: "Critical", severityHigh: "High", severityMedium: "Medium", severityLow: "Low", applyFilters: "Apply filters", autoRefresh: "Refresh every 2 minutes", roadNetwork: "Road network",
     visualObservation: "Visual observation", activeIncidents: "Active incidents", trafficCameras: "Traffic cameras", loadingTitle: "Checking traffic data",
     loadingText: "The first load can take a few seconds.", errorTitle: "Could not load data", retry: "Retry", emptyTitle: "No results",
     emptyText: "Try broadening or clearing the filters.", api: "API", serviceStatus: "Service status", unknownSeverity: "N/A",
@@ -98,7 +98,7 @@ const elements = {};
 const ids = [
   "connectionStatus", "lastUpdate", "refreshButton", "filterForm", "clearFilters",
   "provinceFilter", "roadFilter", "municipalityFilter", "severityFilter", "cameraCoverageFilter", "kmFilter",
-  "limitFilter", "incidentFilters", "cameraFilters", "autoRefresh", "statTotal",
+  "cameraIncidentFilter", "limitFilter", "incidentFilters", "cameraFilters", "autoRefresh", "statTotal",
   "statAccidents", "statRoadworks", "statStuck", "statObstructions", "statWeather", "incidentTabCount",
   "cameraTabCount", "mapTabCount", "resultsTitle", "resultEyebrow", "resultCount", "loadingState",
   "errorState", "errorMessage", "emptyState", "incidentResults", "incidentRows",
@@ -189,6 +189,7 @@ function applyStaticLanguage() {
   setLabelText(elements.severityFilter, uiText("severity"));
   setLabelText(elements.cameraCoverageFilter, uiText("camera"));
   setLabelText(elements.kmFilter, uiText("kilometerPoint"));
+  setLabelText(elements.cameraIncidentFilter, uiText("cameraIncidentCoverage"));
   setLabelText(elements.limitFilter, uiText("cameraLimit"));
   elements.provinceFilter.placeholder = uiText("provincePlaceholder");
   elements.roadFilter.placeholder = uiText("roadPlaceholder");
@@ -263,6 +264,7 @@ function applyTheme(theme) {
 function switchView(view) {
   state.view = view;
   elements.workspace.classList.toggle("is-map-view", view === "map");
+  document.body.classList.toggle("is-map-view", view === "map");
   document.querySelectorAll(".tab").forEach((tab) => {
     const active = tab.dataset.view === view;
     tab.classList.toggle("is-active", active);
@@ -303,7 +305,10 @@ async function loadCurrentView() {
     if (requestId !== state.requestId) return;
     if (state.view === "cameras") renderCameras(payload);
     else if (state.view === "map") await renderMap(payload, requestId);
-    else renderIncidents(payload);
+    else {
+      renderIncidents(payload);
+      await updateRelatedTabCounts(payload, requestId);
+    }
     if (requestId !== state.requestId) return;
     updateTimestamp(payload.updated_at);
     setConnection(true);
@@ -329,6 +334,7 @@ function buildParams() {
     addParam(params, "kind", state.kind);
   } else {
     addParam(params, "km", elements.kmFilter.value);
+    if (elements.cameraIncidentFilter.checked) params.set("incident_coverage", "true");
     addParam(params, "limit", elements.limitFilter.value);
   }
   return params;
@@ -353,6 +359,20 @@ function renderIncidents(payload) {
   elements.resultCount.textContent = uiText("results", payload.count ?? state.incidents.length);
   renderIncidentRows();
   showState(state.incidents.length ? "incidents" : "empty");
+}
+
+async function updateRelatedTabCounts(payload, requestId) {
+  const incidents = payload.items || [];
+  if (!incidents.length) {
+    elements.cameraTabCount.textContent = 0;
+    elements.mapTabCount.textContent = 0;
+    return;
+  }
+  const cameraPayload = await fetchMapCameras(incidents);
+  if (requestId !== state.requestId || state.view !== "incidents") return;
+  const cameraCount = cameraPayload.count ?? (cameraPayload.items || []).length;
+  elements.cameraTabCount.textContent = cameraCount;
+  elements.mapTabCount.textContent = (payload.count ?? incidents.length) + cameraCount;
 }
 
 function renderIncidentRows() {
@@ -526,10 +546,17 @@ async function fetchMapCameras(incidents) {
 
 function mapCameraScopes(incidents) {
   const road = elements.roadFilter.value.trim().toUpperCase();
-  if (road) return [{ road }];
   const municipality = elements.municipalityFilter.value.trim();
-  if (municipality) return mapMunicipalityCameraScopes(incidents);
   const province = elements.provinceFilter.value.trim();
+  const incidentCoverage = elements.cameraCoverageFilter.value === "with";
+  if (incidentCoverage) {
+    if (!incidents.length) return [];
+    if (road || province) return [{ road, province, incidentCoverage }];
+    if (municipality) return mapMunicipalityCameraScopes(incidents).map((scope) => ({ ...scope, incidentCoverage }));
+    return [{ incidentCoverage }];
+  }
+  if (road) return [{ road }];
+  if (municipality) return mapMunicipalityCameraScopes(incidents);
   if (province) return [{ province }];
   return [{}];
 }
@@ -550,6 +577,7 @@ async function fetchMapCameraScope(scope) {
   const params = new URLSearchParams();
   addParam(params, "province", scope.province);
   addParam(params, "road", scope.road);
+  if (scope.incidentCoverage) params.set("incident_coverage", "true");
   if (Number.isFinite(scope.latitude) && Number.isFinite(scope.longitude)) {
     params.set("lat", String(scope.latitude));
     params.set("lon", String(scope.longitude));

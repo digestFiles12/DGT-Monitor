@@ -4,12 +4,13 @@ from fastapi.testclient import TestClient
 
 from dgt_monitor.application.facade import DgtApplicationService
 from dgt_monitor.api.factory import create_app
-from dgt_monitor.core.models import IncidentFilters
+from dgt_monitor.core.models import CameraFilters, IncidentFilters
 
 
 class FakeService:
     def __init__(self):
         self.last_filters: IncidentFilters | None = None
+        self.last_camera_filters: CameraFilters | None = None
         self.last_language: str | None = None
 
     def get_incident_payload(self, filters, refresh=False, language="es"):
@@ -18,7 +19,8 @@ class FakeService:
         return {"updated_at": "2026-07-18T00:00:00+00:00", "count": 1, "language": language, "stats": {"total": 1}, "items": [{"id": "sit-1", "province": filters.province}]}
 
     def get_cameras(self, filters, refresh=False):
-        return {"updated_at": "2026-07-18T00:00:00+00:00", "count": 1, "items": [{"id": "cam-1", "limit": filters.limit}]}
+        self.last_camera_filters = filters
+        return {"updated_at": "2026-07-18T00:00:00+00:00", "count": 1, "items": [{"id": "cam-1", "limit": filters.limit, "incident_coverage": filters.incident_coverage}]}
 
 
 def service() -> DgtApplicationService:
@@ -38,6 +40,9 @@ def test_health_and_rest_contracts():
     assert fake.last_language == "en"
     assert client.get("/api/cameras", params={"limit": 5}).json()["items"][0]["limit"] == 5
     assert client.get("/api/cameras", params={"all": "true"}).json()["items"][0]["limit"] is None
+    assert client.get("/api/cameras", params={"incident_coverage": "true"}).json()["items"][0]["incident_coverage"] is True
+    assert fake.last_camera_filters is not None
+    assert fake.last_camera_filters.incident_coverage is True
 
 
 def test_dashboard_and_pwa_assets_are_served():
@@ -52,6 +57,7 @@ def test_dashboard_and_pwa_assets_are_served():
     assert "statStuck" in dashboard.text
     assert "statWeather" in dashboard.text
     assert "cameraCoverageFilter" in dashboard.text
+    assert "cameraIncidentFilter" in dashboard.text
     assert "mapResults" in dashboard.text
     assert "filterToggle" in dashboard.text
     assert "pageTitle" not in dashboard.text
@@ -80,14 +86,17 @@ def test_dashboard_and_pwa_assets_are_served():
     assert "detailEntries" in app_js.text
     assert "detailLabels" in app_js.text
     assert "mapCameraScopes" in app_js.text
+    assert "updateRelatedTabCounts" in app_js.text
     assert "max_distance_km" in app_js.text
+    assert "incident_coverage" in app_js.text
     assert "requestId" in app_js.text
+    assert "document.body.classList.toggle" in app_js.text
     assert "Meteorología" in app_js.text
     assert "Carretera de dirección" in app_js.text
     assert client.get("/manifest.webmanifest").headers["content-type"].startswith("application/manifest+json")
     service_worker = client.get("/sw.js")
     assert service_worker.status_code == 200
-    assert "dgt-monitor-v42" in service_worker.text
+    assert "dgt-monitor-v49" in service_worker.text
 
 
 def test_websocket_sends_filtered_payload():
