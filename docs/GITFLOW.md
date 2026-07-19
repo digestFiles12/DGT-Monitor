@@ -25,9 +25,9 @@ Este repositorio usa un GitFlow conservador, sin reescritura de historial y con 
 7. Abrir PR de `release` hacia `main`.
 8. Etiquetar la version desde `main` si aplica.
 
-## Flujo usado en este incremento
+## Flujo usado en el incremento mas reciente
 
-El trabajo actual vive en `feature/initial-oop-architecture`. La rama `release` conserva el punto estable anterior y se usa como base para revisar los cambios pendientes de entrega. `develop` debe apuntar al ultimo estado integrado de la feature actual para continuar el desarrollo sin depender de la rama historica.
+La PR #9 integro `feature/scroll` en `develop`. Ese incremento incluyo scroll general/interno del dashboard, filtro de camaras con incidencia, cobertura a 2 km, busqueda exacta/regex y correccion de sintaxis posterior a un merge remoto. `develop` contiene el estado integrado y debe ser la base de nuevas ramas `feature/*`.
 
 ## Validacion antes de PR
 
@@ -45,3 +45,12 @@ git diff --check
 - `hotfix/*` -> `main`, `release` y `develop`: correcciones urgentes.
 
 No se hacen commits directos en `main`, `develop` o `release` salvo inicializacion de ramas o correcciones acordadas.
+
+## Verificacion de PR
+
+Antes de considerar una PR lista:
+
+- Hacer `git fetch` y asegurar que la rama local contiene el ultimo `origin/<feature>`.
+- Reproducir localmente el check relevante si GitHub Actions falla.
+- Revisar `gh pr view <n> --json statusCheckRollup,mergeable` o la vista web de GitHub.
+- Confirmar que `Test & Validate (3.12)` queda en `SUCCESS` y que la PR es mergeable.

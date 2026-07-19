@@ -20,9 +20,10 @@ def incidents(
     severity: str | None = None,
     kind: str | None = None,
     camera: str | None = None,
+    match_mode: str = "contains",
     lang: str = "es",
 ) -> dict:
-    return service.get_incident_payload(IncidentFilters(province, municipality, road, severity, kind, camera), language=lang)
+    return service.get_incident_payload(IncidentFilters(province, municipality, road, severity, kind, camera, match_mode), language=lang)
 
 
 @router.websocket("/ws/incidents")
@@ -32,7 +33,7 @@ async def incidents_websocket(websocket: WebSocket) -> None:
     interval = max(5, min(int(query.get("interval", "120")), 300))
     filters = IncidentFilters(
         query.get("province"), query.get("municipality"), query.get("road"),
-        query.get("severity"), query.get("kind"), query.get("camera"),
+        query.get("severity"), query.get("kind"), query.get("camera"), query.get("match_mode", "contains"),
     )
     language = query.get("lang", "es")
     service: DgtApplicationService = websocket.app.state.dgt_service

@@ -4,6 +4,7 @@ from collections import defaultdict
 from collections.abc import Sequence
 from dataclasses import replace
 
+from dgt_monitor.core.constants import CAMERA_MATCH_RANGE_KM
 from dgt_monitor.core.geometry import DistanceCalculator
 from dgt_monitor.core.models import Camera, CameraFilters, Incident
 from dgt_monitor.core.ports import CameraRepository
@@ -26,14 +27,11 @@ class CameraService:
         incident_km = parse_kilometer_point(filters.kilometer)
         results: list[Camera] = []
         for camera in cameras:
-            province_match = matches_text(camera.province, filters.province)
-            road_match = matches_text(camera.road, filters.road)
-            if filters.province and filters.road:
-                if not province_match and not road_match:
-                    continue
-            elif filters.province and not province_match:
+            province_match = matches_text(camera.province, filters.province, filters.match_mode)
+            road_match = matches_text(camera.road, filters.road, filters.match_mode)
+            if filters.province and not province_match:
                 continue
-            elif filters.road and not road_match:
+            if filters.road and not road_match:
                 continue
             camera_km = parse_kilometer_point(camera.km)
             km_delta = abs(camera_km - incident_km) if camera_km is not None and incident_km is not None else None
@@ -44,11 +42,32 @@ class CameraService:
                 distance_km = self._distance.haversine_km(
                     filters.latitude, filters.longitude, camera.latitude, camera.longitude  # type: ignore[arg-type]
                 )
+                if filters.max_distance_km is not None and distance_km > filters.max_distance_km:
+                    continue
             results.append(replace(camera, km_delta=km_delta, distance_km=distance_km))
         results.sort(key=lambda item: item.distance_km if item.distance_km is not None else float("inf"))
-        return results[:filters.limit]
+        return results if filters.limit is None else results[:filters.limit]
 
-    def annotate_coverage(self, incidents: Sequence[Incident], cameras: Sequence[Camera], range_km: float = 1.0) -> list[Incident]:
+    def with_incident_coverage(self, cameras: Sequence[Camera], incidents: Sequence[Incident], range_km: float = CAMERA_MATCH_RANGE_KM) -> list[Camera]:
+        incidents_by_road: dict[str, list[Incident]] = defaultdict(list)
+        for incident in incidents:
+            if parse_kilometer_point(incident.km) is not None:
+                incidents_by_road[normalize_road(incident.road)].append(incident)
+        matches: list[Camera] = []
+        for camera in cameras:
+            camera_km = parse_kilometer_point(camera.km)
+            if camera_km is None:
+                continue
+            for incident in incidents_by_road.get(normalize_road(camera.road), []):
+                if incident.province and camera.province and not matches_text(camera.province, incident.province):
+                    continue
+                incident_km = parse_kilometer_point(incident.km)
+                if incident_km is not None and abs(camera_km - incident_km) <= range_km:
+                    matches.append(camera)
+                    break
+        return matches
+
+    def annotate_coverage(self, incidents: Sequence[Incident], cameras: Sequence[Camera], range_km: float = CAMERA_MATCH_RANGE_KM) -> list[Incident]:
         by_road: dict[str, list[Camera]] = defaultdict(list)
         for camera in cameras:
             by_road[normalize_road(camera.road)].append(camera)

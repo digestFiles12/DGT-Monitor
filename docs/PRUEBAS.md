@@ -2,7 +2,7 @@
 
 ## Estado
 
-La suite actual contiene 50 pruebas y cubre modelos, texto, distancia, parsers, caché, servicios, fachada, REST, WebSocket, Activity API, dashboard/PWA con filtros completos, modo oscuro, selector ES/EN, fallback localizado de imágenes de cámara y estado sin cobertura con icono, y GUI PyQt6 offscreen con filtros completos y visor fullscreen de cámaras.
+La suite actual contiene 53 pruebas y cubre modelos, texto, distancia, parsers, cache, servicios, fachada, REST, WebSocket, Activity API, dashboard/PWA con filtros completos, `match_mode`, regex/exact, filtro `incident_coverage`, modo oscuro, selector ES/EN, fallback localizado de imagenes de camara, estado sin cobertura con icono, scroll/contratos estaticos y GUI PyQt6 offscreen con filtros completos y visor fullscreen de camaras.
 
 ## Comandos
 
@@ -30,8 +30,23 @@ git diff --check
 - Acceso concurrente y carga única.
 - XML inválido y campos opcionales.
 - Serialización exacta de modelos.
-- Límites y filtros API.
+- Limites y filtros API, incluidos `match_mode`, regex invalido y `incident_coverage`.
 - Ciclo de vida QThread.
 - Aspect ratio y carga fallida de imágenes.
 - Activity API: autenticación, revocación, SSE, CSV y paginación.
-- Dashboard/PWA: rutas estáticas, service worker, manifest, selector de idioma, fallback de imágenes y estados de cobertura de cámara.
+- Dashboard/PWA: rutas estaticas, service worker `dgt-monitor-v51`, manifest, selector de idioma, fallback de imagenes, estados de cobertura de camara, scroll general e interno y sincronizacion de conteos entre incidencias, camaras y mapa.
+
+## Validacion actual
+
+Ultima validacion local documentada, 2026-07-19:
+
+```powershell
+$env:QT_QPA_PLATFORM='offscreen'; .\.venv\Scripts\python.exe -m pytest test -q
+# 53 passed
+
+.\.venv\Scripts\python.exe -m pytest --collect-only | Select-String "collected"
+# 53 tests collected
+
+.\.venv\Scripts\python.exe -m compileall -q dgt_monitor dashboard
+git diff --check
+```

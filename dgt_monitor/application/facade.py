@@ -1,5 +1,6 @@
 """Application facade consumed by API and GUI adapters."""
 
+from dataclasses import replace
 from datetime import datetime, timezone
 from typing import Any
 
@@ -62,10 +63,18 @@ class DgtApplicationService:
             road=filters.road,
             severity=filters.severity,
             camera=filters.camera,
+            match_mode=filters.match_mode,
         )
 
     def get_cameras(self, filters: CameraFilters | None = None, refresh: bool = False) -> dict[str, Any]:
-        items = self._cameras.filter(self._cameras.get_all(refresh=refresh), filters or CameraFilters())
+        filters = filters or CameraFilters()
+        camera_items = self._cameras.get_all(refresh=refresh)
+        search_filters = replace(filters, limit=None) if filters.incident_coverage else filters
+        items = self._cameras.filter(camera_items, search_filters)
+        if filters.incident_coverage:
+            items = self._cameras.with_incident_coverage(items, self._incidents.get_all(refresh=refresh))
+            if filters.limit is not None:
+                items = items[:filters.limit]
         return {
             "updated_at": datetime.now(timezone.utc).isoformat(),
             "count": len(items),

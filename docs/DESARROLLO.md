@@ -28,11 +28,24 @@ $env:QT_QPA_PLATFORM='offscreen'
 git diff --check
 ```
 
+Estado esperado actual: 53 tests pasando. Si se cambia dashboard/API, ejecutar tambien una prueba enfocada de API antes de la suite completa:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest test\api\test_api.py -q
+```
+
 Para probar el dashboard/API local:
 
 ```powershell
 .\.venv\Scripts\python.exe -m uvicorn dashboard.app:app --reload
 ```
+
+Pruebas manuales recomendadas del dashboard:
+
+- Buscar carretera con `contains`, `exact` y `regex`.
+- Activar `Incidencia con camara` en la pestana de camaras.
+- Comprobar que la pagina completa hace scroll en movil/escritorio y que tabla/grid conservan scroll interno.
+- Validar que los contadores de incidencias, camaras y mapa permanecen sincronizados.
 
 Para probar la GUI de escritorio:
 

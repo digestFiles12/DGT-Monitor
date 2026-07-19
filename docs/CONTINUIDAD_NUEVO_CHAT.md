@@ -7,14 +7,18 @@ Este documento es el punto de entrada para reanudar el proyecto con el contexto 
 ## Estado al cerrar el chat
 
 - Fecha de cierre: 2026-07-19.
-- Rama local al documentar: `main`.
-- `main` local sincronizada con `origin/main` por fast-forward.
-- Release mergeada: PR #5 `Release v20260719.01`, `develop` -> `main`.
-- Merge commit en `main`: `de96845c9e5e3fde5c7342e091e4aa7298d973f9`.
-- Tag publicado: `v20260719.01`, creado sobre `origin/develop` en `0d5dc61729132c90e8fdc36f8559036d1542b1c4`.
-- Hotfix previo: PR #4 `hotfix/dashboard-portrait-layout` integrado en `develop` y luego promovido a `main`.
-- Tests locales al cierre: `50 passed`.
-- Checks GitHub del PR de hotfix/release: verdes antes del cierre.
+- Rama de integracion actual: `develop`.
+- Release en preparacion: `20260719.02`, PR `develop` -> `main`.
+- Tag publicado: `20260719.02`, creado sobre el commit `6d72ed5`.
+- Release anterior en `main`: `v20260719.01`.
+- API FastAPI, WebSocket, SSE y Activity API operativas.
+- Dashboard web/PWA servido desde `/`, con filtros completos, busqueda `contains`/`exact`/`regex`, celdas estadisticas clicables, mapa sincronizado, scroll general e interno, modo claro/oscuro, icono rojo de camara tachada sin cobertura, fallback localizado para imagenes no disponibles, visor fullscreen de camaras y desplegable en Render.
+- GUI PyQt6 modular con filtros completos, celdas estadisticas clicables, incidencias, dialogo de camaras, imagenes asincronas, visor fullscreen y modo claro/oscuro.
+- Activity system con backend en memoria o SQLite.
+- Render y GitHub Actions configurados.
+- 53 tests pasando.
+
+Ver `docs/PHASE_7_COMPLETED.md` para estado completo y checklist de handoff.
 
 ---
 
@@ -23,13 +27,17 @@ Este documento es el punto de entrada para reanudar el proyecto con el contexto 
 - Dashboard web/PWA servido desde `/` con filtros, metricas, filas desplegables, selector ES/EN, modo claro/oscuro y visor de camaras.
 - Tabs del dashboard corregidos para no duplicar idioma/label: cada pestana usa `.tab-label` y `.tab-count`.
 - Fechas de detalle de incidencias humanizadas: los campos `creation_time`, `start_time` y `end_time` se muestran con `Intl.DateTimeFormat` segun idioma activo.
-- Tabla de incidencias en movil mejorada: scroll horizontal interno, sin overflow global de pagina, columnas clave sticky (`Gravedad`, `Carretera`) y detalle desplegable limitado al ancho visible de pantalla.
-- Filtros en movil compactados en la parte superior como banda sticky con desplazamiento horizontal para dejar mas espacio a la tabla.
+- Tabla de incidencias en movil con scroll horizontal interno, columnas clave sticky y detalle limitado al ancho visible.
+- Scroll general restaurado en movil y escritorio; tabla de incidencias y grid de camaras conservan scroll interno.
+- Filtro de camaras con incidencia mediante `incident_coverage=true`.
+- Busqueda textual con `contains`, `exact` y `regex` mediante `match_mode`.
+- Cobertura incidencia-camara centralizada en `CAMERA_MATCH_RANGE_KM = 2.0`.
+- Mapa sincronizado con filtros y conteos de incidencias/camaras.
 - Fallback visual localizado para imagenes de camara no disponibles.
 - Icono rojo `camera-off` para incidencias sin cobertura de camara.
 - GUI PyQt6 modular con filtros, modo oscuro, dialogo/visor de camaras y pruebas deterministas de imagen.
 - CI actualizada con librerias Qt necesarias en Ubuntu.
-- Cache PWA actualizada hasta `dgt-monitor-v19` para forzar carga de assets recientes.
+- Cache PWA actualizada hasta `dgt-monitor-v51` para forzar carga de assets recientes.
 
 ---
 
@@ -45,10 +53,10 @@ git diff --check
 git status --short --branch
 ```
 
-Resultado esperado al cierre:
+Resultado esperado:
 
 ```text
-50 passed
+53 passed
 sin errores de compileall
 git diff --check sin salida
 working tree limpio
@@ -72,11 +80,14 @@ http://127.0.0.1:8766/
 
 Comprobaciones visuales importantes:
 
-- En movil, la pagina no debe tener overflow horizontal global.
-- La tabla de incidencias si debe tener scroll horizontal dentro de su contenedor.
+- En movil y escritorio, la pagina debe permitir scroll general.
+- La tabla de incidencias debe tener scroll horizontal dentro de su contenedor.
+- El grid de camaras debe tener scroll interno cuando haya muchas tarjetas.
 - Las columnas `Gravedad` y `Carretera` deben permanecer visibles al desplazar horizontalmente.
 - Las tabs deben mostrar solo un idioma activo: `Incidencias/Camaras` o `Incidents/Cameras`, nunca ambos.
 - En detalles, timestamps tipo `2025-12-12T08:11:34.000+01:00` deben verse como fecha/hora humana.
+- Probar `match_mode=exact` y `match_mode=regex` desde el dashboard o API.
+- Probar `incident_coverage=true` en camaras y confirmar que mapa/conteos se mantienen sincronizados.
 
 ---
 
@@ -84,30 +95,34 @@ Comprobaciones visuales importantes:
 
 Ramas principales:
 
-- `main`: release actual tras PR #5.
-- `develop`: rama de integracion ya promovida a `main` en `v20260719.01`.
-- `hotfix/dashboard-portrait-layout`: rama usada para los ajustes responsive y de UI; ya integrada.
+- `main`: produccion. Contiene la release anterior `v20260719.01` hasta que se mergee `20260719.02`.
+- `develop`: integracion diaria y origen de la PR `Release 20260719.02` hacia `main`.
+- `release`: estabilizacion cuando se use flujo completo GitFlow.
 
 PRs relevantes:
 
-- PR #4: hotfix responsive/dashboard, integrado antes de la release.
-- PR #5: `Release v20260719.01`, `develop` -> `main`, mergeado.
+- PR #9: `feature/scroll` -> `develop`, integrada con filtros exact/regex, cobertura, scroll y fix de sintaxis.
+- PR #10: `develop` -> `main`, release `20260719.02`.
+- PR #5: `Release v20260719.01`, `develop` -> `main`, mergeada anteriormente.
 
 Tags relevantes:
 
-- `v20260719.01`: tag de release solicitado para la promocion `develop` -> `main`.
+- `20260719.02`: tag solicitado para la release actual.
+- `v20260719.02`: tag previo existente sobre el estado anterior de `develop`.
+- `v20260719.01`: release anterior en `main`.
 
 ---
 
 ## Archivos clave modificados recientemente
 
-- `dashboard/static/index.html`: estructura de tabs con `.tab-label` y `.tab-count`.
-- `dashboard/static/styles.css`: responsive de topbar/tabs, filtros moviles compactos y tabla movil horizontal.
-- `dashboard/static/app.js`: i18n, tabs, detalles, fechas humanas, camaras y fallbacks.
-- `dashboard/static/sw.js`: version de cache PWA `dgt-monitor-v19`.
-- `test/api/test_api.py`: contratos de assets/PWA.
-- `test/gui/test_cameras_dialog.py`: pruebas GUI de camaras deterministas.
-- `.github/workflows/test.yml`: dependencias Qt para CI.
+- `README.md`: resumen actualizado, API rapida, validacion y enlaces.
+- `CHANGELOG.md`: historial de cambios de 2026-07-19 y 2026-07-18.
+- `docs/`: documentacion completa actualizada para filtros, cobertura, scroll, Render, GitFlow y pruebas.
+- `dashboard/static/index.html`: filtros de modo de busqueda y camaras con incidencia.
+- `dashboard/static/styles.css`: scroll general, scroll interno y responsive.
+- `dashboard/static/app.js`: i18n, tabs, detalles, fechas humanas, camaras, fallbacks, mapa y filtros avanzados.
+- `dashboard/static/sw.js`: cache PWA `dgt-monitor-v51`.
+- `test/api/test_api.py`: contratos de assets/PWA y filtros API.
 
 ---
 
@@ -115,14 +130,15 @@ Tags relevantes:
 
 1. Leer este documento.
 2. Ejecutar `git status --short --branch`.
-3. Si se va a trabajar desde release, partir de `main` actualizado.
+3. Si se va a trabajar desde produccion, partir de `main` actualizado.
 4. Si se va a desarrollar funcionalidad, crear rama desde `develop` actualizada.
 5. Validar con la suite completa antes de abrir PR.
 
 Documentacion complementaria:
 
 - `docs/INDEX.md`: indice general.
-- `docs/PHASE_7_COMPLETED.md`: handoff historico de fase 7.
+- `docs/PHASE_7_COMPLETED.md`: handoff historico y estado completo.
 - `docs/GITFLOW.md`: flujo de ramas.
 - `docs/PRUEBAS.md`: guia de pruebas.
 - `docs/DESPLIEGUE.md`: despliegue.
+- `CHANGELOG.md`: historial de cambios.

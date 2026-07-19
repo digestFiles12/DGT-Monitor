@@ -3,6 +3,8 @@
 from dataclasses import asdict, dataclass
 from typing import Any
 
+from dgt_monitor.core.constants import CAMERA_MATCH_RANGE_KM
+
 
 @dataclass(slots=True)
 class Incident:
@@ -86,6 +88,7 @@ class IncidentFilters:
     severity: str | None = None
     kind: str | None = None
     camera: str | None = None
+    match_mode: str = "contains"
 
 
 @dataclass(frozen=True, slots=True)
@@ -95,5 +98,8 @@ class CameraFilters:
     kilometer: str | None = None
     latitude: float | None = None
     longitude: float | None = None
-    limit: int = 12
-    max_km_delta: float = 1.0
+    limit: int | None = 12
+    max_km_delta: float = CAMERA_MATCH_RANGE_KM
+    max_distance_km: float | None = None
+    incident_coverage: bool = False
+    match_mode: str = "contains"
