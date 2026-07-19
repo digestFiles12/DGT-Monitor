@@ -44,8 +44,8 @@
 }
 
 * { box-sizing: border-box; }
-html { height: 100%; color-scheme: light; }
-body { height: 100dvh; margin: 0; background: var(--paper); color: var(--ink); font-family: "Source Sans 3", sans-serif; font-size: 16px; display: flex; flex-direction: column; overflow: hidden; }
+html { min-height: 100%; color-scheme: light; }
+body { min-height: 100dvh; margin: 0; background: var(--paper); color: var(--ink); font-family: "Source Sans 3", sans-serif; font-size: 16px; display: flex; flex-direction: column; overflow-x: hidden; overflow-y: auto; }
 button, input, select { font: inherit; }
 button { cursor: pointer; }
 [hidden] { display: none !important; }
@@ -70,8 +70,8 @@ button { cursor: pointer; }
 .icon-button svg { width: 18px; }
 .icon-button.is-loading svg { animation: spin .8s linear infinite; }
 
-main { width: 100%; max-width: none; min-height: 0; margin: 0; padding: 18px 24px 14px; flex: 1 1 auto; display: flex; flex-direction: column; overflow: hidden; }
-body.is-map-view { overflow: hidden; }
+main { width: 100%; max-width: none; min-height: 0; margin: 0; padding: 18px 24px 14px; flex: 1 0 auto; display: flex; flex-direction: column; overflow: visible; }
+body.is-map-view { overflow-x: hidden; overflow-y: auto; }
 body.is-map-view main { padding-bottom: 14px; }
 body.is-map-view .overview, body.is-map-view .view-tabs, .overview, .view-tabs { flex: 0 0 auto; }
 body.is-map-view .overview { padding-bottom: 12px; }

@@ -38,12 +38,14 @@ def test_health_and_rest_contracts():
     assert fake.last_filters.kind == "weather"
     assert fake.last_filters.camera == "with"
     assert fake.last_language == "en"
+    assert client.get("/api/incidents", params={"province": "^Mad", "match_mode": "regex"}).json()["items"][0]["province"] == "^Mad"
+    assert fake.last_filters.match_mode == "regex"
     assert client.get("/api/cameras", params={"limit": 5}).json()["items"][0]["limit"] == 5
     assert client.get("/api/cameras", params={"all": "true"}).json()["items"][0]["limit"] is None
     assert client.get("/api/cameras", params={"incident_coverage": "true"}).json()["items"][0]["incident_coverage"] is True
+    assert client.get("/api/cameras", params={"road": "^A-", "match_mode": "regex"}).json()["items"][0]["limit"] == 12
     assert fake.last_camera_filters is not None
-    assert fake.last_camera_filters.incident_coverage is True
-
+    assert fake.last_camera_filters.match_mode == "regex"
 
 def test_dashboard_and_pwa_assets_are_served():
     client = TestClient(create_app(service()))
@@ -57,6 +59,7 @@ def test_dashboard_and_pwa_assets_are_served():
     assert "statStuck" in dashboard.text
     assert "statWeather" in dashboard.text
     assert "cameraCoverageFilter" in dashboard.text
+    assert "matchModeFilter" in dashboard.text
     assert "cameraIncidentFilter" in dashboard.text
     assert "mapResults" in dashboard.text
     assert "filterToggle" in dashboard.text
@@ -89,6 +92,7 @@ def test_dashboard_and_pwa_assets_are_served():
     assert "updateRelatedTabCounts" in app_js.text
     assert "max_distance_km" in app_js.text
     assert "incident_coverage" in app_js.text
+    assert "match_mode" in app_js.text
     assert "requestId" in app_js.text
     assert "document.body.classList.toggle" in app_js.text
     assert "Meteorología" in app_js.text
@@ -96,7 +100,7 @@ def test_dashboard_and_pwa_assets_are_served():
     assert client.get("/manifest.webmanifest").headers["content-type"].startswith("application/manifest+json")
     service_worker = client.get("/sw.js")
     assert service_worker.status_code == 200
-    assert "dgt-monitor-v49" in service_worker.text
+    assert "dgt-monitor-v51" in service_worker.text
 
 
 def test_websocket_sends_filtered_payload():
