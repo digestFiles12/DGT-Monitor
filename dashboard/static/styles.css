@@ -145,9 +145,10 @@ tbody tr:hover { background: var(--row-hover); }
 .location strong, .location small { display: block; }
 .location small { margin-top: 3px; color: var(--muted); }
 .badge { display: inline-flex; align-items: center; min-height: 24px; padding: 2px 8px; border-radius: 3px; font-size: 12px; font-weight: 600; background: var(--subtle); }
-.severity-highest, .severity-high { background: #fee2e2; color: #991b1b; }
-.severity-medium { background: #fef3c7; color: #92400e; }
-.severity-low { background: #dcfce7; color: #166534; }
+.severity-highest { background: #ffe4ec; color: #9f1239; }
+.severity-high { background: #fee2e2; color: #b91c1c; }
+.severity-medium { background: #ffedd5; color: #c2410c; }
+.severity-low { background: #fef3c7; color: #92400e; }
 .coverage-wrap { position: relative; display: inline-flex; align-items: center; color: var(--green); font-weight: 600; }
 .coverage-button { min-height: 34px; padding: 0 11px; border: 1px solid transparent; background: transparent; color: var(--green); border-radius: 3px; display: inline-flex; align-items: center; gap: 7px; font-weight: 700; }
 .coverage-button:hover, .coverage-button:focus-visible, .coverage-button.is-loading { border-color: var(--green); background: color-mix(in srgb, var(--green) 14%, transparent); }
