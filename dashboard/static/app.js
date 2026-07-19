@@ -161,7 +161,6 @@ function applyLanguage(language, reload = true) {
 
 function applyStaticLanguage() {
   document.querySelector(".brand small").textContent = uiText("brandSubtitle");
-  document.querySelector(".overview .eyebrow").textContent = uiText("operations");
   elements.clearFilters.textContent = uiText("clear");
   if (!elements.connectionStatus.classList.contains("is-online") && !elements.connectionStatus.classList.contains("is-offline")) {
     elements.connectionStatus.lastChild.textContent = uiText("connecting");
@@ -169,8 +168,6 @@ function applyStaticLanguage() {
   if (!elements.lastUpdate.dateTime) elements.lastUpdate.textContent = uiText("notUpdated");
   elements.refreshButton.title = uiText("refresh");
   elements.refreshButton.setAttribute("aria-label", uiText("refresh"));
-  document.getElementById("pageTitle").textContent = uiText("title");
-  document.querySelector(".overview-copy").textContent = uiText("intro");
   setMetricLabel("", uiText("total"));
   setMetricLabel("accident", uiText("accidents"));
   setMetricLabel("roadworks", uiText("roadworks"));

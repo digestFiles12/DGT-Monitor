@@ -52,6 +52,7 @@ def test_dashboard_and_pwa_assets_are_served():
     assert "statWeather" in dashboard.text
     assert "cameraCoverageFilter" in dashboard.text
     assert "mapResults" in dashboard.text
+    assert "pageTitle" not in dashboard.text
     styles = client.get("/static/styles.css")
     assert styles.status_code == 200
     assert ':root[data-theme="dark"]' in styles.text
@@ -79,7 +80,7 @@ def test_dashboard_and_pwa_assets_are_served():
     assert client.get("/manifest.webmanifest").headers["content-type"].startswith("application/manifest+json")
     service_worker = client.get("/sw.js")
     assert service_worker.status_code == 200
-    assert "dgt-monitor-v26" in service_worker.text
+    assert "dgt-monitor-v27" in service_worker.text
 
 
 def test_websocket_sends_filtered_payload():

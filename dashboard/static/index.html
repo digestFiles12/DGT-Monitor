@@ -11,10 +11,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="/static/styles.css?v=26">
+  <link rel="stylesheet" href="/static/styles.css?v=27">
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-  <script src="/static/app.js?v=26" defer></script>
+  <script src="/static/app.js?v=27" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -39,12 +39,7 @@
   </header>
 
   <main>
-    <section class="overview" aria-labelledby="pageTitle">
-      <div>
-        <p class="eyebrow">Panel operativo</p>
-        <h1 id="pageTitle">Tráfico en tiempo real</h1>
-        <p class="overview-copy">Consulta incidencias activas y cámaras de la red estatal desde una única vista.</p>
-      </div>
+    <section class="overview" aria-label="Resumen de incidencias">
       <div class="summary-grid" aria-label="Resumen de incidencias">
         <button class="metric metric-total is-active" type="button" data-kind=""><span>Total</span><strong id="statTotal">--</strong></button>
         <button class="metric metric-accidents" type="button" data-kind="accident"><span>Accidentes</span><strong id="statAccidents">--</strong></button>
