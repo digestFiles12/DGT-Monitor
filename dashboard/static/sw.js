@@ -1,4 +1,4 @@
-const CACHE_NAME = "dgt-monitor-v17";
+const CACHE_NAME = "dgt-monitor-v19";
 const APP_SHELL = ["/", "/static/styles.css", "/static/app.js", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {

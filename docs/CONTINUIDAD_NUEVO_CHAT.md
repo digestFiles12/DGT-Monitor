@@ -23,12 +23,13 @@ Este documento es el punto de entrada para reanudar el proyecto con el contexto 
 - Dashboard web/PWA servido desde `/` con filtros, metricas, filas desplegables, selector ES/EN, modo claro/oscuro y visor de camaras.
 - Tabs del dashboard corregidos para no duplicar idioma/label: cada pestana usa `.tab-label` y `.tab-count`.
 - Fechas de detalle de incidencias humanizadas: los campos `creation_time`, `start_time` y `end_time` se muestran con `Intl.DateTimeFormat` segun idioma activo.
-- Tabla de incidencias en movil mejorada: scroll horizontal interno, sin overflow global de pagina y columnas clave sticky (`Gravedad`, `Carretera`).
+- Tabla de incidencias en movil mejorada: scroll horizontal interno, sin overflow global de pagina, columnas clave sticky (`Gravedad`, `Carretera`) y detalle desplegable limitado al ancho visible de pantalla.
+- Filtros en movil compactados en la parte superior como banda sticky con desplazamiento horizontal para dejar mas espacio a la tabla.
 - Fallback visual localizado para imagenes de camara no disponibles.
 - Icono rojo `camera-off` para incidencias sin cobertura de camara.
 - GUI PyQt6 modular con filtros, modo oscuro, dialogo/visor de camaras y pruebas deterministas de imagen.
 - CI actualizada con librerias Qt necesarias en Ubuntu.
-- Cache PWA actualizada hasta `dgt-monitor-v17` para forzar carga de assets recientes.
+- Cache PWA actualizada hasta `dgt-monitor-v19` para forzar carga de assets recientes.
 
 ---
 
@@ -101,9 +102,9 @@ Tags relevantes:
 ## Archivos clave modificados recientemente
 
 - `dashboard/static/index.html`: estructura de tabs con `.tab-label` y `.tab-count`.
-- `dashboard/static/styles.css`: responsive de topbar/tabs y tabla movil horizontal.
+- `dashboard/static/styles.css`: responsive de topbar/tabs, filtros moviles compactos y tabla movil horizontal.
 - `dashboard/static/app.js`: i18n, tabs, detalles, fechas humanas, camaras y fallbacks.
-- `dashboard/static/sw.js`: version de cache PWA `dgt-monitor-v17`.
+- `dashboard/static/sw.js`: version de cache PWA `dgt-monitor-v19`.
 - `test/api/test_api.py`: contratos de assets/PWA.
 - `test/gui/test_cameras_dialog.py`: pruebas GUI de camaras deterministas.
 - `.github/workflows/test.yml`: dependencias Qt para CI.
