@@ -22,7 +22,17 @@ No se usan singletons globales para la aplicacion principal. `build_application(
 
 ## ADR-006: cobertura de cámaras
 
-Una cámara cubre un incidente si comparte carretera normalizada, provincia compatible y está a un máximo de 1 km por punto kilométrico. Se indexa por carretera para reducir coste.
+Una camara cubre un incidente si comparte carretera normalizada, provincia compatible y esta a un maximo de `CAMERA_MATCH_RANGE_KM` por punto kilometrico. El valor actual es 2.0 km para cubrir casos reales donde la camara util queda fuera de un umbral demasiado estrecho. Se indexa por carretera para reducir coste.
+
+El mismo criterio se usa para anotar incidencias (`has_camera_coverage`, `camera_coverage_count`, `nearest_camera_km_delta`) y para filtrar camaras con `incident_coverage=true`.
+
+## ADR-010: modos de busqueda textual
+
+La busqueda textual se centraliza en `core.text.matches_text()` y se expresa mediante `match_mode`. Los modos soportados son `contains`, `exact` y `regex`. Un regex invalido devuelve no coincidencia en lugar de romper la peticion, porque el dashboard debe tolerar entradas exploratorias del usuario.
+
+## ADR-011: scroll del dashboard
+
+El dashboard conserva scroll general en `body/main` y scroll interno solo en superficies densas como tabla y grid de camaras. Esta decision evita bloquear la navegacion en movil o escritorio y mantiene usable la pestaña de camaras cuando hay muchas tarjetas.
 
 ## ADR-007: compatibilidad de entradas
 

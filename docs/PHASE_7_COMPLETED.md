@@ -1,8 +1,8 @@
 # Estado completo y handoff del proyecto
 
 **Status:** ✅ PRODUCTION READY  
-**Branch:** Feature branch with OOP refactoring  
-**Latest Increment:** Dashboard web/PWA y GUI PyQt6 modular
+**Branch:** `develop`
+**Latest Increment:** Dashboard filters, scroll, map counts and camera coverage
 
 ---
 
@@ -12,9 +12,9 @@ Phase 7 architecture refactoring and the later dashboard/GUI increments are comp
 - ✅ Implements a clean layered architecture (domain → infrastructure → application → API/GUI)
 - ✅ Provides thread-safe activity logging with dual backends (in-memory or SQLite)
 - ✅ Exposes REST API with WebSocket and Server-Sent Events
-- ✅ Serves a responsive dashboard web/PWA from `/` with complete filters, clickable stat cells, light/dark mode, no-coverage camera-off indicator and fullscreen camera image viewer with localized unavailable-image fallback
+- ✅ Serves a responsive dashboard web/PWA from `/` with complete filters, `contains`/`exact`/`regex` search, clickable stat cells, synchronized map counts, page/internal scroll, light/dark mode, no-coverage camera-off indicator and fullscreen camera image viewer with localized unavailable-image fallback
 - ✅ Includes a modular PyQt6 GUI with complete filters, clickable stat cells, non-modal camera dialog, async image loading, fullscreen viewer and light/dark mode
-- ✅ Includes comprehensive test coverage (50 tests, all passing)
+- ✅ Includes comprehensive test coverage (53 tests, all passing)
 - ✅ Is deployable to Render with configured CI/CD
 - ✅ Has updated handoff and operational documentation
 
@@ -66,6 +66,7 @@ Phase 7 architecture refactoring and the later dashboard/GUI increments are comp
 - **Serialization:** Explicit `to_dict()` method per model (no Pydantic dependency)
 - **Ports:** `Protocol` interfaces for HTTP client, activity store
 - **Utilities:** DATEX2 translation, text cleaning, road normalization, Haversine distance, localization
+- **Text matching:** `matches_text()` with contains, exact and regex modes
 - **Activity Facade:** Global `record()`, `get_entries()`, `clear()` with pluggable store backend
 
 #### **Infrastructure** (`dgt_monitor/infrastructure/`)
@@ -80,7 +81,7 @@ Phase 7 architecture refactoring and the later dashboard/GUI increments are comp
 
 #### **Application** (`dgt_monitor/application/`)
 - **IncidentService:** Filters, caching, statistics, distance-based coverage
-- **CameraService:** Filters, distance calculations, 1km coverage index by road
+- **CameraService:** Filters, distance calculations, 2.0 km coverage index by road and `incident_coverage` camera filtering
 - **DgtApplicationService:** Serializable facade for API/GUI consumption
 - **Activity Service:** Pagination (offset/limit), filtering by timestamp/type, CSV export
 - **Composition Root:** `build_application()` with injectable dependencies
@@ -89,8 +90,8 @@ Phase 7 architecture refactoring and the later dashboard/GUI increments are comp
 - **App Factory:** `create_app(service=None)` for FastAPI with dependency injection
 - **Routes:**
   - `GET /api/health` - Health check
-  - `GET /api/incidents` - Incidents with filters (carretera, puesto, tipo, offset, limit)
-  - `GET /api/cameras` - Cameras with filters (carretera, puesto, offset, limit)
+   - `GET /api/incidents` - Incidents with filters (`province`, `municipality`, `road`, `severity`, `kind`, `camera`, `match_mode`, `lang`)
+   - `GET /api/cameras` - Cameras with filters (`province`, `road`, `km`, `lat`, `lon`, `limit`, `max_km_delta`, `max_distance_km`, `incident_coverage`, `match_mode`)
   - `WS /ws/incidents` - WebSocket live incident stream (interval 5-300s, default 120s)
   - `GET /api/activity/` - Paginated activity log with auth
   - `GET /api/activity/stream` - SSE stream with pagination and `once=true` support
@@ -112,6 +113,36 @@ Phase 7 architecture refactoring and the later dashboard/GUI increments are comp
 #### **Dashboard Wrapper** (`dashboard/app.py`)
 - ASGI entry point for Render deployment
 - Exposes FastAPI app as `app` and serves the dashboard web/PWA from `/`
+
+---
+
+## Latest Dashboard Increment: Filters, Scroll and Coverage
+
+### Features Delivered
+
+1. **Search modes**
+   - Dashboard selector for `contains`, `exact` and `regex`.
+   - `match_mode` propagated to `/api/incidents`, `/api/cameras` and `/ws/incidents`.
+   - Invalid regex patterns are treated as no match instead of API errors.
+
+2. **Camera coverage filtering**
+   - `CameraFilters.incident_coverage` and `/api/cameras?incident_coverage=true`.
+   - Coverage range centralized in `CAMERA_MATCH_RANGE_KM = 2.0`.
+   - Camera coverage is calculated before reapplying `limit` to avoid hiding valid cameras.
+
+3. **Map and tab count consistency**
+   - Related camera counts are refreshed after incident filters.
+   - The map combines incidents and cameras computed from the same filter semantics.
+   - Validated scenario: Zamora/A-52 shows 1 incident, 1 camera and 2 map points.
+
+4. **Scroll behavior**
+   - Restored general document scroll on mobile and desktop.
+   - Kept internal scroll for incident table and camera grid.
+   - Camera grid rows use content-sized tracks so cards do not collapse.
+
+5. **PWA assets**
+   - Static shell versioned as `dgt-monitor-v51`.
+   - `/api/` responses remain excluded from service-worker caching.
 
 ---
 
@@ -147,16 +178,16 @@ Phase 7 architecture refactoring and the later dashboard/GUI increments are comp
 
 ---
 
-## Test Suite: 50/50 Passing ✅
+## Test Suite: 53/53 Passing ✅
 
 ### Test Categories
 
 | Category | Tests | Status | Notes |
 |----------|-------|--------|-------|
-| **Core Domain** | 3 | ✅ | Models, text processing, localization |
+| **Core Domain** | 3 | ✅ | Models, text processing, localization, match modes |
 | **Infrastructure** | 9 | ✅ | Parsers, cache, HTTP client |
-| **Application** | 9 | ✅ | Services, facade, coverage logic |
-| **API** | 8+ | ✅ | Endpoints, dashboard assets, authentication, pagination, SSE |
+| **Application** | 9+ | ✅ | Services, facade, coverage logic, camera coverage filter |
+| **API** | 8+ | ✅ | Endpoints, dashboard assets, match_mode, authentication, pagination, SSE |
 | **GUI Lifecycle** | 5 | ✅ | QThread workers, signals, offscreen rendering |
 | **GUI Workers/Dialog/Window** | 10+ | ✅ | Error propagation, thread cleanup, non-modal dialogs, async images |
 | **Cache Expiration** | 6 | ✅ | TTL expiration, thread safety, deterministic testing |
@@ -166,8 +197,8 @@ Phase 7 architecture refactoring and the later dashboard/GUI increments are comp
 ### Test Execution
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest test -q
-# Output: 43 passed
+$env:QT_QPA_PLATFORM='offscreen'; .\.venv\Scripts\python.exe -m pytest test -q
+# Output: 53 passed
 ```
 
 ### Code Quality Validations
@@ -186,6 +217,11 @@ git diff --check
 ```
 
 ### Key Test Fixes (Latest Session)
+
+0. **Dashboard/API filter contract**
+   - Added tests for `match_mode` propagation to incidents, cameras and WebSocket.
+   - Added core tests for contains, exact, regex and invalid regex.
+   - Added facade/API coverage tests for `incident_coverage` and 2.0 km camera range.
 
 1. **QThread Blocking Resolution** (`wait_for_thread` helper)
    - Issue: Enqueued `finished` signal processed after `thread.wait()` blocks
@@ -266,7 +302,7 @@ Configuration in `.github/workflows/test.yml`:
 | `docs/CONTINUIDAD_NUEVO_CHAT.md` | ✅ | Onboarding template |
 | `docs/DECISIONES.md` | ✅ | Architectural decisions recorded |
 | `docs/DESPLIEGUE.md` | ✅ | Render configuration, env vars |
-| `docs/PRUEBAS.md` | ✅ | 50 tests, execution, validation |
+| `docs/PRUEBAS.md` | ✅ | 53 tests, execution, validation |
 | `docs/PHASE_7_COMPLETED.md` | ✅ | This document (handoff reference) |
 
 ---
@@ -298,7 +334,7 @@ python -m pip install -e ".[dev]"
 ### Validate Current State
 
 ```powershell
-# Run full test suite (50 tests)
+# Run full test suite (53 tests)
 python -m pytest test -q
 
 # Compile check (no errors)
@@ -314,7 +350,7 @@ git log --oneline -5
 
 ### What's Ready
 
-- ✅ **All 50 tests passing** with comprehensive coverage
+- ✅ **All 53 tests passing** with comprehensive coverage
 - ✅ **Phase 7 architecture complete** with activity system, API auth, deployment
 - ✅ **Render deployment configured** with CI/CD pipeline
 - ✅ **Documentation complete** for handoff to next phase or new developer
@@ -330,6 +366,7 @@ git log --oneline -5
    - Configurable GUI refresh timer and visible activity log
    - Additional test coverage (network scenarios, error cases)
    - Performance benchmarking and optimization
+   - Optional parity work: expose dashboard search modes and camera-with-incident filter in desktop GUI
 
 ---
 
@@ -341,7 +378,7 @@ For next developer or continuation in new chat:
 - [ ] Read `docs/PLAN_REFACTORIZACION.md` to understand refactoring context
 - [ ] Read `docs/ARQUITECTURA.md` for layered design
 - [ ] Read `docs/PHASE_7_COMPLETED.md` (this file) for exact completion status
-- [ ] Run `python -m pytest test -q` to validate setup (expect 43 passing)
+- [ ] Run `python -m pytest test -q` to validate setup (expect 53 passing)
 - [ ] Review git history: `git log --oneline -10`
 - [ ] Check environment setup: `.\.venv\Scripts\Activate.ps1` then `python --version`
 - [ ] Review `docs/PRUEBAS.md` for test details
@@ -361,5 +398,5 @@ For next developer or continuation in new chat:
 ---
 
 **Status: PRODUCTION READY** ✅  
-**Last Updated:** 2026-07-18  
+**Last Updated:** 2026-07-19
 **

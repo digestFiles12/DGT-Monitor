@@ -7,11 +7,11 @@
 ## Status: proyecto operativo
 
 - ✅ API FastAPI, WebSocket, SSE y Activity API operativas
-- ✅ Dashboard web/PWA servido desde `/`, con filtros completos, celdas estadísticas clicables, modo claro/oscuro, icono rojo de cámara tachada sin cobertura, fallback localizado para imágenes no disponibles, visor fullscreen de cámaras y desplegable en Render
+- ✅ Dashboard web/PWA servido desde `/`, con filtros completos, busqueda `contains`/`exact`/`regex`, celdas estadisticas clicables, mapa sincronizado, scroll general e interno, modo claro/oscuro, icono rojo de camara tachada sin cobertura, fallback localizado para imagenes no disponibles, visor fullscreen de camaras y desplegable en Render
 - ✅ GUI PyQt6 modular con filtros completos, celdas estadísticas clicables, incidencias, dialogo de camaras, imagenes asincronas, visor fullscreen y modo claro/oscuro
 - ✅ Activity system con backend en memoria o SQLite
 - ✅ Render y GitHub Actions configurados
-- ✅ 50 tests pasando
+- ✅ 53 tests pasando
 
 **See `docs/PHASE_7_COMPLETED.md` for complete project status and handoff documentation.**
 
@@ -35,7 +35,7 @@ python --version
 ### Validate State (Always First)
 
 ```powershell
-# 50 tests should pass
+# 53 tests should pass
 python -m pytest test -q
 
 # No compilation errors
@@ -82,7 +82,8 @@ $env:ACTIVITY_REVOKED_API_KEYS = "revoked1"  # Revoked API keys
 | `docs/PLAN_REFACTORIZACION.md` | Refactoring phases (1-7) |
 | `docs/ARQUITECTURA.md` | Layered architecture diagram |
 | `docs/PHASE_7_COMPLETED.md` | **← MAIN HANDOFF DOC: Exact current status** |
-| `docs/PRUEBAS.md` | Test suite (50 tests, execution) |
+| `docs/PRUEBAS.md` | Test suite (53 tests, execution) |
+| `CHANGELOG.md` | Historial de cambios por fecha |
 | `docs/DESPLIEGUE.md` | Render configuration, env vars |
 | `docs/DECISIONES.md` | Architectural constraints & decisions |
 
@@ -90,7 +91,7 @@ $env:ACTIVITY_REVOKED_API_KEYS = "revoked1"  # Revoked API keys
 
 ## Recent history
 
-La rama conserva commits separados por incremento: dashboard web para Render, GUI PyQt6 modular, dialogo no modal de camaras y carga asincrona de imagenes.
+`develop` contiene la integracion de PR #9: scroll general del dashboard, scroll interno de camaras, filtro de camaras con incidencia, cobertura a 2 km, modos de busqueda exacta/regex y fix de sintaxis posterior al merge remoto.
 
 ---
 
@@ -105,7 +106,7 @@ La rama conserva commits separados por incremento: dashboard web para Render, GU
 2. **Verify Setup**:
    ```powershell
    .\.venv\Scripts\Activate.ps1
-   python -m pytest test -q          # expect 43 passed
+   python -m pytest test -q          # expect 53 passed
    python -m compileall -q dgt_monitor dashboard
    git status                         # should be clean
    ```
@@ -117,7 +118,7 @@ La rama conserva commits separados por incremento: dashboard web para Render, GU
 4. **Next Phase**:
    - Wrappers de compatibilidad de escritorio (`DGT.py`, `DGT_V2.py`)
    - Temporizador configurable y registro visible en GUI
-   - Smoke test manual en Render
+   - Smoke test manual en Render despues de cada promocion `develop` -> `release` -> `main`
 
 ---
 

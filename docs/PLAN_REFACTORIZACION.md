@@ -11,12 +11,12 @@ Reimplementar DGT Monitor con programacion orientada a objetos, separando domini
 3. [x] Implementar cliente HTTP, parsers DATEX2, repositorios y cache TTL.
 4. [x] Implementar servicios compartidos de incidentes y camaras.
 5. [x] Implementar dashboard FastAPI, WebSocket y PWA.
-6. [~] Implementar GUI PyQt6 modular y dialogos no modales. Ventana, filtros, estadísticas, tabla, detalle, diálogo no modal de cámaras cercanas y visor asíncrono de imágenes completados; wrappers, temporizador y registro visible pendientes.
-7. [~] Completar pruebas, CI, despliegue y documentacion. Suite actual con 50 tests, Render y Actions configurados; quedan smoke manual y cierre de wrappers.
+6. [~] Implementar GUI PyQt6 modular y dialogos no modales. Ventana, filtros, estadisticas, tabla, detalle, dialogo no modal de camaras cercanas y visor asincrono de imagenes completados; wrappers, temporizador y registro visible pendientes.
+7. [~] Completar pruebas, CI, despliegue y documentacion. Suite actual con 53 tests, Render y Actions configurados; quedan smoke manual de produccion y cierre de wrappers.
 
 ## Estado actual
 
-El flujo compartido, la API modular, el dashboard web/PWA y la GUI modular ya funcionan. La GUI carga incidencias, cámaras e imágenes en `QThread`, filtra mediante modelos de dominio y presenta filtros completos, estadísticas clicables, tabla, detalle, cámaras cercanas, miniaturas, visor fullscreen y modo claro/oscuro sin duplicar lógica de aplicación. El dashboard web se sirve desde `/` para Render e incluye los mismos filtros/celdas, modo claro/oscuro persistente, icono rojo de cámara tachada cuando no hay cobertura y visor de cámaras con fallback visual localizado para imágenes no disponibles.
+El flujo compartido, la API modular, el dashboard web/PWA y la GUI modular ya funcionan. La GUI carga incidencias, camaras e imagenes en `QThread`, filtra mediante modelos de dominio y presenta filtros completos, estadisticas clicables, tabla, detalle, camaras cercanas, miniaturas, visor fullscreen y modo claro/oscuro sin duplicar logica de aplicacion. El dashboard web se sirve desde `/` para Render e incluye filtros completos, modo de busqueda `contains`/`exact`/`regex`, filtro de camaras con incidencia, mapa con conteos sincronizados, scroll general e interno, modo claro/oscuro persistente, icono rojo de camara tachada cuando no hay cobertura y visor de camaras con fallback visual localizado para imagenes no disponibles.
 
 ## Compatibilidad
 
@@ -28,4 +28,5 @@ El flujo compartido, la API modular, el dashboard web/PWA y la GUI modular ya fu
 - No hay parsing DATEX2 ni peticiones HTTP dentro de widgets o rutas.
 - Las pruebas automatizadas no dependen de la red de DGT.
 - La cache es segura para hilos.
+- La cobertura incidencia-camara usa `CAMERA_MATCH_RANGE_KM = 2.0` y esta documentada en servicios, API y modelos.
 - Los comandos de escritorio y Render permanecen estables.

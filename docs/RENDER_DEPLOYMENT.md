@@ -148,8 +148,11 @@ GET /                                    # Dashboard web
 GET /manifest.webmanifest               # PWA manifest
 GET /sw.js                              # Service worker
 GET /api/health                          # Health check
-GET /api/incidents?carretera=A-1         # List incidents
-GET /api/cameras?carretera=A-1           # List cameras
+GET /api/incidents?road=A-1              # List incidents
+GET /api/incidents?road=A-1&match_mode=exact
+GET /api/incidents?road=^A-\d+$&match_mode=regex
+GET /api/cameras?road=A-1                # List cameras
+GET /api/cameras?road=A-1&incident_coverage=true
 WS /ws/incidents                         # WebSocket stream
 GET /api/activity/                       # Activity log (requires X-API-Key)
 GET /api/activity/stream                 # SSE stream (requires X-API-Key)
@@ -171,6 +174,14 @@ To deploy to production:
 2. Configure Render auto-deploy to track `main`
 3. Merge the validated feature branch to main via pull request
 4. Render will auto-deploy from `main` branch
+
+## Functional Smoke Checklist
+
+- `/` loads the dashboard shell and `sw.js` reports cache `dgt-monitor-v51`.
+- `/api/incidents` accepts `match_mode=contains`, `exact` and `regex`.
+- `/api/cameras` accepts `incident_coverage=true` and returns only cameras related to active incidents.
+- The browser dashboard scrolls at page level on desktop/mobile, while incident table and camera grid keep internal scroll.
+- Map counts match active incident and camera filters.
 
 ---
 
