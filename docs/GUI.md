@@ -13,11 +13,11 @@ dgt_monitor/gui/
   workers.py
 ```
 
-`MainWindow` ofrece filtros por provincia, municipio, carretera, gravedad y cobertura de camara, tarjetas estadisticas clicables por tipo, tabla seleccionable, panel de detalle y acceso a camaras cercanas. En el dashboard web, el contador de camaras de cada incidencia es accionable: abre la camara directamente cuando solo hay una y muestra un desplegable cuando hay varias. `IncidentLoadWorker` ejecuta la carga fuera del hilo de interfaz y propaga payload, error y finalizacion mediante senales.
+`MainWindow` ofrece filtros por provincia, municipio, carretera, modo de busqueda (`contains`, `exact`, `regex`), gravedad y cobertura de camara, tarjetas estadisticas clicables por tipo, tabla seleccionable, panel de detalle con fechas humanizadas y acceso a camaras cercanas. En el dashboard web, el contador de camaras de cada incidencia es accionable: abre la camara directamente cuando solo hay una y muestra un desplegable cuando hay varias. `IncidentLoadWorker` ejecuta la carga fuera del hilo de interfaz y propaga payload, error y finalizacion mediante senales.
 
 El dashboard web no reemplaza a la GUI, pero comparte la misma fachada. Sus controles adicionales (`match_mode`, `incident_coverage`, mapa y scroll responsive) deben mantenerse en servicios/API antes de replicarse en escritorio; no deben implementarse como logica aislada en JavaScript.
 
-`CamerasDialog` muestra cámaras cercanas de una incidencia seleccionada en un diálogo no modal. Construye `CameraFilters` con carretera, provincia, punto kilométrico y coordenadas de la incidencia, ejecuta `CameraLoadWorker` en `QThread` y mantiene vivas las referencias hasta la finalización.
+`CamerasDialog` muestra cámaras cercanas de una incidencia seleccionada en un diálogo no modal. Construye `CameraFilters` con carretera, provincia, punto kilométrico y coordenadas de la incidencia, usa el rango compartido `CAMERA_MATCH_RANGE_KM` para no divergir del dashboard/API, ejecuta `CameraLoadWorker` en `QThread` y mantiene vivas las referencias hasta la finalización.
 
 Las imágenes de cámaras se descargan con `ImageLoadWorker` en segundo plano. El diálogo renderiza miniaturas con `QPixmap`, conserva aspecto mediante escalado suave y muestra un estado legible cuando la imagen no está disponible. Al pulsar una miniatura cargada se abre un visor a pantalla completa; Escape o click cierran el visor. En el dashboard, el visor modal usa un tamaño contenido antes de fullscreen y sustituye fallos de carga o placeholders grises de DGT por un panel propio con icono `wifi-off`, titulo y texto secundario localizados.
 
@@ -45,5 +45,5 @@ El tema visual se centraliza en `dgt_monitor.gui.theme` y se aplica tanto a `Mai
 ## Pendiente
 
 - Temporizador configurable y registro de actividad visible.
-- Replicar en la GUI de escritorio, si se decide, el modo exact/regex y el filtro de camaras con incidencia ya disponibles en el dashboard/API.
+- Valorar una vista dedicada de camaras en escritorio si se quiere replicar la pestana completa de camaras del dashboard.
 - Wrappers de compatibilidad de escritorio.
