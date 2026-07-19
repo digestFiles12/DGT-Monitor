@@ -3,11 +3,16 @@ from PyQt6.QtGui import QColor, QImage
 from PyQt6.QtTest import QSignalSpy
 from PyQt6.QtWidgets import QApplication, QLabel
 
+from dgt_monitor.core.constants import CAMERA_MATCH_RANGE_KM
 from dgt_monitor.gui.dialogs import CamerasDialog
 
 
 class FakeService:
+    def __init__(self):
+        self.last_filters = None
+
     def get_cameras(self, filters) -> dict:
+        self.last_filters = filters
         return {
             "count": 1,
             "items": [{
@@ -24,13 +29,15 @@ class FakeService:
 def test_cameras_dialog_loads_nearby_cameras():
     app = QApplication.instance() or QApplication([])
     incident = {"road": "A-6", "province": "Madrid", "municipality": "Madrid", "km": "10.5"}
-    dialog = CamerasDialog(FakeService(), incident, autoload=False)
+    fake = FakeService()
+    dialog = CamerasDialog(fake, incident, autoload=False)
     completed = QSignalSpy(dialog.load_completed)
 
     dialog.reload()
 
     assert completed.wait(1000)
     assert dialog.items[0]["road"] == "A-6"
+    assert fake.last_filters.max_km_delta == CAMERA_MATCH_RANGE_KM
     assert "1 cámaras" in dialog.status_label.text()
     dialog.close()
     app.processEvents()

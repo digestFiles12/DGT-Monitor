@@ -20,6 +20,8 @@ class FakeService:
                 "province": filters.province or "Madrid",
                 "type_label": "Accidente",
                 "km": "10.5",
+                "start_time": "2026-07-19T10:30:00+00:00",
+                "end_time": "2026-07-19T11:45:00+00:00",
                 "latitude": 40.4,
                 "longitude": -3.7,
                 "camera_coverage_count": 2,
@@ -36,6 +38,7 @@ def test_main_window_loads_and_renders_incidents():
     window = MainWindow(fake, autoload=False)
     completed = QSignalSpy(window.load_completed)
     window.province_input.setText("Madrid")
+    window.match_mode_input.setCurrentIndex(1)
 
     window.reload()
 
@@ -46,6 +49,10 @@ def test_main_window_loads_and_renders_incidents():
     assert "stuck" in window.stat_labels
     assert window.refresh_button.isEnabled()
     assert fake.last_filters.province == "Madrid"
+    assert fake.last_filters.match_mode == "exact"
+    window.table.selectRow(0)
+    app.processEvents()
+    assert "19/07/2026 10:30" in window.detail.toHtml()
     window.close()
     app.processEvents()
 
@@ -68,6 +75,7 @@ def test_main_window_applies_camera_and_stat_filters():
     assert completed.wait(1000)
     assert fake.last_filters.camera is None
     assert fake.last_filters.kind is None
+    assert fake.last_filters.match_mode == "contains"
     window.close()
     app.processEvents()
 

@@ -17,6 +17,7 @@ from PyQt6.QtWidgets import (
 )
 
 from dgt_monitor.application.facade import DgtApplicationService
+from dgt_monitor.core.constants import CAMERA_MATCH_RANGE_KM
 from dgt_monitor.core.models import CameraFilters
 from dgt_monitor.gui.theme import ThemeName, camera_dialog_stylesheet, next_theme, normalize_theme
 from dgt_monitor.gui.workers import CameraLoadWorker, ImageLoadWorker
@@ -121,7 +122,7 @@ class CamerasDialog(QDialog):
             latitude=self._incident.get("latitude"),
             longitude=self._incident.get("longitude"),
             limit=12,
-            max_km_delta=1.0,
+            max_km_delta=CAMERA_MATCH_RANGE_KM,
         )
 
     def _apply_payload(self, payload: object) -> None:

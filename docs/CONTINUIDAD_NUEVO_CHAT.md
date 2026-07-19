@@ -13,7 +13,7 @@ Este documento es el punto de entrada para reanudar el proyecto con el contexto 
 - Release anterior en `main`: `v20260719.01`.
 - API FastAPI, WebSocket, SSE y Activity API operativas.
 - Dashboard web/PWA servido desde `/`, con filtros completos, busqueda `contains`/`exact`/`regex`, celdas estadisticas clicables, mapa sincronizado, scroll general e interno, modo claro/oscuro, icono rojo de camara tachada sin cobertura, fallback localizado para imagenes no disponibles, visor fullscreen de camaras y desplegable en Render.
-- GUI PyQt6 modular con filtros completos, celdas estadisticas clicables, incidencias, dialogo de camaras, imagenes asincronas, visor fullscreen y modo claro/oscuro.
+- GUI PyQt6 modular con filtros completos, modo de busqueda contiene/exacta/regex, celdas estadisticas clicables, incidencias, dialogo de camaras alineado con el rango compartido de cobertura, imagenes asincronas, visor fullscreen y modo claro/oscuro.
 - Activity system con backend en memoria o SQLite.
 - Render y GitHub Actions configurados.
 - 53 tests pasando.
