@@ -47,7 +47,6 @@ def test_health_and_rest_contracts():
     assert fake.last_camera_filters is not None
     assert fake.last_camera_filters.match_mode == "regex"
 
-
 def test_dashboard_and_pwa_assets_are_served():
     client = TestClient(create_app(service()))
 
