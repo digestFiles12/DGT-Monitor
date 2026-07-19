@@ -7,6 +7,9 @@ const state = {
   theme: "light",
   language: "es",
   kind: "",
+  map: null,
+  incidentLayer: null,
+  cameraLayer: null,
 };
 
 const incidentDetailFields = [
@@ -54,7 +57,7 @@ const uiCopy = {
     darkOn: "Activar modo oscuro", darkOff: "Activar modo claro", refresh: "Actualizar datos", operations: "Panel operativo",
     title: "Tráfico en tiempo real", intro: "Consulta incidencias activas y cámaras de la red estatal desde una única vista.",
     total: "Total", accidents: "Accidentes", roadworks: "Obras", stuck: "Averías", obstructions: "Obstrucciones", weather: "Clima",
-    incidents: "Incidencias", cameras: "Cámaras", query: "Consulta", filters: "Filtros", clear: "Limpiar", province: "Provincia",
+    incidents: "Incidencias", cameras: "Cámaras", map: "Mapa", query: "Consulta", filters: "Filtros", clear: "Limpiar", province: "Provincia",
     road: "Carretera", location: "Ubicación", type: "Tipo", direction: "Dirección", municipality: "Municipio", severity: "Gravedad", camera: "Cámara", kilometerPoint: "Punto kilométrico",
     cameraLimit: "Máximo de cámaras", all: "Todas", withCamera: "Con cámara", withoutCamera: "Sin cámara", severityHighest: "Muy alta", severityHigh: "Alta", severityMedium: "Media", severityLow: "Baja", applyFilters: "Aplicar filtros", autoRefresh: "Actualizar cada 2 minutos", roadNetwork: "Red viaria",
     visualObservation: "Observación visual", activeIncidents: "Incidencias activas", trafficCameras: "Cámaras de tráfico", loadingTitle: "Consultando datos de tráfico",
@@ -66,7 +69,7 @@ const uiCopy = {
     connectionRetry: "Revisa la conexión y vuelve a intentarlo.", imageOpenFullscreen: "Abrir imagen a pantalla completa", closeImage: "Cerrar imagen",
     cameraImageFullscreen: "Abrir imagen de cámara a pantalla completa", serverStatus: (status) => `El servidor respondió con código ${status}.`, results: (count) => `${count} resultados`, loadMore: (count) => `Mostrar ${count} más`,
     nearbyCameras: (count) => `${count} cámaras cercanas`, cameraAlt: (road, km) => `Cámara ${road || "DGT"} PK ${km || "sin dato"}`, updatedAt: (time) => `Actualizado ${time}`,
-    yes: "Sí", no: "No",
+    mapPointPrompt: "Selecciona un punto", mapPointPromptText: "Elige una incidencia o cámara en el mapa para ver sus detalles.", mapUnavailable: "Mapa no disponible", mapSummary: (incidents, cameras) => `${incidents} incidencias · ${cameras} cámaras`, incidentPoint: "Incidencia", cameraPoint: "Cámara", yes: "Sí", no: "No",
   },
   en: {
     brandSubtitle: "Road network status", connecting: "Connecting", online: "Online", offline: "Offline", notUpdated: "Not updated",
@@ -74,7 +77,7 @@ const uiCopy = {
     darkOn: "Enable dark mode", darkOff: "Enable light mode", refresh: "Refresh data", operations: "Operations panel",
     title: "Real-time traffic", intro: "Check active incidents and traffic cameras across the state road network from one view.",
     total: "Total", accidents: "Accidents", roadworks: "Roadworks", stuck: "Breakdowns", obstructions: "Obstructions", weather: "Weather",
-    incidents: "Incidents", cameras: "Cameras", query: "Query", filters: "Filters", clear: "Clear", province: "Province",
+    incidents: "Incidents", cameras: "Cameras", map: "Map", query: "Query", filters: "Filters", clear: "Clear", province: "Province",
     road: "Road", location: "Location", type: "Type", direction: "Direction", municipality: "Municipality", severity: "Severity", camera: "Camera", kilometerPoint: "Kilometer point",
     cameraLimit: "Maximum cameras", all: "All", withCamera: "With camera", withoutCamera: "Without camera", severityHighest: "Critical", severityHigh: "High", severityMedium: "Medium", severityLow: "Low", applyFilters: "Apply filters", autoRefresh: "Refresh every 2 minutes", roadNetwork: "Road network",
     visualObservation: "Visual observation", activeIncidents: "Active incidents", trafficCameras: "Traffic cameras", loadingTitle: "Checking traffic data",
@@ -86,7 +89,7 @@ const uiCopy = {
     connectionRetry: "Check the connection and try again.", imageOpenFullscreen: "Open image fullscreen", closeImage: "Close image",
     cameraImageFullscreen: "Open camera image fullscreen", serverStatus: (status) => `The server responded with status ${status}.`, results: (count) => `${count} results`, loadMore: (count) => `Show ${count} more`,
     nearbyCameras: (count) => `${count} nearby cameras`, cameraAlt: (road, km) => `Camera ${road || "DGT"} KP ${km || "unavailable"}`, updatedAt: (time) => `Updated ${time}`,
-    yes: "Yes", no: "No",
+    mapPointPrompt: "Select a point", mapPointPromptText: "Choose an incident or camera on the map to see its details.", mapUnavailable: "Map unavailable", mapSummary: (incidents, cameras) => `${incidents} incidents · ${cameras} cameras`, incidentPoint: "Incident", cameraPoint: "Camera", yes: "Yes", no: "No",
   },
 };
 
@@ -96,9 +99,9 @@ const ids = [
   "provinceFilter", "roadFilter", "municipalityFilter", "severityFilter", "cameraCoverageFilter", "kmFilter",
   "limitFilter", "incidentFilters", "cameraFilters", "autoRefresh", "statTotal",
   "statAccidents", "statRoadworks", "statStuck", "statObstructions", "statWeather", "incidentTabCount",
-  "cameraTabCount", "resultsTitle", "resultEyebrow", "resultCount", "loadingState",
+  "cameraTabCount", "mapTabCount", "resultsTitle", "resultEyebrow", "resultCount", "loadingState",
   "errorState", "errorMessage", "emptyState", "incidentResults", "incidentRows",
-  "cameraResults", "retryButton", "loadMoreWrap", "loadMoreButton", "themeButton"
+  "cameraResults", "mapResults", "mapStatus", "mapDetail", "trafficMap", "retryButton", "loadMoreWrap", "loadMoreButton", "themeButton"
 ];
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -176,6 +179,7 @@ function applyStaticLanguage() {
   setMetricLabel("weather", uiText("weather"));
   setTabLabel("incidents", uiText("incidents"));
   setTabLabel("cameras", uiText("cameras"));
+  setTabLabel("map", uiText("map"));
   document.querySelector(".filter-heading .eyebrow").textContent = uiText("query");
   document.getElementById("filterTitle").textContent = uiText("filters");
   setLabelText(elements.provinceFilter, uiText("province"));
@@ -238,8 +242,8 @@ function setTableHeaders() {
 }
 
 function switchViewLabelOnly() {
-  elements.resultsTitle.textContent = state.view === "incidents" ? uiText("activeIncidents") : uiText("trafficCameras");
-  elements.resultEyebrow.textContent = state.view === "incidents" ? uiText("roadNetwork") : uiText("visualObservation");
+  elements.resultsTitle.textContent = state.view === "cameras" ? uiText("trafficCameras") : state.view === "map" ? uiText("map") : uiText("activeIncidents");
+  elements.resultEyebrow.textContent = state.view === "cameras" ? uiText("visualObservation") : uiText("roadNetwork");
 }
 
 function applyTheme(theme) {
@@ -262,7 +266,7 @@ function switchView(view) {
     tab.classList.toggle("is-active", active);
     tab.setAttribute("aria-selected", String(active));
   });
-  elements.incidentFilters.hidden = view !== "incidents";
+  elements.incidentFilters.hidden = view === "cameras";
   elements.cameraFilters.hidden = view !== "cameras";
   switchViewLabelOnly();
   loadCurrentView();
@@ -273,12 +277,13 @@ async function loadCurrentView() {
   elements.refreshButton.classList.add("is-loading");
   try {
     const params = buildParams();
-    const endpoint = state.view === "incidents" ? "/api/incidents" : "/api/cameras";
+    const endpoint = state.view === "cameras" ? "/api/cameras" : "/api/incidents";
     const response = await fetch(`${endpoint}?${params.toString()}`, { headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(response.status === 502 ? uiText("serverUnavailable") : uiText("serverStatus", response.status));
     const payload = await response.json();
-    if (state.view === "incidents") renderIncidents(payload);
-    else renderCameras(payload);
+    if (state.view === "cameras") renderCameras(payload);
+    else if (state.view === "map") await renderMap(payload);
+    else renderIncidents(payload);
     updateTimestamp(payload.updated_at);
     setConnection(true);
   } catch (error) {
@@ -294,7 +299,7 @@ function buildParams() {
   const params = new URLSearchParams();
   addParam(params, "province", elements.provinceFilter.value);
   addParam(params, "road", elements.roadFilter.value.toUpperCase());
-  if (state.view === "incidents") {
+  if (state.view !== "cameras") {
     addParam(params, "lang", state.language);
     addParam(params, "municipality", elements.municipalityFilter.value);
     addParam(params, "severity", elements.severityFilter.value);
@@ -464,6 +469,99 @@ function renderCameras(payload) {
   elements.cameraResults.replaceChildren(...state.cameras.map(createCameraCard));
   if (window.lucide) window.lucide.createIcons();
   showState(state.cameras.length ? "cameras" : "empty");
+}
+
+async function renderMap(incidentPayload) {
+  state.incidents = incidentPayload.items || [];
+  const cameraPayload = await fetchMapCameras();
+  state.cameras = cameraPayload.items || [];
+  elements.incidentTabCount.textContent = incidentPayload.count ?? state.incidents.length;
+  elements.cameraTabCount.textContent = cameraPayload.count ?? state.cameras.length;
+  elements.mapTabCount.textContent = state.incidents.length + state.cameras.length;
+  elements.resultCount.textContent = uiText("mapSummary", state.incidents.length, state.cameras.length);
+  renderStats(incidentPayload.stats || {}, incidentPayload.count ?? state.incidents.length);
+  renderMapMarkers();
+  showState(state.incidents.length || state.cameras.length ? "map" : "empty");
+}
+
+async function fetchMapCameras() {
+  const params = new URLSearchParams();
+  addParam(params, "province", elements.provinceFilter.value);
+  addParam(params, "road", elements.roadFilter.value.toUpperCase());
+  params.set("limit", "50");
+  const response = await fetch(`/api/cameras?${params.toString()}`, { headers: { Accept: "application/json" } });
+  if (!response.ok) throw new Error(response.status === 502 ? uiText("serverUnavailable") : uiText("serverStatus", response.status));
+  return response.json();
+}
+
+function renderStats(stats, fallbackTotal = 0) {
+  elements.statTotal.textContent = stats.total ?? fallbackTotal;
+  elements.statAccidents.textContent = stats.accidents ?? 0;
+  elements.statRoadworks.textContent = stats.roadworks ?? 0;
+  elements.statStuck.textContent = stats.stuck ?? 0;
+  elements.statObstructions.textContent = stats.obstructions ?? 0;
+  elements.statWeather.textContent = stats.weather ?? 0;
+}
+
+function hasCoordinates(item) {
+  return item?.latitude !== null && item?.latitude !== undefined && item?.longitude !== null && item?.longitude !== undefined;
+}
+
+function initMap() {
+  if (state.map || !elements.trafficMap || !window.L) return;
+  state.map = L.map(elements.trafficMap).setView([40.4168, -3.7038], 6);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  }).addTo(state.map);
+  state.incidentLayer = L.layerGroup().addTo(state.map);
+  state.cameraLayer = L.layerGroup().addTo(state.map);
+}
+
+function mapIcon(kind, label) {
+  return L.divIcon({ className: `map-marker ${kind}`, html: `<span>${escapeHtml(label)}</span>`, iconSize: [30, 30], iconAnchor: [15, 15], popupAnchor: [0, -16] });
+}
+
+function renderMapMarkers() {
+  if (!window.L) {
+    elements.mapStatus.textContent = uiText("mapUnavailable");
+    return;
+  }
+  initMap();
+  if (!state.map) return;
+  state.incidentLayer.clearLayers();
+  state.cameraLayer.clearLayers();
+  const bounds = [];
+  state.incidents.filter(hasCoordinates).forEach((incident) => {
+    const point = [Number(incident.latitude), Number(incident.longitude)];
+    bounds.push(point);
+    L.marker(point, { icon: mapIcon("incident", formatDirectionValue(incident.direction_label || "!")) })
+      .addTo(state.incidentLayer)
+      .bindPopup(`<strong>${escapeHtml(incident.road || uiText("incidentPoint"))}</strong><br>${escapeHtml([incident.municipality, incident.province].filter(Boolean).join(" · ") || uiText("unavailableLocation"))}`)
+      .on("click", () => renderMapDetail("incident", incident));
+  });
+  state.cameras.filter(hasCoordinates).forEach((camera) => {
+    const point = [Number(camera.latitude), Number(camera.longitude)];
+    bounds.push(point);
+    L.marker(point, { icon: mapIcon("camera", "CM") })
+      .addTo(state.cameraLayer)
+      .bindPopup(`<strong>${escapeHtml(camera.road || uiText("cameraPoint"))}</strong><br>PK ${escapeHtml(camera.km || "--")}`)
+      .on("click", () => renderMapDetail("camera", camera));
+  });
+  elements.mapStatus.textContent = uiText("mapSummary", state.incidents.filter(hasCoordinates).length, state.cameras.filter(hasCoordinates).length);
+  if (bounds.length) state.map.fitBounds(bounds, { padding: [28, 28], maxZoom: 13 });
+  queueMicrotask(() => state.map.invalidateSize());
+}
+
+function renderMapDetail(kind, item) {
+  if (kind === "camera") {
+    const image = item.image_url ? `<button class="map-camera-preview" type="button"><img src="${escapeHtml(item.image_url)}" alt="${escapeHtml(uiText("cameraAlt", item.road, item.km))}"></button>` : `<div class="image-fallback"><i data-lucide="wifi-off" aria-hidden="true"></i><strong>${uiText("cameraUnavailable")}</strong></div>`;
+    elements.mapDetail.innerHTML = `<p class="eyebrow">${uiText("cameraPoint")}</p><h3>${escapeHtml(item.road || uiText("dgtCamera"))}</h3>${image}<dl><div><dt>${uiText("province")}</dt><dd>${escapeHtml(item.province || uiText("unavailableProvince"))}</dd></div><div><dt>PK</dt><dd>${escapeHtml(item.km || "--")}</dd></div><div><dt>${detailLabel("latitude")}</dt><dd>${escapeHtml(item.latitude ?? "--")}</dd></div><div><dt>${detailLabel("longitude")}</dt><dd>${escapeHtml(item.longitude ?? "--")}</dd></div></dl>`;
+    elements.mapDetail.querySelector(".map-camera-preview")?.addEventListener("click", () => openCameraViewer(item.image_url, uiText("cameraAlt", item.road, item.km)));
+  } else {
+    elements.mapDetail.innerHTML = `<p class="eyebrow">${uiText("incidentPoint")}</p><h3>${escapeHtml(item.road || uiText("incidentDetail"))}</h3><dl><div><dt>${uiText("location")}</dt><dd>${escapeHtml([item.municipality, item.province, item.km && `PK ${item.km}`].filter(Boolean).join(" · ") || uiText("unavailableLocation"))}</dd></div><div><dt>${uiText("type")}</dt><dd>${escapeHtml(item.type_label || item.type || uiText("unclassified"))}</dd></div><div><dt>${uiText("severity")}</dt><dd>${escapeHtml(item.severity_label || uiText("unknownSeverity"))}</dd></div><div><dt>${uiText("direction")}</dt><dd>${escapeHtml(formatDirectionValue(item.direction_label || item.direction || "--"))}</dd></div><div><dt>${detailLabel("latitude")}</dt><dd>${escapeHtml(item.latitude ?? "--")}</dd></div><div><dt>${detailLabel("longitude")}</dt><dd>${escapeHtml(item.longitude ?? "--")}</dd></div></dl>`;
+  }
+  if (window.lucide) window.lucide.createIcons();
 }
 
 function createCameraCard(camera) {
@@ -736,6 +834,9 @@ function isUnavailableCameraImage(image) {
 function badge(value, className) { return text("span", value, `badge ${className}`); }
 function text(tag, value, className = "") { const node = document.createElement(tag); node.textContent = value; node.className = className; return node; }
 function cell(content) { const td = document.createElement("td"); td.append(content); return td; }
+function escapeHtml(value) {
+  return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+}
 function safeClass(value) { return String(value).toLowerCase().replace(/[^a-z0-9_-]/g, ""); }
 function formatSeverity(value) { return ({ highest: uiText("severityHighest"), high: uiText("severityHigh"), medium: uiText("severityMedium"), low: uiText("severityLow") })[String(value).toLowerCase()] || value || uiText("unknownSeverity"); }
 
@@ -745,6 +846,7 @@ function showState(active) {
   elements.emptyState.hidden = active !== "empty";
   elements.incidentResults.hidden = active !== "incidents";
   elements.cameraResults.hidden = active !== "cameras";
+  elements.mapResults.hidden = active !== "map";
   document.querySelector(".results").setAttribute("aria-busy", String(active === "loading"));
 }
 
