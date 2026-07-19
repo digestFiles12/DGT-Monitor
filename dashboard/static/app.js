@@ -28,25 +28,25 @@ const detailLabels = {
     id: "ID", record_id: "Registro", version: "Versión", source: "Fuente", creation_time: "Creación",
     start_time: "Inicio", end_time: "Fin", severity_label: "Gravedad", type_label: "Tipo", cause_label: "Causa",
     road: "Carretera", destination: "Destino", municipality: "Municipio", province: "Provincia", community: "Comunidad",
-    km: "Punto kilométrico", direction_label: "Dirección", direction_road_label: "Carretera dirección",
+    km: "Punto kilométrico", direction: "Dirección original", direction_label: "Dirección", direction_road: "Carretera dirección", direction_road_label: "Carretera dirección",
     latitude: "Latitud", longitude: "Longitud", lane_usage_label: "Uso de carril", management_type_label: "Gestión",
     maintenance_type_label: "Mantenimiento", information_status_label: "Estado de información", probability_label: "Probabilidad",
     compliance_label: "Cumplimiento", vehicle_type_label: "Vehículo", temp_speed_limit: "Límite temporal",
     environment_type_label: "Entorno", road_condition_type_label: "Estado de vía", location_description: "Descripción de ubicación",
     geographic_descriptor: "Descriptor geográfico", has_camera_coverage: "Cobertura de cámara", camera_coverage_count: "Cámaras cercanas",
-    nearest_camera_km_delta: "Distancia a cámara",
+    nearest_camera_km_delta: "Distancia a cámara", image_url: "URL de imagen", distance_km: "Distancia", km_delta: "Diferencia PK",
   },
   en: {
     id: "ID", record_id: "Record", version: "Version", source: "Source", creation_time: "Created",
     start_time: "Start", end_time: "End", severity_label: "Severity", type_label: "Type", cause_label: "Cause",
     road: "Road", destination: "Destination", municipality: "Municipality", province: "Province", community: "Region",
-    km: "Kilometer point", direction_label: "Direction", direction_road_label: "Road direction",
+    km: "Kilometer point", direction: "Original direction", direction_label: "Direction", direction_road: "Road direction", direction_road_label: "Road direction",
     latitude: "Latitude", longitude: "Longitude", lane_usage_label: "Lane usage", management_type_label: "Management",
     maintenance_type_label: "Maintenance", information_status_label: "Information status", probability_label: "Probability",
     compliance_label: "Compliance", vehicle_type_label: "Vehicle", temp_speed_limit: "Temporary speed limit",
     environment_type_label: "Environment", road_condition_type_label: "Road condition", location_description: "Location description",
     geographic_descriptor: "Geographic descriptor", has_camera_coverage: "Camera coverage", camera_coverage_count: "Nearby cameras",
-    nearest_camera_km_delta: "Camera distance",
+    nearest_camera_km_delta: "Camera distance", image_url: "Image URL", distance_km: "Distance", km_delta: "KP difference",
   },
 };
 
@@ -393,9 +393,7 @@ function createIncidentDetailRow(incident) {
   heading.append(text("strong", incident.type_label || uiText("incidentDetail")), text("small", [incident.road, incident.municipality, incident.province].filter(Boolean).join(" · ") || uiText("dgtData")));
   const grid = document.createElement("dl");
   grid.className = "incident-detail-grid";
-  const details = incidentDetailFields
-    .map((key) => [detailLabel(key), formatDetailValue(key, incident[key])])
-    .filter(([, value]) => value !== "");
+  const details = detailEntries(incident, incidentDetailFields);
   details.forEach(([label, value]) => {
     const item = document.createElement("div");
     item.append(text("dt", label), text("dd", value));
@@ -408,12 +406,18 @@ function createIncidentDetailRow(incident) {
 }
 
 function formatDetailValue(key, value) {
-  if (value === null || value === undefined || value === "") return "";
+  if (value === null || value === undefined || value === "") return "--";
   if (typeof value === "boolean") return value ? uiText("yes") : uiText("no");
   if (timeDetailFields.has(key)) return formatHumanDateTime(value);
   if (key === "direction_label") return formatDirectionValue(value);
   if (key === "nearest_camera_km_delta" && Number.isFinite(Number(value))) return `${Number(value).toFixed(3)} PK`;
+  if (["distance_km", "km_delta"].includes(key) && Number.isFinite(Number(value))) return `${Number(value).toFixed(3)} km`;
   return String(value);
+}
+
+function detailEntries(item, preferredKeys = []) {
+  const keys = [...preferredKeys, ...Object.keys(item || {}).filter((key) => !preferredKeys.includes(key))];
+  return keys.map((key) => [detailLabel(key), formatDetailValue(key, item?.[key])]);
 }
 
 function directionContent(incident) {
@@ -454,7 +458,7 @@ function formatHumanDateTime(value) {
 }
 
 function detailLabel(key) {
-  return (detailLabels[state.language] || detailLabels.es)[key] || key;
+  return (detailLabels[state.language] || detailLabels.es)[key] || key.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 function uiText(key) {
@@ -554,12 +558,14 @@ function renderMapMarkers() {
 }
 
 function renderMapDetail(kind, item) {
+  const details = detailEntries(item, kind === "incident" ? incidentDetailFields : []);
+  const detailList = `<dl>${details.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}</dl>`;
   if (kind === "camera") {
     const image = item.image_url ? `<button class="map-camera-preview" type="button"><img src="${escapeHtml(item.image_url)}" alt="${escapeHtml(uiText("cameraAlt", item.road, item.km))}"></button>` : `<div class="image-fallback"><i data-lucide="wifi-off" aria-hidden="true"></i><strong>${uiText("cameraUnavailable")}</strong></div>`;
-    elements.mapDetail.innerHTML = `<p class="eyebrow">${uiText("cameraPoint")}</p><h3>${escapeHtml(item.road || uiText("dgtCamera"))}</h3>${image}<dl><div><dt>${uiText("province")}</dt><dd>${escapeHtml(item.province || uiText("unavailableProvince"))}</dd></div><div><dt>PK</dt><dd>${escapeHtml(item.km || "--")}</dd></div><div><dt>${detailLabel("latitude")}</dt><dd>${escapeHtml(item.latitude ?? "--")}</dd></div><div><dt>${detailLabel("longitude")}</dt><dd>${escapeHtml(item.longitude ?? "--")}</dd></div></dl>`;
+    elements.mapDetail.innerHTML = `<p class="eyebrow">${uiText("cameraPoint")}</p><h3>${escapeHtml(item.road || uiText("dgtCamera"))}</h3>${image}${detailList}`;
     elements.mapDetail.querySelector(".map-camera-preview")?.addEventListener("click", () => openCameraViewer(item.image_url, uiText("cameraAlt", item.road, item.km)));
   } else {
-    elements.mapDetail.innerHTML = `<p class="eyebrow">${uiText("incidentPoint")}</p><h3>${escapeHtml(item.road || uiText("incidentDetail"))}</h3><dl><div><dt>${uiText("location")}</dt><dd>${escapeHtml([item.municipality, item.province, item.km && `PK ${item.km}`].filter(Boolean).join(" · ") || uiText("unavailableLocation"))}</dd></div><div><dt>${uiText("type")}</dt><dd>${escapeHtml(item.type_label || item.type || uiText("unclassified"))}</dd></div><div><dt>${uiText("severity")}</dt><dd>${escapeHtml(item.severity_label || uiText("unknownSeverity"))}</dd></div><div><dt>${uiText("direction")}</dt><dd>${escapeHtml(formatDirectionValue(item.direction_label || item.direction || "--"))}</dd></div><div><dt>${detailLabel("latitude")}</dt><dd>${escapeHtml(item.latitude ?? "--")}</dd></div><div><dt>${detailLabel("longitude")}</dt><dd>${escapeHtml(item.longitude ?? "--")}</dd></div></dl>`;
+    elements.mapDetail.innerHTML = `<p class="eyebrow">${uiText("incidentPoint")}</p><h3>${escapeHtml(item.road || uiText("incidentDetail"))}</h3>${detailList}`;
   }
   if (window.lucide) window.lucide.createIcons();
 }
