@@ -141,6 +141,7 @@ tbody tr:hover { background: var(--row-hover); }
 .load-more-wrap { padding: 18px; border-top: 1px solid var(--line); text-align: center; }
 .load-more-wrap .secondary-button { min-width: 180px; }
 .road { font: 700 19px/1 "Barlow Condensed", sans-serif; }
+.direction-abbr { text-decoration: none; font-weight: 700; letter-spacing: 0; }
 .location { min-width: 180px; }
 .location strong, .location small { display: block; }
 .location small { margin-top: 3px; color: var(--muted); }

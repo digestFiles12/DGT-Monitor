@@ -356,7 +356,7 @@ function createIncidentRows(incident) {
     cell(text("strong", incident.road || "--", "road")),
     cell(locationContent(incident)),
     cell(text("span", incident.type_label || incident.type || uiText("unclassified"), "badge")),
-    cell(document.createTextNode(incident.direction_label || incident.direction || "--")),
+    cell(directionContent(incident)),
     cell(coverageContent(incident))
   );
   const toggleDetails = () => {
@@ -406,8 +406,39 @@ function formatDetailValue(key, value) {
   if (value === null || value === undefined || value === "") return "";
   if (typeof value === "boolean") return value ? uiText("yes") : uiText("no");
   if (timeDetailFields.has(key)) return formatHumanDateTime(value);
+  if (key === "direction_label") return formatDirectionValue(value);
   if (key === "nearest_camera_km_delta" && Number.isFinite(Number(value))) return `${Number(value).toFixed(3)} PK`;
   return String(value);
+}
+
+function directionContent(incident) {
+  const full = incident.direction_label || incident.direction || "--";
+  const short = formatDirectionValue(full);
+  const node = text("abbr", short, "direction-abbr");
+  node.title = full;
+  return node;
+}
+
+function formatDirectionValue(value) {
+  const textValue = String(value || "").trim();
+  const normalized = textValue.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const compact = normalized.replace(/[^a-z]/g, "");
+  if (["unknown", "desconocido", "sindato", "na"].includes(compact)) return "--";
+  const matches = [
+    ["northeastbound", "NE"], ["northeast", "NE"], ["noreste", "NE"],
+    ["northwestbound", "NO"], ["northwest", "NO"], ["noroeste", "NO"],
+    ["southeastbound", "SE"], ["southeast", "SE"], ["sureste", "SE"],
+    ["southwestbound", "SO"], ["southwest", "SO"], ["suroeste", "SO"],
+    ["northbound", "N"], ["direccionnorte", "N"], ["north", "N"], ["norte", "N"],
+    ["southbound", "S"], ["direccionsur", "S"], ["south", "S"], ["sur", "S"],
+    ["eastbound", "E"], ["direccioneste", "E"], ["east", "E"], ["este", "E"],
+    ["westbound", "O"], ["direccionoeste", "O"], ["west", "O"], ["oeste", "O"],
+    ["bothdirections", "N/S"], ["ambossentidos", "N/S"],
+    ["positivedirection", "+"], ["sentidopositivo", "+"],
+    ["negativedirection", "-"], ["sentidonegativo", "-"],
+  ];
+  const match = matches.find(([needle]) => compact.includes(needle));
+  return match ? match[1] : textValue;
 }
 
 function formatHumanDateTime(value) {
@@ -1272,7 +1303,7 @@ function renderDetail(incident) {
     <div class="detail-row"><span>Ubicación</span>${escapeHtml(incident.road || "N/A")} · Km ${escapeHtml(incident.km || "N/A")} · ${escapeHtml(incident.municipality || "N/A")} · ${escapeHtml(incident.province || "N/A")}</div>
     <div class="detail-row"><span>Causa</span>${escapeHtml(incident.cause_label || incident.cause || "N/A")}</div>
     <div class="detail-row"><span>Severidad</span>${escapeHtml(incident.severity_label || "N/A")}</div>
-    <div class="detail-row"><span>Dirección</span>${escapeHtml(incident.direction_label || "N/A")}</div>
+    <div class="detail-row"><span>Dirección</span>${escapeHtml(formatDirectionValue(incident.direction_label || incident.direction || "N/A"))}</div>
     <div class="detail-row"><span>Inicio</span>${escapeHtml(formatDetailValue("start_time", incident.start_time) || "N/A")}</div>
     <div class="detail-row"><span>Fin previsto</span>${escapeHtml(formatDetailValue("end_time", incident.end_time) || "N/A")}</div>
     <div class="detail-row"><span>Mapa</span>${mapsLink}</div>
