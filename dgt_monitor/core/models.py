@@ -88,6 +88,7 @@ class IncidentFilters:
     severity: str | None = None
     kind: str | None = None
     camera: str | None = None
+    match_mode: str = "contains"
 
 
 @dataclass(frozen=True, slots=True)
@@ -101,3 +102,4 @@ class CameraFilters:
     max_km_delta: float = CAMERA_MATCH_RANGE_KM
     max_distance_km: float | None = None
     incident_coverage: bool = False
+    match_mode: str = "contains"

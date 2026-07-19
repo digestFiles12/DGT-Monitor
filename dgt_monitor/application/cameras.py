@@ -27,8 +27,8 @@ class CameraService:
         incident_km = parse_kilometer_point(filters.kilometer)
         results: list[Camera] = []
         for camera in cameras:
-            province_match = matches_text(camera.province, filters.province)
-            road_match = matches_text(camera.road, filters.road)
+            province_match = matches_text(camera.province, filters.province, filters.match_mode)
+            road_match = matches_text(camera.road, filters.road, filters.match_mode)
             if filters.province and not province_match:
                 continue
             if filters.road and not road_match:

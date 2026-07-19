@@ -1,7 +1,7 @@
 from dgt_monitor.core.geometry import DistanceCalculator
 from dgt_monitor.core.localization import Translator
 from dgt_monitor.core.models import Incident, IncidentStats
-from dgt_monitor.core.text import TextCleaner, normalize_road, parse_kilometer_point
+from dgt_monitor.core.text import TextCleaner, matches_text, normalize_road, parse_kilometer_point
 
 
 def test_models_serialize_stable_contract():
@@ -30,6 +30,11 @@ def test_text_translation_and_location_helpers():
     assert normalize_road("AP-7") == "AP7"
     assert parse_kilometer_point("PK 12+500") == 12.5
     assert parse_kilometer_point("330,2") == 330.2
+    assert matches_text("Madrid", "mad")
+    assert matches_text("Madrid", "madrid", "exact")
+    assert not matches_text("Madrid Norte", "madrid", "exact")
+    assert matches_text("A-52", r"^A-\d+$", "regex")
+    assert not matches_text("A-52", "[", "regex")
 
 
 def test_haversine_distance_for_nearby_points():

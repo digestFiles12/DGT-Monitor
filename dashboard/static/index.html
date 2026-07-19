@@ -11,10 +11,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="/static/styles.css?v=50">
+  <link rel="stylesheet" href="/static/styles.css?v=51">
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-  <script src="/static/app.js?v=50" defer></script>
+  <script src="/static/app.js?v=51" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -70,6 +70,7 @@
           <button class="text-button" id="clearFilters" type="button">Limpiar</button>
         </div>
         <form id="filterForm">
+          <label>Modo de búsqueda<select id="matchModeFilter" name="match_mode"><option value="contains">Contiene</option><option value="exact">Exacta</option><option value="regex">Regex</option></select></label>
           <label>Provincia<input id="provinceFilter" name="province" type="search" placeholder="Ej. Madrid" autocomplete="off"></label>
           <label>Carretera<input id="roadFilter" name="road" type="search" placeholder="Ej. A-6" autocomplete="off"></label>
           <div id="incidentFilters">

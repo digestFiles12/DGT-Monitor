@@ -51,9 +51,9 @@ class IncidentService:
             "without": not item.has_camera_coverage,
         }
         return (
-            matches_text(item.province, filters.province)
-            and matches_text(item.municipality, filters.municipality)
-            and matches_text(item.road, filters.road)
+            matches_text(item.province, filters.province, filters.match_mode)
+            and matches_text(item.municipality, filters.municipality, filters.match_mode)
+            and matches_text(item.road, filters.road, filters.match_mode)
             and (not filters.severity or item.severity.casefold() == filters.severity.casefold())
             and kind_matches.get(filters.kind, True)
             and camera_matches.get(filters.camera, True)
