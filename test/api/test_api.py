@@ -51,6 +51,8 @@ def test_dashboard_and_pwa_assets_are_served():
     assert "statStuck" in dashboard.text
     assert "statWeather" in dashboard.text
     assert "cameraCoverageFilter" in dashboard.text
+    assert "mapResults" in dashboard.text
+    assert "pageTitle" not in dashboard.text
     styles = client.get("/static/styles.css")
     assert styles.status_code == 200
     assert ':root[data-theme="dark"]' in styles.text
@@ -58,6 +60,7 @@ def test_dashboard_and_pwa_assets_are_served():
     assert ".image-viewer-frame" in styles.text
     assert ".image-viewer-fallback" in styles.text
     assert ".incident-detail-panel" in styles.text
+    assert ".map-window" in styles.text
     assert ".coverage-menu" in styles.text
     app_js = client.get("/static/app.js")
     assert app_js.status_code == 200
@@ -71,11 +74,13 @@ def test_dashboard_and_pwa_assets_are_served():
     assert "isUnavailableCameraImage" in app_js.text
     assert "createIncidentDetailRow" in app_js.text
     assert "formatHumanDateTime" in app_js.text
+    assert "formatDirectionValue" in app_js.text
+    assert "detailEntries" in app_js.text
     assert "detailLabels" in app_js.text
     assert client.get("/manifest.webmanifest").headers["content-type"].startswith("application/manifest+json")
     service_worker = client.get("/sw.js")
     assert service_worker.status_code == 200
-    assert "dgt-monitor-v17" in service_worker.text
+    assert "dgt-monitor-v31" in service_worker.text
 
 
 def test_websocket_sends_filtered_payload():

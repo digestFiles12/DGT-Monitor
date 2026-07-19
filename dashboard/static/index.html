@@ -10,9 +10,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="/static/styles.css?v=31">
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
-  <script src="/static/app.js" defer></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+  <script src="/static/app.js?v=31" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -37,12 +39,7 @@
   </header>
 
   <main>
-    <section class="overview" aria-labelledby="pageTitle">
-      <div>
-        <p class="eyebrow">Panel operativo</p>
-        <h1 id="pageTitle">Tráfico en tiempo real</h1>
-        <p class="overview-copy">Consulta incidencias activas y cámaras de la red estatal desde una única vista.</p>
-      </div>
+    <section class="overview" aria-label="Resumen de incidencias">
       <div class="summary-grid" aria-label="Resumen de incidencias">
         <button class="metric metric-total is-active" type="button" data-kind=""><span>Total</span><strong id="statTotal">--</strong></button>
         <button class="metric metric-accidents" type="button" data-kind="accident"><span>Accidentes</span><strong id="statAccidents">--</strong></button>
@@ -59,6 +56,9 @@
       </button>
       <button class="tab" type="button" data-view="cameras" aria-selected="false">
         <i data-lucide="camera" aria-hidden="true"></i><span class="tab-label">Cámaras</span><span class="tab-count" id="cameraTabCount">0</span>
+      </button>
+      <button class="tab" type="button" data-view="map" aria-selected="false">
+        <i data-lucide="map" aria-hidden="true"></i><span class="tab-label">Mapa</span><span class="tab-count" id="mapTabCount">0</span>
       </button>
     </nav>
 
@@ -112,6 +112,19 @@
           </div>
         </div>
         <div class="camera-grid" id="cameraResults" hidden></div>
+        <div class="map-results" id="mapResults" hidden>
+          <section class="map-shell" aria-label="Mapa de incidencias y cámaras">
+            <div class="map-panel" id="trafficMap"></div>
+            <aside class="map-detail" id="mapDetail" aria-live="polite">
+              <section class="map-window map-detail-window">
+                <p class="eyebrow">OpenStreetMap</p>
+                <h3>Selecciona un punto</h3>
+                <p>Elige una incidencia o cámara en el mapa para ver sus detalles.</p>
+              </section>
+            </aside>
+          </section>
+          <p class="map-status" id="mapStatus">OpenStreetMap</p>
+        </div>
       </section>
     </section>
   </main>
