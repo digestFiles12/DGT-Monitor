@@ -92,6 +92,9 @@ h2 { font-size: 26px; line-height: 1; }
 .metric-weather { color: var(--green); }
 
 .view-tabs { display: flex; gap: 4px; border-bottom: 1px solid #aeb6bd; }
+.filter-toggle { flex: 0 0 48px; width: 48px; min-height: 48px; padding: 0; border: 0; border-bottom: 3px solid transparent; background: transparent; color: var(--muted); display: grid; place-items: center; }
+.filter-toggle:hover, .filter-toggle:focus-visible { color: var(--ink); background: var(--subtle); }
+.filter-toggle svg { width: 19px; }
 .tab { min-height: 48px; padding: 0 18px; border: 0; border-bottom: 3px solid transparent; background: transparent; color: var(--muted); display: flex; align-items: center; gap: 9px; font-weight: 600; }
 .tab:hover { color: var(--ink); }
 .tab.is-active { color: var(--red); border-bottom-color: var(--red); }
@@ -116,6 +119,7 @@ input:focus, select:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba
 .auto-refresh { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 9px; }
 .auto-refresh input { width: 16px; height: 16px; accent-color: var(--red); }
 
+.workspace.is-filters-hidden { grid-template-columns: minmax(0, 1fr); }
 .results { min-width: 0; }
 .results-header { min-height: 48px; margin-bottom: 16px; }
 .result-count { color: var(--muted); font-size: 14px; }
@@ -181,7 +185,9 @@ tbody tr:hover { background: var(--row-hover); }
 
 .map-results { display: grid; gap: 10px; }
 .map-shell { min-height: 640px; position: relative; background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow); overflow: hidden; }
-.map-panel { min-height: 640px; background: var(--media-bg); }
+.workspace.is-map-view .map-shell { height: max(520px, calc(100dvh - 348px)); min-height: max(520px, calc(100dvh - 348px)); }
+.map-panel { min-height: 640px; height: 100%; background: var(--media-bg); }
+.workspace.is-map-view .map-panel { min-height: 100%; }
 .map-detail { position: absolute; inset: 18px; z-index: 500; display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; pointer-events: none; }
 .map-window { width: min(360px, 42vw); max-height: calc(640px - 36px); padding: 16px; background: color-mix(in srgb, var(--panel) 96%, transparent); border: 1px solid var(--line); box-shadow: 0 18px 44px rgba(24, 33, 43, .18); overflow-y: auto; pointer-events: auto; }
 .map-image-window { align-self: flex-start; }
@@ -252,9 +258,11 @@ footer a:hover { color: white; }
   .metric { min-height: 90px; border-top: 1px solid var(--line); }
   .metric:nth-child(odd) { border-left: 0; }
   .workspace { grid-template-columns: 1fr; }
+  .workspace.is-map-view { padding-top: 14px; }
   .filters { position: static; }
   .camera-grid { grid-template-columns: 1fr; }
   .view-tabs { min-width: 0; }
+  .filter-toggle { flex-basis: 42px; width: 42px; min-height: 50px; }
   .tab { flex: 1 1 0; min-width: 0; justify-content: center; padding-inline: 8px; }
   .table-wrap { margin-inline: -14px; border-inline: 0; overscroll-behavior-inline: contain; }
   .table-wrap::after { content: ""; position: sticky; right: 0; display: block; width: 32px; height: 0; box-shadow: -20px 0 24px 8px var(--panel); pointer-events: none; }
@@ -276,8 +284,9 @@ footer a:hover { color: white; }
   .incident-detail-panel { padding: 16px 14px 18px; }
   .incident-detail-heading { display: grid; }
   .incident-detail-grid { grid-template-columns: 1fr; }
-  .map-shell { min-height: 0; overflow: visible; }
-  .map-panel { min-height: 420px; }
+  .results-header { align-items: flex-start; }
+  .map-shell, .workspace.is-map-view .map-shell { min-height: 0; height: calc(100dvh - 304px); overflow: visible; }
+  .map-panel { min-height: 0; height: 100%; }
   .map-detail { position: static; display: grid; padding: 0; gap: 10px; margin-top: 10px; pointer-events: auto; }
   .map-window { width: 100%; max-height: none; box-shadow: var(--shadow); }
   .map-detail-window { margin-left: 0; }
@@ -315,6 +324,7 @@ footer a:hover { color: white; }
 
 @media (max-width: 900px) and (orientation: landscape) {
   main { padding-inline: 12px; }
+  .workspace.is-map-view .map-shell { height: calc(100dvh - 254px); min-height: 360px; }
   .table-wrap { margin-inline: 0; overflow-x: hidden; }
   .table-wrap::after { content: none; }
   table { width: 100%; min-width: 0; table-layout: fixed; font-size: 13px; }

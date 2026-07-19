@@ -46,7 +46,7 @@ class CameraService:
                 )
             results.append(replace(camera, km_delta=km_delta, distance_km=distance_km))
         results.sort(key=lambda item: item.distance_km if item.distance_km is not None else float("inf"))
-        return results[:filters.limit]
+        return results if filters.limit is None else results[:filters.limit]
 
     def annotate_coverage(self, incidents: Sequence[Incident], cameras: Sequence[Camera], range_km: float = 1.0) -> list[Incident]:
         by_road: dict[str, list[Camera]] = defaultdict(list)

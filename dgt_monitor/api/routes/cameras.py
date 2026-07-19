@@ -18,6 +18,7 @@ def cameras(
     lat: float | None = None,
     lon: float | None = None,
     limit: int = Query(12, ge=1, le=50),
+    all: bool = False,
     max_km_delta: float = Query(1.0, ge=0.1, le=20),
 ) -> dict:
-    return service.get_cameras(CameraFilters(province, road, km, lat, lon, limit, max_km_delta))
+    return service.get_cameras(CameraFilters(province, road, km, lat, lon, None if all else limit, max_km_delta))

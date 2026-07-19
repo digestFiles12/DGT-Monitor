@@ -95,5 +95,5 @@ class CameraFilters:
     kilometer: str | None = None
     latitude: float | None = None
     longitude: float | None = None
-    limit: int = 12
+    limit: int | None = 12
     max_km_delta: float = 1.0

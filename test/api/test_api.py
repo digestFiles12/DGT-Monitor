@@ -37,6 +37,7 @@ def test_health_and_rest_contracts():
     assert fake.last_filters.camera == "with"
     assert fake.last_language == "en"
     assert client.get("/api/cameras", params={"limit": 5}).json()["items"][0]["limit"] == 5
+    assert client.get("/api/cameras", params={"all": "true"}).json()["items"][0]["limit"] is None
 
 
 def test_dashboard_and_pwa_assets_are_served():
@@ -52,6 +53,7 @@ def test_dashboard_and_pwa_assets_are_served():
     assert "statWeather" in dashboard.text
     assert "cameraCoverageFilter" in dashboard.text
     assert "mapResults" in dashboard.text
+    assert "filterToggle" in dashboard.text
     assert "pageTitle" not in dashboard.text
     styles = client.get("/static/styles.css")
     assert styles.status_code == 200
@@ -82,7 +84,7 @@ def test_dashboard_and_pwa_assets_are_served():
     assert client.get("/manifest.webmanifest").headers["content-type"].startswith("application/manifest+json")
     service_worker = client.get("/sw.js")
     assert service_worker.status_code == 200
-    assert "dgt-monitor-v33" in service_worker.text
+    assert "dgt-monitor-v37" in service_worker.text
 
 
 def test_websocket_sends_filtered_payload():
