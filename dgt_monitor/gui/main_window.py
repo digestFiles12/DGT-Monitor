@@ -1,5 +1,6 @@
 """Main desktop window for DGT Monitor."""
 
+from datetime import datetime
 from typing import Any
 
 from PyQt6.QtCore import QThread, Qt, pyqtSignal
@@ -88,6 +89,10 @@ class MainWindow(QMainWindow):
         self.municipality_input.setPlaceholderText("Municipio")
         self.road_input = QLineEdit()
         self.road_input.setPlaceholderText("Carretera")
+        self.match_mode_input = QComboBox()
+        self.match_mode_input.addItem("Contiene", "contains")
+        self.match_mode_input.addItem("Exacta", "exact")
+        self.match_mode_input.addItem("Regex", "regex")
         self.severity_input = QComboBox()
         self.severity_input.addItem("Todas las gravedades", "")
         self.severity_input.addItem("Muy alta", "highest")
@@ -98,7 +103,7 @@ class MainWindow(QMainWindow):
         self.camera_input.addItem("Todas las cámaras", "")
         self.camera_input.addItem("Con cámara", "with")
         self.camera_input.addItem("Sin cámara", "without")
-        for widget in (self.province_input, self.municipality_input, self.road_input, self.severity_input, self.camera_input):
+        for widget in (self.province_input, self.municipality_input, self.road_input, self.match_mode_input, self.severity_input, self.camera_input):
             controls_layout.addWidget(widget)
         apply_button = QPushButton("Aplicar filtros")
         apply_button.setObjectName("primaryButton")
@@ -174,7 +179,8 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(root)
         self.setTabOrder(self.province_input, self.municipality_input)
         self.setTabOrder(self.municipality_input, self.road_input)
-        self.setTabOrder(self.road_input, self.severity_input)
+        self.setTabOrder(self.road_input, self.match_mode_input)
+        self.setTabOrder(self.match_mode_input, self.severity_input)
         self.setTabOrder(self.severity_input, self.camera_input)
         self.setTabOrder(self.camera_input, self.refresh_button)
 
@@ -188,6 +194,7 @@ class MainWindow(QMainWindow):
             severity=self.severity_input.currentData() or None,
             kind=self._kind_filter or None,
             camera=self.camera_input.currentData() or None,
+            match_mode=self.match_mode_input.currentData() or "contains",
         )
         self.refresh_button.setEnabled(False)
         self.status_label.setText("Actualizando...")
@@ -229,6 +236,7 @@ class MainWindow(QMainWindow):
         self.province_input.clear()
         self.municipality_input.clear()
         self.road_input.clear()
+        self.match_mode_input.setCurrentIndex(0)
         self.severity_input.setCurrentIndex(0)
         self.camera_input.setCurrentIndex(0)
         self._set_kind_filter("", reload=False)
@@ -276,7 +284,8 @@ class MainWindow(QMainWindow):
             ("Tipo", incident.get("type_label") or incident.get("type")),
             ("Causa", incident.get("cause_label") or incident.get("cause")),
             ("Dirección", incident.get("direction_label") or incident.get("direction")),
-            ("Inicio", incident.get("start_time")),
+            ("Inicio", self._format_datetime(incident.get("start_time"))),
+            ("Fin", self._format_datetime(incident.get("end_time"))),
             ("Cobertura de cámaras", incident.get("camera_coverage_count", 0)),
         )
         rows = "".join(f"<tr><th>{name}</th><td>{value or '--'}</td></tr>" for name, value in fields)
@@ -334,6 +343,17 @@ class MainWindow(QMainWindow):
     @staticmethod
     def _severity_color(value: str) -> QColor:
         return QColor({"highest": "#b91c1c", "high": "#dc2626", "medium": "#b45309", "low": "#15803d"}.get(value.lower(), "#475569"))
+
+    @staticmethod
+    def _format_datetime(value: object) -> str:
+        if not value:
+            return ""
+        text = str(value)
+        try:
+            parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        except ValueError:
+            return text
+        return parsed.strftime("%d/%m/%Y %H:%M")
 
     def _apply_style(self) -> None:
         self.setStyleSheet(main_window_stylesheet(self._theme))
