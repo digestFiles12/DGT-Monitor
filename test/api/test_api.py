@@ -59,6 +59,7 @@ def test_dashboard_and_pwa_assets_are_served():
     assert ".image-viewer-frame" in styles.text
     assert ".image-viewer-fallback" in styles.text
     assert ".incident-detail-panel" in styles.text
+    assert ".map-window" in styles.text
     assert ".coverage-menu" in styles.text
     app_js = client.get("/static/app.js")
     assert app_js.status_code == 200
@@ -78,7 +79,7 @@ def test_dashboard_and_pwa_assets_are_served():
     assert client.get("/manifest.webmanifest").headers["content-type"].startswith("application/manifest+json")
     service_worker = client.get("/sw.js")
     assert service_worker.status_code == 200
-    assert "dgt-monitor-v25" in service_worker.text
+    assert "dgt-monitor-v26" in service_worker.text
 
 
 def test_websocket_sends_filtered_payload():

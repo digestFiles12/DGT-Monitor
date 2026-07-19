@@ -562,10 +562,10 @@ function renderMapDetail(kind, item) {
   const detailList = `<dl>${details.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}</dl>`;
   if (kind === "camera") {
     const image = item.image_url ? `<button class="map-camera-preview" type="button"><img src="${escapeHtml(item.image_url)}" alt="${escapeHtml(uiText("cameraAlt", item.road, item.km))}"></button>` : `<div class="image-fallback"><i data-lucide="wifi-off" aria-hidden="true"></i><strong>${uiText("cameraUnavailable")}</strong></div>`;
-    elements.mapDetail.innerHTML = `<p class="eyebrow">${uiText("cameraPoint")}</p><h3>${escapeHtml(item.road || uiText("dgtCamera"))}</h3>${image}${detailList}`;
+    elements.mapDetail.innerHTML = `<section class="map-window map-image-window"><p class="eyebrow">${uiText("cameraImage")}</p><h3>${escapeHtml(item.road || uiText("dgtCamera"))}</h3>${image}</section><section class="map-window map-detail-window"><p class="eyebrow">${uiText("cameraPoint")}</p><h3>${escapeHtml(item.road || uiText("dgtCamera"))}</h3>${detailList}</section>`;
     elements.mapDetail.querySelector(".map-camera-preview")?.addEventListener("click", () => openCameraViewer(item.image_url, uiText("cameraAlt", item.road, item.km)));
   } else {
-    elements.mapDetail.innerHTML = `<p class="eyebrow">${uiText("incidentPoint")}</p><h3>${escapeHtml(item.road || uiText("incidentDetail"))}</h3>${detailList}`;
+    elements.mapDetail.innerHTML = `<section class="map-window map-detail-window"><p class="eyebrow">${uiText("incidentPoint")}</p><h3>${escapeHtml(item.road || uiText("incidentDetail"))}</h3>${detailList}</section>`;
   }
   if (window.lucide) window.lucide.createIcons();
 }

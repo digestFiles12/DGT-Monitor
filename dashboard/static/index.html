@@ -11,10 +11,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="/static/styles.css?v=25">
+  <link rel="stylesheet" href="/static/styles.css?v=26">
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-  <script src="/static/app.js?v=25" defer></script>
+  <script src="/static/app.js?v=26" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -121,9 +121,11 @@
           <section class="map-shell" aria-label="Mapa de incidencias y cámaras">
             <div class="map-panel" id="trafficMap"></div>
             <aside class="map-detail" id="mapDetail" aria-live="polite">
-              <p class="eyebrow">OpenStreetMap</p>
-              <h3>Selecciona un punto</h3>
-              <p>Elige una incidencia o cámara en el mapa para ver sus detalles.</p>
+              <section class="map-window map-detail-window">
+                <p class="eyebrow">OpenStreetMap</p>
+                <h3>Selecciona un punto</h3>
+                <p>Elige una incidencia o cámara en el mapa para ver sus detalles.</p>
+              </section>
             </aside>
           </section>
           <p class="map-status" id="mapStatus">OpenStreetMap</p>

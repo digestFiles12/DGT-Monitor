@@ -1,5 +1,5 @@
-const CACHE_NAME = "dgt-monitor-v25";
-const APP_SHELL = ["/", "/static/styles.css?v=25", "/static/app.js?v=25", "/manifest.webmanifest"];
+const CACHE_NAME = "dgt-monitor-v26";
+const APP_SHELL = ["/", "/static/styles.css?v=26", "/static/app.js?v=26", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
