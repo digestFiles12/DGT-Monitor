@@ -6,6 +6,8 @@ Todos los cambios relevantes del proyecto se documentan aqui. El repositorio sig
 
 ### Aniadido
 
+- Pestaña `Favoritas` en el dashboard para conservar cámaras marcadas aunque las incidencias cambien.
+- Estrella amarilla sobre la imagen de cada cámara para marcar/desmarcar favoritos persistidos en `localStorage`.
 - Modo de busqueda `contains`/`exact`/`regex` disponible tambien en la GUI PyQt6.
 - Fechas de detalle en GUI formateadas como fecha/hora humana.
 - Pruebas de GUI para modo de busqueda, reseteo de filtros, fechas y click de visor fullscreen.
@@ -13,6 +15,7 @@ Todos los cambios relevantes del proyecto se documentan aqui. El repositorio sig
 ### Cambiado
 
 - El dialogo de camaras de la GUI usa el rango compartido `CAMERA_MATCH_RANGE_KM` para alinearse con dashboard/API.
+- El service worker del dashboard pasa a `dgt-monitor-v52` para publicar los assets con favoritos.
 - La rama `release` se actualizo desde `develop` y se promociono a `main` mediante PR #13.
 - `main` quedo en el merge commit `5d75d6f91ba3b79c72c6d0ab2632621873d54f7c`.
 

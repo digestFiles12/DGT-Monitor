@@ -183,11 +183,16 @@ tbody tr:hover { background: var(--row-hover); }
 
 .camera-grid { flex: 1 1 auto; min-height: 0; overflow: auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: max-content; align-content: start; gap: 16px; padding-right: 4px; scrollbar-gutter: stable; }
 .camera-card { min-width: 0; align-self: start; background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow); overflow: hidden; }
-.camera-media { min-height: 150px; aspect-ratio: 16 / 9; background: var(--media-bg); display: grid; place-items: center; overflow: hidden; }
+.camera-media { position: relative; min-height: 150px; aspect-ratio: 16 / 9; background: var(--media-bg); display: grid; place-items: center; overflow: hidden; }
 .camera-media.is-clickable { cursor: zoom-in; }
-.camera-media.is-clickable:hover img, .camera-media.is-clickable:focus-visible img { transform: scale(1.03); }
+.camera-media.is-clickable:hover > img, .camera-media.is-clickable:focus-visible > img { transform: scale(1.03); }
 .camera-media.is-clickable:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
 .camera-media img { width: 100%; height: 100%; object-fit: cover; }
+.camera-favorite { position: absolute; top: 10px; right: 10px; z-index: 2; width: 40px; height: 40px; border: 1px solid rgba(255, 255, 255, .7); background: rgba(7, 16, 24, .72); color: rgba(255, 255, 255, .9); border-radius: 4px; display: grid; place-items: center; box-shadow: 0 8px 20px rgba(0, 0, 0, .22); cursor: pointer; }
+.camera-favorite:hover, .camera-favorite:focus-visible { background: rgba(7, 16, 24, .9); color: #facc15; outline: 2px solid #facc15; outline-offset: 2px; }
+.camera-favorite.is-active { background: #facc15; border-color: #facc15; color: #713f12; }
+.camera-favorite svg { width: 20px; height: 20px; fill: transparent; stroke-width: 2.4; }
+.camera-favorite.is-active svg { fill: currentColor; }
 .camera-media .image-fallback { width: 100%; height: 100%; padding: 18px; background: #0d1721; color: rgba(255, 255, 255, .66); display: grid; place-items: center; align-content: center; gap: 6px; text-align: center; }
 .camera-media .image-fallback svg { width: 34px; height: 34px; color: #f87171; }
 .camera-media .image-fallback strong { color: rgba(255, 255, 255, .92); font: 700 20px/1 "Barlow Condensed", sans-serif; }
