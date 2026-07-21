@@ -681,7 +681,9 @@ function renderMapDetail(kind, item) {
   if (kind === "camera") {
     const image = item.image_url ? `<button class="map-camera-preview" type="button"><img src="${escapeHtml(item.image_url)}" alt="${escapeHtml(uiText("cameraAlt", item.road, item.km))}"></button>` : `<div class="image-fallback"><i data-lucide="wifi-off" aria-hidden="true"></i><strong>${uiText("cameraUnavailable")}</strong></div>`;
     elements.mapDetail.innerHTML = `<section class="map-window map-image-window"><p class="eyebrow">${uiText("cameraImage")}</p><h3>${escapeHtml(item.road || uiText("dgtCamera"))}</h3>${image}</section><section class="map-window map-detail-window"><p class="eyebrow">${uiText("cameraPoint")}</p><h3>${escapeHtml(item.road || uiText("dgtCamera"))}</h3>${detailList}</section>`;
-    elements.mapDetail.querySelector(".map-camera-preview")?.addEventListener("click", () => openCameraViewer(item.image_url, uiText("cameraAlt", item.road, item.km)));
+    const imageWindow = elements.mapDetail.querySelector(".map-image-window");
+    imageWindow?.append(createFavoriteButton(item, "map-camera-favorite"));
+    elements.mapDetail.querySelector(".map-camera-preview")?.addEventListener("click", () => openCameraViewer(item.image_url, uiText("cameraAlt", item.road, item.km), item));
   } else {
     elements.mapDetail.innerHTML = `<section class="map-window map-detail-window"><p class="eyebrow">${uiText("incidentPoint")}</p><h3>${escapeHtml(item.road || uiText("incidentDetail"))}</h3>${detailList}</section>`;
   }
@@ -726,10 +728,11 @@ function createCameraCard(camera) {
   return card;
 }
 
-function createFavoriteButton(camera) {
+function createFavoriteButton(camera, className = "") {
   const button = document.createElement("button");
-  button.className = "camera-favorite";
+  button.className = ["camera-favorite", className].filter(Boolean).join(" ");
   button.type = "button";
+  button.dataset.favoriteId = cameraFavoriteId(camera);
   button.addEventListener("click", (event) => {
     event.stopPropagation();
     toggleCameraFavorite(camera);
@@ -762,14 +765,18 @@ function toggleCameraFavorite(camera) {
     renderFavoriteCameras();
     return;
   }
-  document.querySelectorAll(".camera-card .camera-favorite").forEach((button) => {
-    if (button.closest(".camera-card")?.dataset.favoriteId !== key) return;
+  refreshFavoriteButtons(key, active);
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function refreshFavoriteButtons(key, active) {
+  document.querySelectorAll(".camera-favorite").forEach((button) => {
+    if (button.dataset.favoriteId !== key) return;
     button.classList.toggle("is-active", active);
     button.setAttribute("aria-pressed", String(active));
     button.setAttribute("aria-label", active ? uiText("unfavoriteCamera") : uiText("favoriteCamera"));
     button.title = active ? uiText("unfavoriteCamera") : uiText("favoriteCamera");
   });
-  if (window.lucide) window.lucide.createIcons();
 }
 
 function loadFavoriteCameras() {
@@ -886,16 +893,35 @@ function showCameraMenu(wrapper, cameras, message = "") {
     menu.append(empty);
   } else {
     cameras.forEach((camera, index) => {
-      const item = document.createElement("button");
-      item.type = "button";
+      const item = document.createElement("div");
+      item.className = "coverage-menu-item";
       item.setAttribute("role", "menuitem");
-      item.innerHTML = `<strong>${camera.road || uiText("dgtCamera")} · PK ${camera.km || "--"}</strong><small>${camera.province || uiText("unavailableProvince")}${camera.km_delta != null ? ` · Δ PK ${Number(camera.km_delta).toFixed(3)}` : ""}</small>`;
-      item.addEventListener("click", () => {
+      const preview = document.createElement("button");
+      preview.className = "coverage-camera-preview";
+      preview.type = "button";
+      preview.setAttribute("aria-label", uiText("cameraImageFullscreen"));
+      if (camera.image_url) {
+        const image = document.createElement("img");
+        image.src = camera.image_url;
+        image.alt = uiText("cameraAlt", camera.road, camera.km);
+        image.loading = "lazy";
+        preview.append(image);
+        preview.addEventListener("click", () => openCameraViewer(camera.image_url, uiText("cameraAlt", camera.road, camera.km), camera));
+      } else {
+        preview.innerHTML = `<i data-lucide="wifi-off" aria-hidden="true"></i>`;
+        preview.disabled = true;
+      }
+      const target = document.createElement("button");
+      target.className = "coverage-camera-target";
+      target.type = "button";
+      target.innerHTML = `<strong>${camera.road || uiText("dgtCamera")} · PK ${camera.km || "--"}</strong><small>${camera.province || uiText("unavailableProvince")}${camera.km_delta != null ? ` · Δ PK ${Number(camera.km_delta).toFixed(3)}` : ""}</small>`;
+      target.addEventListener("click", () => {
         closeCameraMenus();
         openCameraTarget(camera);
       });
+      item.append(preview, target, createFavoriteButton(camera, "coverage-camera-favorite"));
       menu.append(item);
-      if (index === 0) queueMicrotask(() => item.focus());
+      if (index === 0) queueMicrotask(() => target.focus());
     });
   }
   wrapper.append(menu);
@@ -909,7 +935,7 @@ function closeCameraMenus(except = null) {
 
 function openCameraTarget(camera) {
   if (camera.image_url) {
-    openCameraViewer(camera.image_url, uiText("cameraAlt", camera.road, camera.km));
+    openCameraViewer(camera.image_url, uiText("cameraAlt", camera.road, camera.km), camera);
     return;
   }
   state.view = "cameras";
@@ -937,7 +963,7 @@ function showCameraMediaFallback(media) {
   if (favoriteButton) media.append(favoriteButton);
 }
 
-function openCameraViewer(src, alt) {
+function openCameraViewer(src, alt, camera = null) {
   const viewer = document.createElement("div");
   viewer.className = "image-viewer";
   viewer.setAttribute("role", "dialog");
@@ -950,6 +976,7 @@ function openCameraViewer(src, alt) {
   closeButton.type = "button";
   closeButton.setAttribute("aria-label", uiText("closeImage"));
   closeButton.innerHTML = `<i data-lucide="x" aria-hidden="true"></i>`;
+  const favoriteButton = camera ? createFavoriteButton(camera, "image-viewer-favorite") : null;
   const image = document.createElement("img");
   image.src = src;
   image.alt = alt || uiText("cameraImage");
@@ -967,6 +994,7 @@ function openCameraViewer(src, alt) {
     if (isUnavailableCameraImage(image)) showViewerFallback();
   });
   frame.append(closeButton, image);
+  if (favoriteButton) frame.append(favoriteButton);
   viewer.append(frame);
   const enterFullscreen = () => {
     if (!frame.contains(image)) return;
