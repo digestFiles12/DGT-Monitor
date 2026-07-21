@@ -1,6 +1,6 @@
 # Documentacion de DGT Monitor
 
-Estado actual: API FastAPI, dashboard web/PWA, GUI PyQt6 local, Activity API, Render y GitHub Actions operativos. El dashboard incluye filtros completos, modo de busqueda `contains`/`exact`/`regex`, cobertura de camaras a 2 km por punto kilometrico, filtro de camaras con incidencia, mapa con conteos sincronizados, scroll general en movil/escritorio y scroll interno en tabla/grid. La suite automatizada actual contiene 53 tests.
+Estado actual: API FastAPI, dashboard web/PWA, GUI PyQt6 local, Activity API, Render y GitHub Actions operativos. El dashboard incluye filtros completos, modo de busqueda `contains`/`exact`/`regex`, cobertura de camaras a 2 km por punto kilometrico, filtro de camaras con incidencia, pestaña de camaras favoritas persistidas en el navegador, mapa con conteos sincronizados, scroll general en movil/escritorio y scroll interno en tabla/grid. La GUI incluye modo de busqueda contiene/exacta/regex, fechas humanizadas, dialogo de camaras con rango compartido y visor fullscreen corregido. La suite automatizada actual contiene 53 tests. La version publicada actual es `20260719.06` en `main`, promocionada desde `release` por PR #13.
 
 ## Leer primero
 

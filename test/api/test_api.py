@@ -61,6 +61,8 @@ def test_dashboard_and_pwa_assets_are_served():
     assert "cameraCoverageFilter" in dashboard.text
     assert "matchModeFilter" in dashboard.text
     assert "cameraIncidentFilter" in dashboard.text
+    assert "favoriteTabCount" in dashboard.text
+    assert "data-view=\"favorites\"" in dashboard.text
     assert "mapResults" in dashboard.text
     assert "filterToggle" in dashboard.text
     assert "pageTitle" not in dashboard.text
@@ -73,6 +75,7 @@ def test_dashboard_and_pwa_assets_are_served():
     assert ".incident-detail-panel" in styles.text
     assert ".map-window" in styles.text
     assert ".coverage-menu" in styles.text
+    assert ".camera-favorite" in styles.text
     app_js = client.get("/static/app.js")
     assert app_js.status_code == 200
     assert "dgt-monitor-theme" in app_js.text
@@ -80,6 +83,8 @@ def test_dashboard_and_pwa_assets_are_served():
     assert "applyLanguage" in app_js.text
     assert "openCameraViewer" in app_js.text
     assert "openIncidentCameras" in app_js.text
+    assert "dgt-monitor-camera-favorites" in app_js.text
+    assert "toggleCameraFavorite" in app_js.text
     assert "camera-off" in app_js.text
     assert "disconnectedFallback" in app_js.text
     assert "isUnavailableCameraImage" in app_js.text
@@ -100,7 +105,8 @@ def test_dashboard_and_pwa_assets_are_served():
     assert client.get("/manifest.webmanifest").headers["content-type"].startswith("application/manifest+json")
     service_worker = client.get("/sw.js")
     assert service_worker.status_code == 200
-    assert "dgt-monitor-v51" in service_worker.text
+    assert "dgt-monitor-v52" in service_worker.text
+    assert "/static/app.js?v=52" in service_worker.text
 
 
 def test_websocket_sends_filtered_payload():

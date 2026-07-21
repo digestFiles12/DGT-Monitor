@@ -57,4 +57,4 @@ $env:QT_QPA_PLATFORM='offscreen'; .\.venv\Scripts\python.exe -m pytest test -q
 git diff --check
 ```
 
-Estado validado el 2026-07-19: 53 tests pasando, compilacion limpia y checks de GitHub Actions en verde para la PR #9 integrada en `develop`.
+Estado validado el 2026-07-19: 53 tests pasando, compilacion limpia y checks de GitHub Actions en verde. La release actual publicada es `20260719.06`, promocionada desde `release` a `main` mediante PR #13.
