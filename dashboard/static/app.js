@@ -2,6 +2,7 @@ const state = {
   view: "incidents",
   incidents: [],
   cameras: [],
+  favoriteCameras: [],
   incidentLimit: 100,
   timer: null,
   theme: "light",
@@ -12,6 +13,8 @@ const state = {
   cameraLayer: null,
   requestId: 0,
 };
+
+const cameraFavoritesKey = "dgt-monitor-camera-favorites";
 
 const incidentDetailFields = [
   "id", "record_id", "version", "source", "creation_time", "start_time", "end_time",
@@ -58,7 +61,7 @@ const uiCopy = {
     darkOn: "Activar modo oscuro", darkOff: "Activar modo claro", refresh: "Actualizar datos", operations: "Panel operativo",
     title: "Tráfico en tiempo real", intro: "Consulta incidencias activas y cámaras de la red estatal desde una única vista.",
     total: "Total", accidents: "Accidentes", roadworks: "Obras", stuck: "Averías", obstructions: "Obstrucciones", weather: "Meteorología",
-    incidents: "Incidencias", cameras: "Cámaras", map: "Mapa", query: "Consulta", filters: "Filtros", hideFilters: "Ocultar filtros", showFilters: "Mostrar filtros", clear: "Limpiar", province: "Provincia",
+    incidents: "Incidencias", cameras: "Cámaras", favorites: "Favoritas", map: "Mapa", query: "Consulta", filters: "Filtros", hideFilters: "Ocultar filtros", showFilters: "Mostrar filtros", clear: "Limpiar", province: "Provincia",
     road: "Carretera", location: "Ubicación", type: "Tipo", direction: "Dirección", municipality: "Municipio", severity: "Gravedad", camera: "Cámara", searchMode: "Modo de búsqueda", searchContains: "Contiene", searchExact: "Exacta", searchRegex: "Regex", kilometerPoint: "Punto kilométrico",
     cameraLimit: "Máximo de cámaras", cameraIncidentCoverage: "Incidencia con cámara", all: "Todas", withCamera: "Con cámara", withoutCamera: "Sin cámara", severityHighest: "Muy alta", severityHigh: "Alta", severityMedium: "Media", severityLow: "Baja", applyFilters: "Aplicar filtros", autoRefresh: "Actualizar cada 2 minutos", roadNetwork: "Red viaria",
     visualObservation: "Observación visual", activeIncidents: "Incidencias activas", trafficCameras: "Cámaras de tráfico", loadingTitle: "Consultando datos de tráfico",
@@ -66,7 +69,7 @@ const uiCopy = {
     emptyText: "Prueba a ampliar o limpiar los filtros.", api: "API", serviceStatus: "Estado del servicio", unknownSeverity: "Sin dato",
     unclassified: "Sin clasificar", incidentDetail: "Detalle de incidencia", dgtData: "Datos de DGT", unavailableLocation: "Ubicación no disponible", noCoverage: "Sin cobertura",
     noCameraRange: "Sin cámara en rango por PK", cameraUnavailable: "Imagen no disponible", cameraUnavailableLong: "La cámara no está respondiendo ahora mismo.", unavailableProvince: "Provincia no disponible",
-    unidentifiedRoad: "Carretera sin identificar", dgtCamera: "Cámara DGT", cameraImage: "Imagen de cámara", unavailableCameras: "No hay cámaras disponibles.", cameraLoadError: "No se pudieron cargar las cámaras cercanas.", serverUnavailable: "La fuente de datos DGT no está disponible temporalmente.",
+    unidentifiedRoad: "Carretera sin identificar", dgtCamera: "Cámara DGT", cameraImage: "Imagen de cámara", favoriteCameras: "Cámaras favoritas", favoriteCamera: "Marcar cámara favorita", unfavoriteCamera: "Quitar cámara favorita", unavailableFavorites: "No hay cámaras favoritas.", unavailableCameras: "No hay cámaras disponibles.", cameraLoadError: "No se pudieron cargar las cámaras cercanas.", serverUnavailable: "La fuente de datos DGT no está disponible temporalmente.",
     connectionRetry: "Revisa la conexión y vuelve a intentarlo.", imageOpenFullscreen: "Abrir imagen a pantalla completa", closeImage: "Cerrar imagen",
     cameraImageFullscreen: "Abrir imagen de cámara a pantalla completa", serverStatus: (status) => `El servidor respondió con código ${status}.`, results: (count) => `${count} resultados`, loadMore: (count) => `Mostrar ${count} más`,
     nearbyCameras: (count) => `${count} cámaras cercanas`, cameraAlt: (road, km) => `Cámara ${road || "DGT"} PK ${km || "sin dato"}`, updatedAt: (time) => `Actualizado ${time}`,
@@ -78,7 +81,7 @@ const uiCopy = {
     darkOn: "Enable dark mode", darkOff: "Enable light mode", refresh: "Refresh data", operations: "Operations panel",
     title: "Real-time traffic", intro: "Check active incidents and traffic cameras across the state road network from one view.",
     total: "Total", accidents: "Accidents", roadworks: "Roadworks", stuck: "Breakdowns", obstructions: "Obstructions", weather: "Weather",
-    incidents: "Incidents", cameras: "Cameras", map: "Map", query: "Query", filters: "Filters", hideFilters: "Hide filters", showFilters: "Show filters", clear: "Clear", province: "Province",
+    incidents: "Incidents", cameras: "Cameras", favorites: "Favorites", map: "Map", query: "Query", filters: "Filters", hideFilters: "Hide filters", showFilters: "Show filters", clear: "Clear", province: "Province",
     road: "Road", location: "Location", type: "Type", direction: "Direction", municipality: "Municipality", severity: "Severity", camera: "Camera", searchMode: "Search mode", searchContains: "Contains", searchExact: "Exact", searchRegex: "Regex", kilometerPoint: "Kilometer point",
     cameraLimit: "Maximum cameras", cameraIncidentCoverage: "Incident with camera", all: "All", withCamera: "With camera", withoutCamera: "Without camera", severityHighest: "Critical", severityHigh: "High", severityMedium: "Medium", severityLow: "Low", applyFilters: "Apply filters", autoRefresh: "Refresh every 2 minutes", roadNetwork: "Road network",
     visualObservation: "Visual observation", activeIncidents: "Active incidents", trafficCameras: "Traffic cameras", loadingTitle: "Checking traffic data",
@@ -86,7 +89,7 @@ const uiCopy = {
     emptyText: "Try broadening or clearing the filters.", api: "API", serviceStatus: "Service status", unknownSeverity: "N/A",
     unclassified: "Unclassified", incidentDetail: "Incident detail", dgtData: "DGT data", unavailableLocation: "Location unavailable", noCoverage: "No coverage",
     noCameraRange: "No camera in kilometer range", cameraUnavailable: "Image unavailable", cameraUnavailableLong: "The camera is not responding right now.", unavailableProvince: "Province unavailable",
-    unidentifiedRoad: "Unidentified road", dgtCamera: "DGT camera", cameraImage: "Camera image", unavailableCameras: "No cameras available.", cameraLoadError: "Could not load nearby cameras.", serverUnavailable: "The DGT data source is temporarily unavailable.",
+    unidentifiedRoad: "Unidentified road", dgtCamera: "DGT camera", cameraImage: "Camera image", favoriteCameras: "Favorite cameras", favoriteCamera: "Mark favorite camera", unfavoriteCamera: "Remove favorite camera", unavailableFavorites: "No favorite cameras.", unavailableCameras: "No cameras available.", cameraLoadError: "Could not load nearby cameras.", serverUnavailable: "The DGT data source is temporarily unavailable.",
     connectionRetry: "Check the connection and try again.", imageOpenFullscreen: "Open image fullscreen", closeImage: "Close image",
     cameraImageFullscreen: "Open camera image fullscreen", serverStatus: (status) => `The server responded with status ${status}.`, results: (count) => `${count} results`, loadMore: (count) => `Show ${count} more`,
     nearbyCameras: (count) => `${count} nearby cameras`, cameraAlt: (road, km) => `Camera ${road || "DGT"} KP ${km || "unavailable"}`, updatedAt: (time) => `Updated ${time}`,
@@ -100,13 +103,14 @@ const ids = [
   "matchModeFilter", "provinceFilter", "roadFilter", "municipalityFilter", "severityFilter", "cameraCoverageFilter", "kmFilter",
   "cameraIncidentFilter", "limitFilter", "incidentFilters", "cameraFilters", "autoRefresh", "statTotal",
   "statAccidents", "statRoadworks", "statStuck", "statObstructions", "statWeather", "incidentTabCount",
-  "cameraTabCount", "mapTabCount", "resultsTitle", "resultEyebrow", "resultCount", "loadingState",
+  "cameraTabCount", "favoriteTabCount", "mapTabCount", "resultsTitle", "resultEyebrow", "resultCount", "loadingState",
   "errorState", "errorMessage", "emptyState", "incidentResults", "incidentRows",
   "cameraResults", "mapResults", "mapStatus", "mapDetail", "trafficMap", "retryButton", "loadMoreWrap", "loadMoreButton", "themeButton", "workspace", "filtersPanel", "filterToggle"
 ];
 
 document.addEventListener("DOMContentLoaded", () => {
   ids.forEach((id) => { elements[id] = document.getElementById(id); });
+  state.favoriteCameras = loadFavoriteCameras();
   applyTheme(resolveInitialTheme());
   applyLanguage(resolveInitialLanguage(), false);
   document.querySelectorAll(".tab").forEach((tab) => tab.addEventListener("click", () => switchView(tab.dataset.view)));
@@ -179,7 +183,9 @@ function applyStaticLanguage() {
   setMetricLabel("weather", uiText("weather"));
   setTabLabel("incidents", uiText("incidents"));
   setTabLabel("cameras", uiText("cameras"));
+  setTabLabel("favorites", uiText("favorites"));
   setTabLabel("map", uiText("map"));
+  updateFavoriteTabCount();
   document.querySelector(".filter-heading .eyebrow").textContent = uiText("query");
   document.getElementById("filterTitle").textContent = uiText("filters");
   updateFilterToggle();
@@ -205,8 +211,7 @@ function applyStaticLanguage() {
   document.querySelector("#loadingState p").textContent = uiText("loadingText");
   document.querySelector("#errorState strong").textContent = uiText("errorTitle");
   elements.retryButton.textContent = uiText("retry");
-  document.querySelector("#emptyState strong").textContent = uiText("emptyTitle");
-  document.querySelector("#emptyState p").textContent = uiText("emptyText");
+  setEmptyStateText(uiText("emptyText"));
   setTableHeaders();
   document.querySelector("footer a[href='/docs']").textContent = uiText("api");
   document.querySelector("footer a[href='/api/health']").textContent = uiText("serviceStatus");
@@ -246,8 +251,8 @@ function setTableHeaders() {
 }
 
 function switchViewLabelOnly() {
-  elements.resultsTitle.textContent = state.view === "cameras" ? uiText("trafficCameras") : state.view === "map" ? uiText("map") : uiText("activeIncidents");
-  elements.resultEyebrow.textContent = state.view === "cameras" ? uiText("visualObservation") : uiText("roadNetwork");
+  elements.resultsTitle.textContent = state.view === "favorites" ? uiText("favoriteCameras") : state.view === "cameras" ? uiText("trafficCameras") : state.view === "map" ? uiText("map") : uiText("activeIncidents");
+  elements.resultEyebrow.textContent = state.view === "cameras" || state.view === "favorites" ? uiText("visualObservation") : uiText("roadNetwork");
 }
 
 function applyTheme(theme) {
@@ -272,7 +277,7 @@ function switchView(view) {
     tab.classList.toggle("is-active", active);
     tab.setAttribute("aria-selected", String(active));
   });
-  elements.incidentFilters.hidden = view === "cameras";
+  elements.incidentFilters.hidden = view === "cameras" || view === "favorites";
   elements.cameraFilters.hidden = view !== "cameras";
   switchViewLabelOnly();
   loadCurrentView();
@@ -296,6 +301,11 @@ function updateFilterToggle() {
 
 async function loadCurrentView() {
   const requestId = ++state.requestId;
+  if (state.view === "favorites") {
+    renderFavoriteCameras();
+    return;
+  }
+  setEmptyStateText(uiText("emptyText"));
   showState("loading");
   elements.refreshButton.classList.add("is-loading");
   try {
@@ -513,11 +523,23 @@ function uiText(key) {
 
 function renderCameras(payload) {
   state.cameras = payload.items || [];
+  updateFavoriteTabCount();
   elements.cameraTabCount.textContent = payload.count ?? state.cameras.length;
   elements.resultCount.textContent = uiText("results", payload.count ?? state.cameras.length);
   elements.cameraResults.replaceChildren(...state.cameras.map(createCameraCard));
   if (window.lucide) window.lucide.createIcons();
   showState(state.cameras.length ? "cameras" : "empty");
+}
+
+function renderFavoriteCameras() {
+  state.favoriteCameras = loadFavoriteCameras();
+  updateFavoriteTabCount();
+  switchViewLabelOnly();
+  setEmptyStateText(uiText("unavailableFavorites"));
+  elements.resultCount.textContent = uiText("results", state.favoriteCameras.length);
+  elements.cameraResults.replaceChildren(...state.favoriteCameras.map(createCameraCard));
+  if (window.lucide) window.lucide.createIcons();
+  showState(state.favoriteCameras.length ? "cameras" : "empty");
 }
 
 async function renderMap(incidentPayload, requestId) {
@@ -669,6 +691,8 @@ function renderMapDetail(kind, item) {
 function createCameraCard(camera) {
   const card = document.createElement("article");
   card.className = "camera-card";
+  card.dataset.favoriteId = cameraFavoriteId(camera);
+  const favoriteButton = createFavoriteButton(camera);
   const media = document.createElement("div");
   media.className = "camera-media";
   if (camera.image_url) {
@@ -691,8 +715,8 @@ function createCameraCard(camera) {
         openCameraViewer(image.src, image.alt);
       }
     });
-    media.append(image);
-  } else media.append(imageFallback());
+    media.append(image, favoriteButton);
+  } else media.append(imageFallback(), favoriteButton);
   const body = document.createElement("div");
   body.className = "camera-body";
   const label = document.createElement("div");
@@ -700,6 +724,90 @@ function createCameraCard(camera) {
   body.append(label, text("span", camera.km ? `PK ${camera.km}` : "PK --", "camera-km"));
   card.append(media, body);
   return card;
+}
+
+function createFavoriteButton(camera) {
+  const button = document.createElement("button");
+  button.className = "camera-favorite";
+  button.type = "button";
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();
+    toggleCameraFavorite(camera);
+  });
+  button.addEventListener("keydown", (event) => event.stopPropagation());
+  updateFavoriteButton(button, camera);
+  return button;
+}
+
+function updateFavoriteButton(button, camera) {
+  const active = isFavoriteCamera(camera);
+  button.classList.toggle("is-active", active);
+  button.setAttribute("aria-pressed", String(active));
+  button.setAttribute("aria-label", active ? uiText("unfavoriteCamera") : uiText("favoriteCamera"));
+  button.title = active ? uiText("unfavoriteCamera") : uiText("favoriteCamera");
+  button.innerHTML = `<i data-lucide="star" aria-hidden="true"></i>`;
+}
+
+function toggleCameraFavorite(camera) {
+  const key = cameraFavoriteId(camera);
+  const favorites = loadFavoriteCameras();
+  const index = favorites.findIndex((item) => cameraFavoriteId(item) === key);
+  const active = index < 0;
+  if (active) favorites.unshift(normalizeFavoriteCamera(camera));
+  else favorites.splice(index, 1);
+  saveFavoriteCameras(favorites);
+  state.favoriteCameras = favorites;
+  updateFavoriteTabCount();
+  if (state.view === "favorites") {
+    renderFavoriteCameras();
+    return;
+  }
+  document.querySelectorAll(".camera-card .camera-favorite").forEach((button) => {
+    if (button.closest(".camera-card")?.dataset.favoriteId !== key) return;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+    button.setAttribute("aria-label", active ? uiText("unfavoriteCamera") : uiText("favoriteCamera"));
+    button.title = active ? uiText("unfavoriteCamera") : uiText("favoriteCamera");
+  });
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function loadFavoriteCameras() {
+  try {
+    const value = JSON.parse(localStorage.getItem(cameraFavoritesKey) || "[]");
+    return Array.isArray(value) ? value.filter((camera) => camera && typeof camera === "object") : [];
+  } catch (_error) {
+    return [];
+  }
+}
+
+function saveFavoriteCameras(cameras) {
+  localStorage.setItem(cameraFavoritesKey, JSON.stringify(cameras.map(normalizeFavoriteCamera)));
+}
+
+function normalizeFavoriteCamera(camera) {
+  return {
+    id: camera.id || "",
+    road: camera.road || "",
+    province: camera.province || "",
+    km: camera.km || "",
+    image_url: camera.image_url || "",
+    latitude: camera.latitude ?? null,
+    longitude: camera.longitude ?? null,
+  };
+}
+
+function cameraFavoriteId(camera) {
+  return camera.id || [camera.province, camera.road, camera.km, camera.image_url].map((value) => String(value || "").trim()).join("|");
+}
+
+function isFavoriteCamera(camera) {
+  const key = cameraFavoriteId(camera);
+  return loadFavoriteCameras().some((item) => cameraFavoriteId(item) === key);
+}
+
+function updateFavoriteTabCount() {
+  elements.favoriteTabCount.textContent = state.favoriteCameras.length;
 }
 
 function locationContent(incident) {
@@ -820,11 +928,13 @@ function imageFallback() {
 }
 
 function showCameraMediaFallback(media) {
+  const favoriteButton = media.querySelector(".camera-favorite");
   media.classList.remove("is-clickable");
   media.removeAttribute("role");
   media.removeAttribute("aria-label");
   media.removeAttribute("tabindex");
   media.replaceChildren(imageFallback());
+  if (favoriteButton) media.append(favoriteButton);
 }
 
 function openCameraViewer(src, alt) {
@@ -950,6 +1060,11 @@ function showState(active) {
   elements.cameraResults.hidden = active !== "cameras";
   elements.mapResults.hidden = active !== "map";
   document.querySelector(".results").setAttribute("aria-busy", String(active === "loading"));
+}
+
+function setEmptyStateText(message) {
+  document.querySelector("#emptyState strong").textContent = uiText("emptyTitle");
+  document.querySelector("#emptyState p").textContent = message;
 }
 
 function setConnection(online) {

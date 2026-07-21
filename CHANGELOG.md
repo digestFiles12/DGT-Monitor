@@ -2,6 +2,34 @@
 
 Todos los cambios relevantes del proyecto se documentan aqui. El repositorio sigue GitFlow: las features entran en `develop`, se estabilizan en `release` y se publican desde `main`.
 
+## 2026-07-19 - Release 20260719.06 y GUI actualizada
+
+### Aniadido
+
+- Pestaña `Favoritas` en el dashboard para conservar cámaras marcadas aunque las incidencias cambien.
+- Estrella amarilla sobre la imagen de cada cámara para marcar/desmarcar favoritos persistidos en `localStorage`.
+- Modo de busqueda `contains`/`exact`/`regex` disponible tambien en la GUI PyQt6.
+- Fechas de detalle en GUI formateadas como fecha/hora humana.
+- Pruebas de GUI para modo de busqueda, reseteo de filtros, fechas y click de visor fullscreen.
+
+### Cambiado
+
+- El dialogo de camaras de la GUI usa el rango compartido `CAMERA_MATCH_RANGE_KM` para alinearse con dashboard/API.
+- El service worker del dashboard pasa a `dgt-monitor-v52` para publicar los assets con favoritos.
+- La rama `release` se actualizo desde `develop` y se promociono a `main` mediante PR #13.
+- `main` quedo en el merge commit `5d75d6f91ba3b79c72c6d0ab2632621873d54f7c`.
+
+### Corregido
+
+- Click sobre imagen de camara en GUI: el handler del visor fullscreen devuelve `None` y evita `TypeError: invalid argument to sipBadCatcherResult()`.
+
+### Validacion
+
+- PR #12 `feature/GUI` -> `develop`: integrada.
+- PR #13 `release` -> `main`: integrada con checks `Test & Validate (3.12)` en `SUCCESS`.
+- Tag `20260719.06`: creado y subido sobre el commit final de `main`.
+- `QT_QPA_PLATFORM=offscreen python -m pytest test -q`: 53 tests pasando.
+
 ## 2026-07-19 - Dashboard, filtros avanzados y cobertura de camaras
 
 ### Aniadido
