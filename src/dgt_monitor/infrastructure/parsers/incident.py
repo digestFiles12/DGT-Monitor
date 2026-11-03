@@ -18,7 +18,7 @@ class IncidentParser(Datex2Parser):
         try:
             root = ET.fromstring(xml_content)
         except ET.ParseError as exc:
-            raise DgtParseError(f"XML de incidentes no válido: {exc}") from exc
+            raise DgtParseError(f"Invalid incidents XML: {exc}") from exc
         return [incident for node in root.iter() if node.tag.endswith("situation") if (incident := self._parse_one(node))]
 
     def _parse_one(self, situation: ET.Element) -> Incident | None:

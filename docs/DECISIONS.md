@@ -36,7 +36,7 @@ El dashboard conserva scroll general en `body/main` y scroll interno solo en sup
 
 ## ADR-007: compatibilidad de entradas
 
-Render seguirá usando `dashboard.app:app`. Los wrappers pequeños `DGT.py` y `DGT_V2.py` se crearán sobre `gui.entrypoints`; no se restaurará código monolítico.
+Render seguirá usando `dgt_monitor.web.app:app`. Los wrappers pequeños `DGT.py` y `DGT_V2.py` se crearán sobre `gui.entrypoints`; no se restaurará código monolítico.
 
 ## ADR-009: Render no ejecuta PyQt6
 

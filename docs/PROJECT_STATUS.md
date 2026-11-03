@@ -61,7 +61,7 @@ Phase 7 architecture refactoring and the later dashboard/GUI increments are comp
 
 ### Key Components Implemented
 
-#### **Core Domain** (`dgt_monitor/core/`)
+#### **Core Domain** (`src/dgt_monitor/core/`)
 - **Models:** `Incident`, `Camera`, `IncidentStats`, `IncidentFilters`, `CameraFilters`
 - **Serialization:** Explicit `to_dict()` method per model (no Pydantic dependency)
 - **Ports:** `Protocol` interfaces for HTTP client, activity store
@@ -69,7 +69,7 @@ Phase 7 architecture refactoring and the later dashboard/GUI increments are comp
 - **Text matching:** `matches_text()` with contains, exact and regex modes
 - **Activity Facade:** Global `record()`, `get_entries()`, `clear()` with pluggable store backend
 
-#### **Infrastructure** (`dgt_monitor/infrastructure/`)
+#### **Infrastructure** (`src/dgt_monitor/infrastructure/`)
 - **HTTP Client:** `RequestsXmlClient` with session, headers, timeouts, error handling
 - **Parsers:** DATEX2 incident/camera parsers producing domain models
 - **Repositories:** DGT API repositories (incidents, cameras) with injectable HTTP client
@@ -79,14 +79,14 @@ Phase 7 architecture refactoring and the later dashboard/GUI increments are comp
   - `SqliteActivityStore` (persistent, PRAGMA user_version auto-migration)
   - Factory `build_activity_store()` respecting `ACTIVITY_DB_PATH` environment variable
 
-#### **Application** (`dgt_monitor/application/`)
+#### **Application** (`src/dgt_monitor/application/`)
 - **IncidentService:** Filters, caching, statistics, distance-based coverage
 - **CameraService:** Filters, distance calculations, 2.0 km coverage index by road and `incident_coverage` camera filtering
 - **DgtApplicationService:** Serializable facade for API/GUI consumption
 - **Activity Service:** Pagination (offset/limit), filtering by timestamp/type, CSV export
 - **Composition Root:** `build_application()` with injectable dependencies
 
-#### **API** (`dgt_monitor/api/`)
+#### **API** (`src/dgt_monitor/api/`)
 - **App Factory:** `create_app(service=None)` for FastAPI with dependency injection
 - **Routes:**
   - `GET /api/health` - Health check
@@ -101,7 +101,7 @@ Phase 7 architecture refactoring and the later dashboard/GUI increments are comp
 - **Error Handling:** Domain exceptions → HTTP 502 Bad Gateway
 - **Authentication:** `X-API-Key` header with revocation list (fail-fast) and acceptance list (constant-time comparison)
 
-#### **GUI** (`dgt_monitor/gui/`)
+#### **GUI** (`src/dgt_monitor/gui/`)
 - PyQt6 modules for:
    - Incident filters, statistics, table and detail panel
    - Non-modal camera dialog for selected incidents
@@ -110,7 +110,7 @@ Phase 7 architecture refactoring and the later dashboard/GUI increments are comp
    - Tab order and keyboard navigation
 - Test support: offscreen rendering with `QT_QPA_PLATFORM=offscreen`
 
-#### **Dashboard Wrapper** (`dashboard/app.py`)
+#### **Dashboard Wrapper** (`src/dgt_monitor/web/app.py`)
 - ASGI entry point for Render deployment
 - Exposes FastAPI app as `app` and serves the dashboard web/PWA from `/`
 
@@ -197,7 +197,7 @@ Phase 7 architecture refactoring and the later dashboard/GUI increments are comp
 ### Test Execution
 
 ```powershell
-$env:QT_QPA_PLATFORM='offscreen'; .\.venv\Scripts\python.exe -m pytest test -q
+$env:QT_QPA_PLATFORM='offscreen'; .\.venv\Scripts\python.exe -m pytest tests -q
 # Output: 53 passed
 ```
 
@@ -205,7 +205,7 @@ $env:QT_QPA_PLATFORM='offscreen'; .\.venv\Scripts\python.exe -m pytest test -q
 
 ```powershell
 # Python 3.12 compilation check
-.\.venv\Scripts\python.exe -m compileall -q dgt_monitor dashboard
+.\.venv\Scripts\python.exe -m compileall -q src
 # Result: ✅ Clean
 
 # Whitespace check (trailing spaces, tabs, etc)
@@ -276,7 +276,7 @@ $env:CAMERAS_CACHE_TTL = "300"    # seconds
 
 Configuration in `render.yaml`:
 - **Build command:** `pip install -e ".[dev]"` + `pytest`
-- **Start command:** `uvicorn dashboard.app:app --host 0.0.0.0 --port 10000`
+- **Start command:** `uvicorn dgt_monitor.web.app:app --host 0.0.0.0 --port 10000`
 - **Health check:** `GET /api/health`
 - **Auto-deploy:** On push to the branch configured in Render
 
@@ -297,13 +297,13 @@ Configuration in `.github/workflows/test.yml`:
 | Document | Status | Notes |
 |----------|--------|-------|
 | `docs/INDEX.md` | ✅ | Navigation hub for all docs |
-| `docs/PLAN_REFACTORIZACION.md` | ✅ | Phase 7 marked complete |
-| `docs/ARQUITECTURA.md` | ✅ | Full layered architecture diagram |
-| `docs/CONTINUIDAD_NUEVO_CHAT.md` | ✅ | Onboarding template |
-| `docs/DECISIONES.md` | ✅ | Architectural decisions recorded |
-| `docs/DESPLIEGUE.md` | ✅ | Render configuration, env vars |
-| `docs/PRUEBAS.md` | ✅ | 53 tests, execution, validation |
-| `docs/PHASE_7_COMPLETED.md` | ✅ | This document (handoff reference) |
+| `docs/REFACTORING_PLAN.md` | ✅ | Phase 7 marked complete |
+| `docs/ARCHITECTURE.md` | ✅ | Full layered architecture diagram |
+| `docs/HANDOFF.md` | ✅ | Onboarding template |
+| `docs/DECISIONS.md` | ✅ | Architectural decisions recorded |
+| `docs/DEPLOYMENT.md` | ✅ | Render configuration, env vars |
+| `docs/TESTING.md` | ✅ | 53 tests, execution, validation |
+| `docs/PROJECT_STATUS.md` | ✅ | This document (handoff reference) |
 
 ---
 
@@ -335,10 +335,10 @@ python -m pip install -e ".[dev]"
 
 ```powershell
 # Run full test suite (53 tests)
-python -m pytest test -q
+python -m pytest tests -q
 
 # Compile check (no errors)
-python -m compileall -q dgt_monitor dashboard
+python -m compileall -q src
 
 # Git status (should be clean after latest commit)
 git status
@@ -375,22 +375,22 @@ git log --oneline -5
 For next developer or continuation in new chat:
 
 - [ ] Read `docs/INDEX.md` for navigation
-- [ ] Read `docs/PLAN_REFACTORIZACION.md` to understand refactoring context
-- [ ] Read `docs/ARQUITECTURA.md` for layered design
-- [ ] Read `docs/PHASE_7_COMPLETED.md` (this file) for exact completion status
-- [ ] Run `python -m pytest test -q` to validate setup (expect 53 passing)
+- [ ] Read `docs/REFACTORING_PLAN.md` to understand refactoring context
+- [ ] Read `docs/ARCHITECTURE.md` for layered design
+- [ ] Read `docs/PROJECT_STATUS.md` (this file) for exact completion status
+- [ ] Run `python -m pytest tests -q` to validate setup (expect 53 passing)
 - [ ] Review git history: `git log --oneline -10`
 - [ ] Check environment setup: `.\.venv\Scripts\Activate.ps1` then `python --version`
-- [ ] Review `docs/PRUEBAS.md` for test details
+- [ ] Review `docs/TESTING.md` for test details
 - [ ] Manually validate `/`, `/api/health`, PWA assets, REST, WebSocket and Activity API before production
 - [ ] Check Render dashboard for active deployments
-- [ ] If continuing with Phase 8+, review `docs/DECISIONES.md` for constraints
+- [ ] If continuing with Phase 8+, review `docs/DECISIONS.md` for constraints
 
 ---
 
 ## Environment Setup
 
-- **Workspace Structure:** Root directory contains `pyproject.toml`, `dgt_monitor/`, `dashboard/`, `test/`
+- **Workspace Structure:** Root directory contains `pyproject.toml`, `src/dgt_monitor/`, `dashboard/`, `test/`
 - **Virtual Environment:** `.\.venv` (relative to project root)
 - **Python:** 3.12
 - **Repository:** Managed via git with feature branches

@@ -26,8 +26,8 @@ Render will auto-detect `render.yaml` and apply configuration:
 
 - **Service Name:** `dgt-monitor`
 - **Runtime:** Python 3.12 (`PYTHON_VERSION=3.12.0`)
-- **Build Command:** `pip install -e ".[dev]" && python -m pytest test -q --tb=no && python -m compileall -q dgt_monitor dashboard`
-- **Start Command:** `uvicorn dashboard.app:app --host 0.0.0.0 --port $PORT`
+- **Build Command:** `pip install -e ".[dev]" && python -m pytest tests -q --tb=no && python -m compileall -q src`
+- **Start Command:** `uvicorn dgt_monitor.web.app:app --host 0.0.0.0 --port $PORT`
 - **Health Check:** `GET /api/health`
 - **Auto-deploy:** Enabled
 
@@ -101,7 +101,7 @@ If health checks fail, service will be marked as unhealthy.
 1. Check build log in Render Dashboard
 2. Verify `pyproject.toml` dependencies
 3. Ensure Python 3.12 compatibility
-4. Run locally: `python -m pytest test -q`
+4. Run locally: `python -m pytest tests -q`
 
 ### Tests Fail During Build
 
@@ -112,7 +112,7 @@ If health checks fail, service will be marked as unhealthy.
 ### Health Check Fails
 
 1. Check runtime logs in Render Dashboard
-2. Verify `dashboard.app:app` is accessible
+2. Verify `dgt_monitor.web.app:app` is accessible
 3. Confirm `GET /api/health` returns `{"status": "ok", ...}`
 
 ### Service Crashes
