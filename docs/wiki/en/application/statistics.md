@@ -1,5 +1,5 @@
 # dgt_monitor/application/statistics.py
-Computes the six incident indicators, geographic/temporal groupings, per-group extremes, and JSON export.
+Computes the six incident indicators, geographic/temporal and type+geography groupings, per-group extremes, and JSON export.
 ## Dependencies
 Uses the shared rules from [core.indicators](../core/indicators.md), `Incident`, and the province-to-region mapping from `core`; `DgtApplicationService` and `menu.py` consume these calculations. It also uses the standard library for dates, JSON, and paths.
 ## Contents
@@ -18,7 +18,7 @@ Uses the shared rules from [core.indicators](../core/indicators.md), `Incident`,
 ### `_sorted_groups(groups)`
 - Returns a new dictionary with group keys in alphabetical order.
 ### `group_incidents(incidents, generated_at=None)`
-- Builds grouped JSON by province, region, type, and weekday, plus weekday+province and weekday+region. Unparseable dates go into `unknown`, which is omitted if empty; unknown geographic values use `UNKNOWN_REGION`.
+- Builds grouped JSON by province, region, type, and weekday, plus weekday+province, weekday+region, type+province (`by_province_type`), and type+region (`by_region_type`). Unparseable dates go into `unknown`, which is omitted if empty; unknown geographic values use `UNKNOWN_REGION`. The facade adds `region_provinces` with feed provinces by region.
 ### `find_extremes(groups)`
 - For each indicator returns `{max, min}` with name and value. Ties are alphabetical; the minimum ignores zero values and is `None` if no group has a positive value.
 ### `build_statistics(incidents, level="province", generated_at=None)`

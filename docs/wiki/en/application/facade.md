@@ -12,10 +12,10 @@ Composes `IncidentService` and `CameraService`, uses filter models and localizat
 ### `DgtApplicationService._localized_incident(item, translator)`
 - Copies an incident dictionary and adds translated labels for the listed fields; `cause` uses compound translation and the others use simple translation.
 ### `DgtApplicationService._filters_without_kind(filters)`
-- Builds a new filter preserving province, municipality, road, severity, camera, and match mode while omitting `kind`; therefore the statistics count does not depend on the selected category.
+- Builds a new filter preserving province, municipality, road, severity, camera, match mode, and `community` while omitting `kind`; therefore the statistics count does not depend on the selected category.
 ### `DgtApplicationService.get_statistics(level="province", refresh=False)`
 - Returns the six indicators (`total`, `accidents`, `roadworks`, `breakdowns`, `obstructions`, and `weather`) grouped by province or region, including maxima and minima; other levels are rejected by the delegated function.
 ### `DgtApplicationService.get_grouped_incidents(refresh=False)`
-- Returns the full incident grouping structure by geography, type, and weekday, plus `labels.by_type` with each type label in Spanish and English (the JSON keys remain the DATEX II codes).
+- Returns groupings by province, region, type, weekday, and type+geography (`by_province_type`, `by_region_type`), plus `region_provinces` (feed provinces by community) and localized `labels.by_type` in Spanish and English; keys remain DATEX II codes.
 ### `DgtApplicationService.get_cameras(filters=None, refresh=False)`
 - Filters cameras and returns UTC time, count, and items. When incident coverage is requested, it postpones the limit until after coverage selection and then applies it.

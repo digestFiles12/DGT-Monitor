@@ -2,7 +2,7 @@
 
 Aplicacion modular para consultar incidencias y camaras de trafico de la DGT desde un dashboard FastAPI/PWA y una GUI PyQt6. El sistema esta reimplementado con arquitectura por capas: dominio tipado, infraestructura DATEX2/cache, servicios de aplicacion, API, dashboard web y escritorio.
 
-El dashboard incluye selector ES/EN, modo claro/oscuro, filtros por provincia, municipio, carretera, severidad, tipo, cobertura de camara y modo de busqueda (`contains`, `exact`, `regex`). La pestaña de camaras puede mostrar todas las camaras filtradas o solo las que cubren alguna incidencia activa mediante `incident_coverage=true`. El mapa reutiliza los mismos filtros y calcula el total combinado de incidencias y camaras visibles.
+El dashboard incluye selector ES/EN, modo claro/oscuro, filtros por comunidad autónoma, provincia, municipio, carretera, severidad, tipo, cobertura de camara y modo de busqueda (`contains`, `exact`, `regex`). La pestaña de camaras puede mostrar todas las camaras filtradas o solo las que cubren alguna incidencia activa mediante `incident_coverage=true`. El mapa reutiliza los mismos filtros y calcula el total combinado de incidencias y camaras visibles.
 
 La cobertura incidencia-camara se calcula por carretera normalizada, provincia compatible y punto kilometrico dentro de `CAMERA_MATCH_RANGE_KM = 2.0`. El dashboard mantiene scroll general en movil/escritorio y scroll interno en tabla de incidencias y grid de camaras, de modo que la navegacion funciona tanto por pagina completa como dentro de cada superficie densa.
 
@@ -14,6 +14,8 @@ Documentacion: wiki en [espanol](docs/wiki/es/README.md) y [English](docs/wiki/e
 - Dashboard web/PWA servido desde `/`, con assets versionados y service worker sin cachear respuestas `/api/`.
 - GUI PyQt6 local con workers en `QThread`, dialogos no modales de camaras e imagenes asincronas.
 - Filtros compartidos por API, dashboard y servicios mediante `IncidentFilters` y `CameraFilters`.
+- Estadisticas con 6 indicadores (total, accidentes, obras, averias, obstrucciones y meteorologia), graficas de barras, lineas y queso, y selector de provincias y CCAA con maximo y minimo sobre la seleccion.
+- Filtro por comunidad autonoma en incidencias, camaras, favoritas y mapa (`community`, `GET /api/regions`).
 - Busqueda textual por contiene, exacta o regex insensible a mayusculas.
 - Cobertura de camaras anotada en incidencias y filtro inverso de camaras con incidencia.
 - Pruebas hermeticas sin depender de la DGT real.

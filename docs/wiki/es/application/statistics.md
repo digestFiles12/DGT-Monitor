@@ -1,5 +1,5 @@
 # dgt_monitor/application/statistics.py
-Calcula los seis indicadores de incidencias, agrupaciones geográficas/temporales, extremos por grupo y exportación JSON.
+Calcula los seis indicadores de incidencias, agrupaciones geográficas/temporales y por tipo+geografía, extremos por grupo y exportación JSON.
 ## Dependencias
 Usa las reglas compartidas de [core.indicators](../core/indicators.md), `Incident` y la correspondencia provincia-región de `core`; `DgtApplicationService` y `menu.py` consumen estos cálculos. También usa la biblioteca estándar para fechas, JSON y rutas.
 ## Contenido
@@ -18,7 +18,7 @@ Usa las reglas compartidas de [core.indicators](../core/indicators.md), `Inciden
 ### `_sorted_groups(groups)`
 - Devuelve un nuevo diccionario con las claves de grupo en orden alfabético.
 ### `group_incidents(incidents, generated_at=None)`
-- Genera JSON agrupado por provincia, región, tipo y día, además de día+provincia y día+región. Los días sin fecha analizable se agrupan como `unknown` y esa sección se omite si queda vacía; los grupos geográficos desconocidos usan `UNKNOWN_REGION`.
+- Genera JSON agrupado por provincia, región, tipo y día, además de día+provincia, día+región, tipo+provincia (`by_province_type`) y tipo+región (`by_region_type`). Los días sin fecha analizable se agrupan como `unknown` y esa sección se omite si queda vacía; los grupos geográficos desconocidos usan `UNKNOWN_REGION`. La fachada añade `region_provinces` con las provincias del feed por región.
 ### `find_extremes(groups)`
 - Para cada indicador devuelve `{max, min}` con nombre y valor. Los empates se resuelven alfabéticamente; el mínimo ignora valores cero y es `None` si no hay grupo positivo.
 ### `build_statistics(incidents, level="province", generated_at=None)`

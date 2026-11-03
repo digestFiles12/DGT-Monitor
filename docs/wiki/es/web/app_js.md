@@ -4,7 +4,7 @@ Controla la interfaz web: estado, idioma y tema, vistas, carga de datos, inciden
 JavaScript del navegador (DOM, `fetch`, `URLSearchParams`, `localStorage`, timers y canvas); endpoints JSON `/api/incidents`, `/api/cameras`, `/api/stats` y `/api/stats/grouped`; globals `Chart`, `L` (Leaflet) y `lucide` cuando están disponibles.
 ## Contenido
 ### Estado, inicio, idioma y tema
-El listener `DOMContentLoaded` resuelve elementos por ID, carga favoritos, aplica idioma y tema, conecta controles, registra `/sw.js`, hace la carga inicial y programa actualizaciones. `state` guarda vista/opciones, datos, mapa, tema, filtros y contador de solicitudes; `uiCopy` y `detailLabels` contienen traducciones.
+El listener `DOMContentLoaded` resuelve elementos por ID, carga favoritos, aplica idioma y tema, conecta controles, registra `/sw.js`, hace la carga inicial y programa actualizaciones. `state` guarda vista/opciones, datos, mapa, tema, filtros, contador de solicitudes y `chartSelection` (un `Set` de geografías seleccionadas); `uiCopy`/`detailLabels` contienen traducciones, incluidos `communityLabel` y los textos `selector*`.
 #### `resolveInitialTheme()`
 - Devuelve el tema guardado (`dark`/`light`) o el preferido por el sistema.
 #### `toggleTheme()`
@@ -24,7 +24,7 @@ El listener `DOMContentLoaded` resuelve elementos por ID, carga favoritos, aplic
 #### `setSubmitButtonText()`
 - Actualiza el texto del botón principal del formulario de filtros.
 #### `setSelectOptions(select, values, labels)`
-- Asigna las etiquetas a las opciones existentes del `<select>` mediante sus valores.
+- Asigna las etiquetas a las opciones existentes del `<select>` mediante sus valores; `loadCommunities()` obtiene `/api/regions` para poblar el selector de comunidades y, si falla, conserva «Todas».
 #### `setTableHeaders()`
 - Traduce las seis cabeceras de la tabla de incidencias.
 #### `switchViewLabelOnly()`
@@ -42,7 +42,7 @@ El listener `DOMContentLoaded` resuelve elementos por ID, carga favoritos, aplic
 #### `loadCurrentView()`
 - Carga incidencias o cámaras según la vista, procesa respuestas/errores e ignora solicitudes obsoletas.
 #### `buildParams()`
-- Construye los parámetros de consulta desde los filtros e incorpora los propios de cada vista.
+- Construye los parámetros desde los filtros, siempre envía `community` si está seleccionada, y añade los específicos de la vista; ese filtro también limita las cámaras de los ámbitos del mapa.
 #### `addParam(params, key, value)`
 - Recorta `value` y la añade a `URLSearchParams` si no queda vacía.
 
@@ -52,7 +52,7 @@ El listener `DOMContentLoaded` resuelve elementos por ID, carga favoritos, aplic
 #### `applyChartsLanguage()`
 - Traduce controles y estados de Gráficas y vuelve a dibujar si hay datos cargados.
 #### `renderChart()`
-- Elige grupo e indicador, ordena y limita filas, y dibuja barras, líneas o sectores con Chart.js.
+- `chartSource()` selecciona los datos de nivel, día o tipo; `selectedExtremes()` recalcula máximo y mínimo de la selección; `renderChartSelector()`/`selectorToggle()` implementan búsqueda, selección múltiple, botones seleccionar todo/limpiar, chips removibles y grupos regionales con estado parcial. `renderChart()` restringe los gráficos de nivel/día/tipo y sus extremos a la selección y dibuja con Chart.js.
 #### `formatChartExtremes(extremes)`
 - Formatea máximo y mínimo de estadísticas como texto localizado o indica que faltan.
 
