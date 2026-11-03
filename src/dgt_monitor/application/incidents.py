@@ -3,6 +3,7 @@
 from collections.abc import Sequence
 import logging
 
+from dgt_monitor.core.indicators import is_accident, is_breakdown, is_obstruction, is_roadworks, is_weather
 from dgt_monitor.core.models import Incident, IncidentFilters, IncidentStats
 from dgt_monitor.core.ports import IncidentRepository, IncidentStore
 from dgt_monitor.core.text import matches_text
@@ -41,27 +42,25 @@ class IncidentService:
         return [item for item in incidents if self._matches(item, filters)]
 
     def stats(self, incidents: Sequence[Incident]) -> IncidentStats:
-        causes = [item.cause.casefold() for item in incidents]
         return IncidentStats(
             total=len(incidents),
-            accidents=sum("accident" in cause for cause in causes),
-            roadworks=sum("roadworks" in cause or "maintenance" in cause for cause in causes),
-            stuck=sum("stuck" in cause or "breakdown" in cause for cause in causes),
-            obstructions=sum("obstruction" in cause for cause in causes),
-            weather=sum(any(word in cause for word in ("weather", "fog", "snow", "flooding", "ice", "rain")) for cause in causes),
+            accidents=sum(is_accident(item) for item in incidents),
+            roadworks=sum(is_roadworks(item) for item in incidents),
+            stuck=sum(is_breakdown(item) for item in incidents),
+            obstructions=sum(is_obstruction(item) for item in incidents),
+            weather=sum(is_weather(item) for item in incidents),
         )
 
     @staticmethod
     def _matches(item: Incident, filters: IncidentFilters) -> bool:
-        cause = item.cause.casefold()
         kind_matches = {
             None: True,
             "": True,
-            "accident": "accident" in cause,
-            "roadworks": "roadworks" in cause or "maintenance" in cause,
-            "stuck": "stuck" in cause or "breakdown" in cause,
-            "obstruction": "obstruction" in cause,
-            "weather": any(word in cause for word in ("weather", "fog", "snow", "flooding", "ice", "rain")),
+            "accident": is_accident(item),
+            "roadworks": is_roadworks(item),
+            "stuck": is_breakdown(item),
+            "obstruction": is_obstruction(item),
+            "weather": is_weather(item),
         }
         camera_matches = {
             None: True,

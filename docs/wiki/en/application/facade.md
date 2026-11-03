@@ -14,7 +14,7 @@ Composes `IncidentService` and `CameraService`, uses filter models and localizat
 ### `DgtApplicationService._filters_without_kind(filters)`
 - Builds a new filter preserving province, municipality, road, severity, camera, and match mode while omitting `kind`; therefore the statistics count does not depend on the selected category.
 ### `DgtApplicationService.get_statistics(level="province", refresh=False)`
-- Returns the four indicators grouped by province or region, including maxima and minima; other levels are rejected by the delegated function.
+- Returns the six indicators (`total`, `accidents`, `roadworks`, `breakdowns`, `obstructions`, and `weather`) grouped by province or region, including maxima and minima; other levels are rejected by the delegated function.
 ### `DgtApplicationService.get_grouped_incidents(refresh=False)`
 - Returns the full incident grouping structure by geography, type, and weekday, plus `labels.by_type` with each type label in Spanish and English (the JSON keys remain the DATEX II codes).
 ### `DgtApplicationService.get_cameras(filters=None, refresh=False)`

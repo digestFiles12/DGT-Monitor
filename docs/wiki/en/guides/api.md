@@ -74,30 +74,32 @@ Parameters:
 {
   "level": "province",
   "total": 120,
-  "groups": {"Madrid": {"total": 10, "severe": 1, "roadworks": 4, "road_closures": 0}},
+  "groups": {"Madrid": {"total": 10, "accidents": 1, "roadworks": 4, "breakdowns": 2, "obstructions": 1, "weather": 0}},
   "extremes": {
     "total": {"max": {"name": "Madrid", "value": 10}, "min": {"name": "Soria", "value": 1}},
-    "severe": {"max": {"name": "Madrid", "value": 1}, "min": null},
+    "accidents": {"max": {"name": "Madrid", "value": 1}, "min": null},
     "roadworks": {"max": {"name": "Madrid", "value": 4}, "min": {"name": "Soria", "value": 1}},
-    "road_closures": {"max": null, "min": null}
+    "breakdowns": {"max": {"name": "Madrid", "value": 2}, "min": {"name": "Madrid", "value": 2}},
+    "obstructions": {"max": {"name": "Madrid", "value": 1}, "min": {"name": "Madrid", "value": 1}},
+    "weather": {"max": {"name": "Madrid", "value": 0}, "min": null}
   }
 }
 ```
-The indicators are `total`, `severe` (`highest` severity), `roadworks` (roadworks or maintenance), and `road_closures` (`roadClosed` or `carriagewayClosures`). `max` breaks ties alphabetically and `min` ignores groups with value 0; both are `null` when there is no data.
+The six indicators are `total`, `accidents`, `roadworks`, `breakdowns`, `obstructions`, and `weather`; their shared rules are documented in [core.indicators](../core/indicators.md). `max` breaks ties alphabetically and `min` ignores groups with value 0; if `weather` is 0 in every group, its minimum is `null`.
 ## `GET /api/stats/grouped`
 Parameter: `refresh` (boolean).
 ```json
 {
   "generated_at": "2026-11-03T11:14:18+01:00",
   "total": 120,
-  "indicators": ["total", "severe", "roadworks", "road_closures"],
-  "by_province": {"Madrid": {"total": 10, "severe": 1, "roadworks": 4, "road_closures": 0}},
-  "by_region": {"Comunidad de Madrid": {"total": 10, "severe": 1, "roadworks": 4, "road_closures": 0}},
-  "by_type": {"<type>": {"total": 3, "severe": 0, "roadworks": 0, "road_closures": 0}},
+  "indicators": ["total", "accidents", "roadworks", "breakdowns", "obstructions", "weather"],
+  "by_province": {"Madrid": {"total": 10, "accidents": 1, "roadworks": 4, "breakdowns": 2, "obstructions": 1, "weather": 0}},
+  "by_region": {"Comunidad de Madrid": {"total": 10, "accidents": 1, "roadworks": 4, "breakdowns": 2, "obstructions": 1, "weather": 0}},
+  "by_type": {"<type>": {"total": 3, "accidents": 0, "roadworks": 0, "breakdowns": 0, "obstructions": 0, "weather": 0}},
   "labels": {"by_type": {"es": {"<type>": "<Spanish label>"}, "en": {"<type>": "<English label>"}}},
-  "by_weekday": {"monday": {"total": 5, "severe": 0, "roadworks": 1, "road_closures": 0}},
-  "by_weekday_province": {"monday": {"Madrid": {"total": 2, "severe": 0, "roadworks": 0, "road_closures": 0}}},
-  "by_weekday_region": {"monday": {"<region>": {"total": 2, "severe": 0, "roadworks": 0, "road_closures": 0}}}
+  "by_weekday": {"monday": {"total": 5, "accidents": 0, "roadworks": 1, "breakdowns": 0, "obstructions": 0, "weather": 0}},
+  "by_weekday_province": {"monday": {"Madrid": {"total": 2, "accidents": 0, "roadworks": 0, "breakdowns": 0, "obstructions": 0, "weather": 0}}},
+  "by_weekday_region": {"monday": {"<region>": {"total": 2, "accidents": 0, "roadworks": 0, "breakdowns": 0, "obstructions": 0, "weather": 0}}}
 }
 ```
 `by_weekday` always contains the seven days (`monday`…`sunday`); `unknown` appears only when some incident has no valid date. The day is derived from `start_time`, falling back to `creation_time`. Unrecognized provinces are grouped as `Unknown`.
@@ -153,7 +155,7 @@ Served from `src/dgt_monitor/web/static/`; it consumes these endpoints from the 
 - Tabs: Incidents, Cameras, Favorites (stored in `localStorage`), Charts, and Map.
 - The **Charts** tab uses `/api/stats?level=province|region` and can group by province/region, weekday, or type, as bars, lines, or pie (top eight plus "Others"), with maxima and minima. Chart.js is served locally (`static/chart.umd.min.js`).
 - ES/EN language selector, light/dark mode, and filters with search mode.
-- PWA: the service worker (cache `dgt-monitor-v55`) stores the static shell and never caches `/api/`.
+- PWA: the service worker (cache `dgt-monitor-v56`) stores the static shell and never caches `/api/`.
 ## Development run
 ```powershell
 .\.venv\Scripts\python.exe -m uvicorn dgt_monitor.web.app:app --reload

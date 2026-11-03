@@ -4,7 +4,7 @@ Implementa el menú de consola del proyecto final: prepara datos agrupados desde
 Usa las funciones de agrupación/extremos/escritura de `application.statistics`, la URL DGT, cliente XML y parser de incidentes. Matplotlib se importa de forma diferida solo al construir o mostrar gráficos.
 ## Contenido
 ### `INDICATOR_OPTIONS`, `EXIT_OPTION`, `MAX_BARS`, `MAX_SLICES`
-- Asocian las opciones 1–4 a indicadores/etiquetas, fijan la opción de salida en 5 y limitan las gráficas a 15 barras o 8 sectores antes de agrupar el resto.
+- Asocian las opciones 1–6 a total, accidentes, obras, averías, obstrucciones y meteorología, y fijan la opción de salida en 7 y limitan las gráficas a 15 barras o 8 sectores antes de agrupar el resto.
 ### `load_grouped_data(xml_path, json_path, output_path)`
 - Ejercicio 1: carga el JSON indicado si `json_path` existe; si no, lee XML local o lo descarga de DGT, lo analiza, agrupa incidentes y escribe `output_path`. Devuelve el diccionario agrupado. El JSON existente evita ejecutar el ejercicio de construcción.
 ### `top_groups(groups, indicator, limit, add_others)`
@@ -18,7 +18,7 @@ Usa las funciones de agrupación/extremos/escritura de `application.statistics`,
 ### `show_figure(figure)`
 - Abre la figura en una ventana y espera a que se cierre; después la cierra mediante Matplotlib.
 ### `run_chart_menu(groups, kind, ask=input, say=print, show=show_figure)`
-- Mantiene un bucle con opciones para los cuatro indicadores y salida; construye barra salvo que `kind == "pie"`, muestra la figura y, después de cualquier gráfico, imprime máximo y mínimo. Las funciones inyectables facilitan probar el menú.
+- Mantiene un bucle con opciones 1–6 para total, accidentes, obras, averías, obstrucciones y meteorología, y opción 7 para salir; construye barra salvo que `kind == "pie"`, muestra la figura y, después de cualquier gráfico, imprime máximo y mínimo. Las funciones inyectables facilitan probar el menú.
 ### `run_main_menu(data, ask=input, say=print, show=show_figure)`
 - Menú principal: conecta la opción 1 con el menú de barras del ejercicio 2 y la opción 2 con el de sectores del ejercicio 3; permite agrupar por provincia o región y vuelve al menú principal al terminar un submenú.
 ### `main(argv=None)`

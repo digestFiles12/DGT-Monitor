@@ -12,9 +12,9 @@ Los casos de uso de aplicación coordinan repositorios, cachés, persistencia y 
 
 ## Fachada y estadísticas
 
-`DgtApplicationService.get_incident_payload()` calcula cobertura, filtra incidencias y prepara etiquetas localizadas. `get_cameras()` devuelve cámaras filtradas; cuando se solicita cobertura de incidencias, aplica el límite de resultados después de seleccionar la cobertura. `get_statistics()` devuelve cuatro indicadores por provincia o comunidad autónoma, con máximo y mínimo. `get_grouped_incidents()` genera agrupaciones por provincia, comunidad autónoma, tipo y día de la semana.
+`DgtApplicationService.get_incident_payload()` calcula cobertura, filtra incidencias y prepara etiquetas localizadas. `get_cameras()` devuelve cámaras filtradas; cuando se solicita cobertura de incidencias, aplica el límite de resultados después de seleccionar la cobertura. `get_statistics()` devuelve los seis indicadores por provincia o comunidad autónoma, con máximo y mínimo. `get_grouped_incidents()` genera agrupaciones por provincia, comunidad autónoma, tipo y día de la semana.
 
-Las rutas `GET /api/stats` y `GET /api/stats/grouped` exponen esos resultados. El módulo `application.statistics` define total, incidencias graves, obras y cierres de carretera; determina el día desde la hora de inicio (o, si falta, la hora de creación) y escribe JSON agrupado en UTF-8. Consulta [DATEX II](datex2.md) para el origen y análisis de los datos.
+Las rutas `GET /api/stats` y `GET /api/stats/grouped` exponen esos resultados. El módulo `application.statistics` agrupa `total`, `accidents`, `roadworks`, `breakdowns`, `obstructions` y `weather` con las reglas compartidas de [core.indicators](../core/indicators.md); determina el día desde la hora de inicio (o, si falta, la hora de creación) y escribe JSON agrupado en UTF-8. Consulta [DATEX II](datex2.md) para el origen y análisis de los datos.
 
 ## Caché y persistencia
 

@@ -1,7 +1,7 @@
 # dgt_monitor/application/incidents.py
 Implements cached loading, filtering, and cause-based incident counts; it can optionally persist loaded incidents.
 ## Dependencies
-Uses core models and ports, text matching, and the infrastructure `TtlCache`; the application facade uses `IncidentService`.
+Uses core models and ports, the shared rules in [core.indicators](../core/indicators.md), text matching, and the infrastructure `TtlCache`; the application facade uses `IncidentService`.
 ## Contents
 ### `IncidentService`
 - Application service for loading and filtering incidents, calculating cause-based counts, and optionally persisting results.
@@ -14,6 +14,6 @@ Uses core models and ports, text matching, and the infrastructure `TtlCache`; th
 ### `IncidentService.filter(incidents, filters)`
 - Returns only incidents that pass every criterion according to `_matches`.
 ### `IncidentService.stats(incidents)`
-- Counts total, accidents, roadworks/maintenance, stuck or broken-down vehicles, obstructions, and weather events using keyword checks in `cause.casefold()`.
+- Counts total, accidents, roadworks/maintenance, stuck or broken-down vehicles, obstructions, and weather events through the shared predicates in `core.indicators`; its counters are `total`, `accidents`, `roadworks`, `stuck`, `obstructions`, and `weather`.
 ### `IncidentService._matches(item, filters)`
-- Applies text matching to province, municipality, and road; compares severity case-insensitively and filters cause (`kind`) and coverage (`camera`). An unrecognized `kind` or `camera` value does not exclude the incident.
+- Applies text matching to province, municipality, and road; compares severity case-insensitively and filters cause (`kind`) through the same predicates in `core.indicators` and coverage (`camera`). An unrecognized `kind` or `camera` value does not exclude the incident.

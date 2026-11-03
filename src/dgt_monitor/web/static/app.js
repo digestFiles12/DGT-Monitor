@@ -80,7 +80,7 @@ const uiCopy = {
     cameraImageFullscreen: "Abrir imagen de cámara a pantalla completa", serverStatus: (status) => `El servidor respondió con código ${status}.`, results: (count) => `${count} resultados`, loadMore: (count) => `Mostrar ${count} más`,
     nearbyCameras: (count) => `${count} cámaras cercanas`, cameraAlt: (road, km) => `Cámara ${road || "DGT"} PK ${km || "sin dato"}`, updatedAt: (time) => `Actualizado ${time}`,
     mapPointPrompt: "Selecciona un punto", mapPointPromptText: "Elige una incidencia o cámara en el mapa para ver sus detalles.", mapUnavailable: "Mapa no disponible", mapSummary: (incidents, cameras) => `${incidents} incidencias · ${cameras} cámaras`, incidentPoint: "Incidencia", cameraPoint: "Cámara", yes: "Sí", no: "No",
-    charts: "Gráficas", chartEyebrow: "Estadísticas", chartLevel: "Nivel", provinceLevel: "Provincia", regionLevel: "CCAA", chartGrouping: "Agrupar por", groupLevel: "Provincia / CCAA", weekdays: "Día de la semana", incidentTypes: "Tipo de incidencia", barMode: "Barras", lineMode: "Líneas", pieMode: "Queso", totalIncidents: "Incidencias totales", severeIncidents: "Graves", roadworksIndicator: "Obras", roadClosures: "Cortes de carretera", chartIndicator: "Indicador", chartMode: "Modo de gráfica", loadingCharts: "Cargando estadísticas", chartLoadError: "No se pudieron cargar las estadísticas", noChartData: "No hay datos para mostrar.", maximum: "Máximo", minimum: "Mínimo", unavailableValue: "No disponible", otherGroups: "Otros", unknownGroup: "Sin datos", weekdayNames: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
+    charts: "Gráficas", chartEyebrow: "Estadísticas", chartLevel: "Nivel", provinceLevel: "Provincia", regionLevel: "CCAA", chartGrouping: "Agrupar por", groupLevel: "Provincia / CCAA", weekdays: "Día de la semana", incidentTypes: "Tipo de incidencia", barMode: "Barras", lineMode: "Líneas", pieMode: "Queso", totalIncidents: "Incidencias totales", accidentsIndicator: "Accidentes", roadworksIndicator: "Obras", breakdownsIndicator: "Averías", obstructionsIndicator: "Obstrucciones", weatherIndicator: "Meteorología", chartIndicator: "Indicador", chartMode: "Modo de gráfica", loadingCharts: "Cargando estadísticas", chartLoadError: "No se pudieron cargar las estadísticas", noChartData: "No hay datos para mostrar.", maximum: "Máximo", minimum: "Mínimo", unavailableValue: "No disponible", otherGroups: "Otros", unknownGroup: "Sin datos", weekdayNames: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
   },
   en: {
     brandSubtitle: "Road network status", connecting: "Connecting", online: "Online", offline: "Offline", notUpdated: "Not updated",
@@ -101,7 +101,7 @@ const uiCopy = {
     cameraImageFullscreen: "Open camera image fullscreen", serverStatus: (status) => `The server responded with status ${status}.`, results: (count) => `${count} results`, loadMore: (count) => `Show ${count} more`,
     nearbyCameras: (count) => `${count} nearby cameras`, cameraAlt: (road, km) => `Camera ${road || "DGT"} KP ${km || "unavailable"}`, updatedAt: (time) => `Updated ${time}`,
     mapPointPrompt: "Select a point", mapPointPromptText: "Choose an incident or camera on the map to see its details.", mapUnavailable: "Map unavailable", mapSummary: (incidents, cameras) => `${incidents} incidents · ${cameras} cameras`, incidentPoint: "Incident", cameraPoint: "Camera", yes: "Yes", no: "No",
-    charts: "Charts", chartEyebrow: "Statistics", chartLevel: "Level", provinceLevel: "Province", regionLevel: "Region (CCAA)", chartGrouping: "Group by", groupLevel: "Province / region", weekdays: "Weekday", incidentTypes: "Incident type", barMode: "Bars", lineMode: "Lines", pieMode: "Pie", totalIncidents: "Total incidents", severeIncidents: "Severe", roadworksIndicator: "Roadworks", roadClosures: "Road closures", chartIndicator: "Indicator", chartMode: "Chart mode", loadingCharts: "Loading statistics", chartLoadError: "Could not load statistics", noChartData: "No data to display.", maximum: "Maximum", minimum: "Minimum", unavailableValue: "Unavailable", otherGroups: "Others", unknownGroup: "Unknown", weekdayNames: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+    charts: "Charts", chartEyebrow: "Statistics", chartLevel: "Level", provinceLevel: "Province", regionLevel: "Region (CCAA)", chartGrouping: "Group by", groupLevel: "Province / region", weekdays: "Weekday", incidentTypes: "Incident type", barMode: "Bars", lineMode: "Lines", pieMode: "Pie", totalIncidents: "Total incidents", accidentsIndicator: "Accidents", roadworksIndicator: "Roadworks", breakdownsIndicator: "Breakdowns", obstructionsIndicator: "Obstructions", weatherIndicator: "Weather", chartIndicator: "Indicator", chartMode: "Chart mode", loadingCharts: "Loading statistics", chartLoadError: "Could not load statistics", noChartData: "No data to display.", maximum: "Maximum", minimum: "Minimum", unavailableValue: "Unavailable", otherGroups: "Others", unknownGroup: "Unknown", weekdayNames: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
   },
 };
 
@@ -436,9 +436,11 @@ function applyChartsLanguage() {
   elements.chartGrouping.options[1].textContent = uiText("weekdays");
   elements.chartGrouping.options[2].textContent = uiText("incidentTypes");
   document.querySelector('[data-chart-indicator="total"]').textContent = uiText("totalIncidents");
-  document.querySelector('[data-chart-indicator="severe"]').textContent = uiText("severeIncidents");
+  document.querySelector('[data-chart-indicator="accidents"]').textContent = uiText("accidentsIndicator");
   document.querySelector('[data-chart-indicator="roadworks"]').textContent = uiText("roadworksIndicator");
-  document.querySelector('[data-chart-indicator="road_closures"]').textContent = uiText("roadClosures");
+  document.querySelector('[data-chart-indicator="breakdowns"]').textContent = uiText("breakdownsIndicator");
+  document.querySelector('[data-chart-indicator="obstructions"]').textContent = uiText("obstructionsIndicator");
+  document.querySelector('[data-chart-indicator="weather"]').textContent = uiText("weatherIndicator");
   document.getElementById("chartModeBar").textContent = uiText("barMode");
   document.getElementById("chartModeLine").textContent = uiText("lineMode");
   document.getElementById("chartModePie").textContent = uiText("pieMode");
@@ -446,6 +448,11 @@ function applyChartsLanguage() {
   elements.chartErrorTitle.textContent = uiText("chartLoadError");
   if (state.chartData && state.view === "charts") renderChart();
 }
+
+const CHART_INDICATOR_TEXT = {
+  total: "totalIncidents", accidents: "accidentsIndicator", roadworks: "roadworksIndicator",
+  breakdowns: "breakdownsIndicator", obstructions: "obstructionsIndicator", weather: "weatherIndicator",
+};
 
 function renderChart() {
   if (!state.chartData) return;
@@ -490,9 +497,9 @@ function renderChart() {
     if (state.chartGrouping === "type") return { ...row, label: typeLabels[row.name] || row.name };
     return row.name === "Unknown" ? { ...row, label: uiText("unknownGroup") } : row;
   });
-  elements.chartIndicatorTitle.textContent = uiText({
-    total: "totalIncidents", severe: "severeIncidents", roadworks: "roadworksIndicator", road_closures: "roadClosures",
-  }[state.chartIndicator]);
+  elements.chartIndicatorTitle.textContent = uiText(CHART_INDICATOR_TEXT[state.chartIndicator]);
+
+
   elements.chartExtremes.textContent = formatChartExtremes(stats.extremes?.[state.chartIndicator]);
   elements.chartEmpty.textContent = uiText("noChartData");
   elements.chartEmpty.hidden = rows.length > 0;
@@ -509,7 +516,7 @@ function renderChart() {
   const border = getComputedStyle(document.documentElement).getPropertyValue("--line").trim();
   const panel = getComputedStyle(document.documentElement).getPropertyValue("--panel").trim();
   const dataset = {
-    label: uiText({ total: "totalIncidents", severe: "severeIncidents", roadworks: "roadworksIndicator", road_closures: "roadClosures" }[state.chartIndicator]),
+    label: uiText(CHART_INDICATOR_TEXT[state.chartIndicator]),
     data: rows.map((row) => row.value),
     backgroundColor: isPie ? rows.map((_, index) => colors[index % colors.length]) : colors[0],
     borderColor: isPie ? panel : colors[0],
