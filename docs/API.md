@@ -55,11 +55,13 @@ El dashboard consume los endpoints REST desde el mismo origen y no contiene lóg
 
 Los textos de incidencias usan campos `*_label` localizados, no codigos DATEX2. En la tabla de incidencias, el boton de camaras cercanas consulta `/api/cameras`; si solo hay una camara abre directamente su imagen en tamano contenido y, si hay varias, muestra un desplegable para elegir destino. Las incidencias sin cobertura visual muestran un icono `camera-off` rojo con etiqueta accesible localizada.
 
+La pestaña **Gráficas** consume `/api/stats?level=province|region` y `/api/stats/grouped`. Permite explorar los cuatro indicadores en vistas de barras, líneas o circulares, agrupados por provincia/CCAA, día de la semana o tipo; las gráficas circulares muestran los ocho grupos principales y el resto como «Otros», junto con máximos y mínimos. Chart.js se sirve localmente para no depender de una CDN.
+
 La pestaña de camaras puede filtrar por carretera/provincia/PK y activar `incident_coverage=true`. La pestaña de mapa reutiliza los filtros activos: para incidencias carga `/api/incidents` y para camaras calcula un scope relacionado, de forma que los contadores de tabs no diverjan. En escenarios como Zamora/A-52, una incidencia con una camara cercana debe reflejar 1 incidencia, 1 camara y 2 puntos en mapa.
 
 La pagina conserva scroll general en movil y escritorio. La tabla y el grid de camaras mantienen scroll interno con `-webkit-overflow-scrolling: touch` y `scrollbar-gutter: stable` para que el contenido denso no rompa el layout.
 
-Al pulsar la imagen del visor, se expande a pantalla completa; si la imagen falla o DGT devuelve un placeholder gris de no disponible, se reemplaza por un fallback propio con icono `wifi-off`, titulo y texto secundario en el idioma activo. Puede instalarse como PWA y conserva el shell estatico en cache (`dgt-monitor-v51`); las respuestas de `/api/` nunca se cachean.
+Al pulsar la imagen del visor, se expande a pantalla completa; si la imagen falla o DGT devuelve un placeholder gris de no disponible, se reemplaza por un fallback propio con icono `wifi-off`, titulo y texto secundario en el idioma activo. Puede instalarse como PWA y conserva el shell estatico en cache (`dgt-monitor-v54`); las respuestas de `/api/` nunca se cachean.
 
 ## Desarrollo
 

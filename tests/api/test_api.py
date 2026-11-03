@@ -63,6 +63,10 @@ def test_dashboard_and_pwa_assets_are_served():
     assert "cameraIncidentFilter" in dashboard.text
     assert "favoriteTabCount" in dashboard.text
     assert "data-view=\"favorites\"" in dashboard.text
+    assert "data-view=\"charts\"" in dashboard.text
+    assert "id=\"chartsView\"" in dashboard.text
+    assert "id=\"chartCanvas\"" in dashboard.text
+    assert "/static/chart.umd.min.js?v=1" in dashboard.text
     assert "mapResults" in dashboard.text
     assert "filterToggle" in dashboard.text
     assert "pageTitle" not in dashboard.text
@@ -78,6 +82,9 @@ def test_dashboard_and_pwa_assets_are_served():
     assert ".camera-favorite" in styles.text
     assert ".coverage-camera-preview" in styles.text
     assert ".image-viewer-favorite" in styles.text
+    chart_js = client.get("/static/chart.umd.min.js")
+    assert chart_js.status_code == 200
+    assert "4.4.7" in chart_js.text
     app_js = client.get("/static/app.js")
     assert app_js.status_code == 200
     assert "dgt-monitor-theme" in app_js.text
@@ -86,6 +93,12 @@ def test_dashboard_and_pwa_assets_are_served():
     assert "openCameraViewer" in app_js.text
     assert "openIncidentCameras" in app_js.text
     assert "dgt-monitor-camera-favorites" in app_js.text
+    assert "loadChartsData" in app_js.text
+    assert "refresh=true" in app_js.text
+    assert "renderChart" in app_js.text
+    assert "by_weekday" in app_js.text
+    assert "by_type" in app_js.text
+    assert "road_closures" in app_js.text
     assert "toggleCameraFavorite" in app_js.text
     assert "coverage-camera-preview" in app_js.text
     assert "image-viewer-favorite" in app_js.text
@@ -109,8 +122,9 @@ def test_dashboard_and_pwa_assets_are_served():
     assert client.get("/manifest.webmanifest").headers["content-type"].startswith("application/manifest+json")
     service_worker = client.get("/sw.js")
     assert service_worker.status_code == 200
-    assert "dgt-monitor-v53" in service_worker.text
-    assert "/static/app.js?v=53" in service_worker.text
+    assert "dgt-monitor-v54" in service_worker.text
+    assert "/static/app.js?v=54" in service_worker.text
+    assert "/static/chart.umd.min.js?v=1" in service_worker.text
 
 
 def test_websocket_sends_filtered_payload():

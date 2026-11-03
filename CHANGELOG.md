@@ -1,3 +1,15 @@
+## 2026-11-03 - Pestaña de gráficas
+
+### Añadido
+
+- Nueva vista de gráficas con indicadores de incidencias totales, graves, obras y cortes de carretera.
+- Gráficas de barras, líneas y circulares por provincia/CCAA, día de la semana y tipo, con extremos y selector de nivel.
+- Chart.js local en el shell PWA, gráficos adaptados a los temas claro/oscuro y textos ES/EN.
+
+### Validación
+
+- Tests estáticos de los recursos y controles de la pestaña de gráficas.
+
 # Changelog
 
 Todos los cambios relevantes del proyecto se documentan aqui. El repositorio sigue GitFlow: las features entran en `develop`, se estabilizan en `release` y se publican desde `main`.
