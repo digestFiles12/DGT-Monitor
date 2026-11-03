@@ -12,9 +12,9 @@ Application use cases coordinate repositories, caches, persistence, and models. 
 
 ## Facade and statistics
 
-`DgtApplicationService.get_incident_payload()` calculates coverage, filters incidents, and prepares localized labels. `get_cameras()` returns filtered cameras; when incident coverage is requested, it applies the result limit after selecting coverage. `get_statistics()` returns four indicators by province or autonomous community, with maximum and minimum values. `get_grouped_incidents()` builds groupings by province, autonomous community, type, and weekday.
+`DgtApplicationService.get_incident_payload()` calculates coverage, filters incidents, and prepares localized labels. `get_cameras()` returns filtered cameras; when incident coverage is requested, it applies the result limit after selecting coverage. `get_statistics()` returns six indicators by province or autonomous community, with maximum and minimum values. `get_grouped_incidents()` builds groupings by province, autonomous community, type, and weekday.
 
-The `GET /api/stats` and `GET /api/stats/grouped` routes expose those results. `application.statistics` defines total incidents, severe incidents, roadworks, and road closures; it derives the weekday from the start time (or creation time when the start time is absent) and writes grouped JSON as UTF-8. See [DATEX II](datex2.md) for the data source and parsing process.
+The `GET /api/stats` and `GET /api/stats/grouped` routes expose those results. `application.statistics` groups `total`, `accidents`, `roadworks`, `breakdowns`, `obstructions`, and `weather` using the shared rules in [core.indicators](../core/indicators.md); it derives the weekday from the start time (or creation time when the start time is absent) and writes grouped JSON as UTF-8. See [DATEX II](datex2.md) for the data source and parsing process.
 
 ## Cache and persistence
 

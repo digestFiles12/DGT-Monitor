@@ -6,38 +6,20 @@ import json
 from pathlib import Path
 from typing import Any
 
+from dgt_monitor.core.indicators import INDICATOR_RULES
 from dgt_monitor.core.models import Incident
 from dgt_monitor.core.regions import UNKNOWN_REGION, region_for_province
 
-INDICATORS = ("total", "severe", "roadworks", "road_closures")
+INDICATORS = ("total", *INDICATOR_RULES)
 WEEKDAYS = ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
 DEFAULT_GROUPED_JSON = "grouped_incidents.json"
 
 
-def is_severe(incident: Incident) -> bool:
-    """Return whether the incident has the highest severity."""
-    return incident.severity.casefold() == "highest"
-
-
-def is_roadworks(incident: Incident) -> bool:
-    """Return whether the incident cause describes roadworks or maintenance."""
-    cause = incident.cause.casefold()
-    return "roadworks" in cause or "maintenance" in cause
-
-
-def is_road_closure(incident: Incident) -> bool:
-    """Return whether traffic management indicates a road closure."""
-    return incident.management_type in {"roadClosed", "carriagewayClosures"}
-
-
 def count_indicators(incidents: Iterable[Incident]) -> dict[str, int]:
-    """Count the four dashboard indicators."""
-    counts = dict.fromkeys(INDICATORS, 0)
+    """Count the six dashboard indicators."""
+    counts = _empty_leaf()
     for incident in incidents:
-        counts["total"] += 1
-        counts["severe"] += is_severe(incident)
-        counts["roadworks"] += is_roadworks(incident)
-        counts["road_closures"] += is_road_closure(incident)
+        _count(counts, incident)
     return counts
 
 
@@ -57,14 +39,16 @@ def _empty_leaf() -> dict[str, int]:
     return dict.fromkeys(INDICATORS, 0)
 
 
+def _count(leaf: dict[str, int], incident: Incident) -> None:
+    leaf["total"] += 1
+    for name, rule in INDICATOR_RULES.items():
+        leaf[name] += rule(incident)
+
+
 def _add_incident(groups: dict[str, dict[str, int]], key: str, incident: Incident) -> None:
     if key not in groups:
         groups[key] = _empty_leaf()
-    leaf = groups[key]
-    leaf["total"] += 1
-    leaf["severe"] += is_severe(incident)
-    leaf["roadworks"] += is_roadworks(incident)
-    leaf["road_closures"] += is_road_closure(incident)
+    _count(groups[key], incident)
 
 
 def _sorted_groups(groups: dict[str, dict[str, int]]) -> dict[str, dict[str, int]]:

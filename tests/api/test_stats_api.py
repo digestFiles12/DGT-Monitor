@@ -33,8 +33,11 @@ def test_stats_by_province_has_indicators_and_extremes():
     assert body["level"] == "province"
     assert body["total"] == 90
     assert sum(group["total"] for group in body["groups"].values()) == 90
-    for indicator in ("total", "severe", "roadworks", "road_closures"):
+    for indicator in ("total", "accidents", "roadworks", "breakdowns", "obstructions", "weather"):
         extreme = body["extremes"][indicator]
+        if indicator == "weather":  # no weather incidents in the sample: every group is 0
+            assert extreme["min"] is None and extreme["max"]["value"] == 0
+            continue
         assert extreme["max"]["value"] >= extreme["min"]["value"] >= 1
 
 

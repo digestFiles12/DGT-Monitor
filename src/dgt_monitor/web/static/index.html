@@ -11,11 +11,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="/static/styles.css?v=55">
+  <link rel="stylesheet" href="/static/styles.css?v=56">
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
   <script src="/static/chart.umd.min.js?v=1" defer></script>
-  <script src="/static/app.js?v=55" defer></script>
+  <script src="/static/app.js?v=56" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -145,9 +145,11 @@
         <div class="chart-menus">
           <div class="chart-menu" role="group" aria-label="Indicador">
             <button type="button" class="chart-menu-button is-active" data-chart-indicator="total" aria-pressed="true">Total</button>
-            <button type="button" class="chart-menu-button" data-chart-indicator="severe" aria-pressed="false">Graves</button>
+            <button type="button" class="chart-menu-button" data-chart-indicator="accidents" aria-pressed="false">Accidentes</button>
             <button type="button" class="chart-menu-button" data-chart-indicator="roadworks" aria-pressed="false">Obras</button>
-            <button type="button" class="chart-menu-button" data-chart-indicator="road_closures" aria-pressed="false">Cortes de carretera</button>
+            <button type="button" class="chart-menu-button" data-chart-indicator="breakdowns" aria-pressed="false">Averías</button>
+            <button type="button" class="chart-menu-button" data-chart-indicator="obstructions" aria-pressed="false">Obstrucciones</button>
+            <button type="button" class="chart-menu-button" data-chart-indicator="weather" aria-pressed="false">Meteorología</button>
           </div>
           <div class="chart-options">
             <div class="chart-menu chart-mode-menu" role="group" aria-label="Modo de gráfica">

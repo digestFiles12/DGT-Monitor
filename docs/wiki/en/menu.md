@@ -4,7 +4,7 @@ Implements the final project's console menu: prepares grouped data from DGT XML 
 Uses grouping, extremes, and writing functions from `application.statistics`, the DGT URL, an XML client, and the incident parser. Matplotlib is imported lazily only when building or showing charts.
 ## Contents
 ### `INDICATOR_OPTIONS`, `EXIT_OPTION`, `MAX_BARS`, `MAX_SLICES`
-- Map options 1–4 to indicators/labels, set exit to option 5, and cap charts at 15 bars or 8 pie slices before combining the remainder.
+- Map options 1–6 to total, accidents, roadworks, breakdowns, obstructions, and weather, and set exit to option 7, and cap charts at 15 bars or 8 pie slices before combining the remainder.
 ### `load_grouped_data(xml_path, json_path, output_path)`
 - Exercise 1: loads the specified JSON when `json_path` is given; otherwise reads local XML or downloads it from DGT, parses and groups incidents, and writes `output_path`. Returns the grouped dictionary. An existing JSON skips the build exercise.
 ### `top_groups(groups, indicator, limit, add_others)`
@@ -18,7 +18,7 @@ Uses grouping, extremes, and writing functions from `application.statistics`, th
 ### `show_figure(figure)`
 - Opens the figure in a window and waits for it to close; then closes it through Matplotlib.
 ### `run_chart_menu(groups, kind, ask=input, say=print, show=show_figure)`
-- Runs a loop with choices for the four indicators and exit; builds bars unless `kind == "pie"`, displays the figure, and prints maximum and minimum after every chart. Injectable functions make the menu easier to test.
+- Runs a loop with choices 1–6 for total, accidents, roadworks, breakdowns, obstructions, and weather, plus option 7 to exit; builds bars unless `kind == "pie"`, displays the figure, and prints maximum and minimum after every chart. Injectable functions make the menu easier to test.
 ### `run_main_menu(data, ask=input, say=print, show=show_figure)`
 - Main menu: connects option 1 to the Exercise 2 bar menu and option 2 to the Exercise 3 pie menu; allows grouping by province or region and returns to the main menu when a submenu ends.
 ### `main(argv=None)`

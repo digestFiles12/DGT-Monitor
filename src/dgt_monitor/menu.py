@@ -22,11 +22,13 @@ from dgt_monitor.infrastructure.parsers import IncidentParser
 # Menu option -> (indicator key in the JSON, label shown to the user).
 INDICATOR_OPTIONS = {
     "1": ("total", "Incidencias totales"),
-    "2": ("severe", "Incidencias graves"),
+    "2": ("accidents", "Accidentes"),
     "3": ("roadworks", "Obras"),
-    "4": ("road_closures", "Cortes de carretera"),
+    "4": ("breakdowns", "Averías"),
+    "5": ("obstructions", "Obstrucciones"),
+    "6": ("weather", "Meteorología"),
 }
-EXIT_OPTION = "5"
+EXIT_OPTION = str(len(INDICATOR_OPTIONS) + 1)
 MAX_BARS = 15
 MAX_SLICES = 8
 

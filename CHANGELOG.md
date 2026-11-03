@@ -1,3 +1,12 @@
+## 2026-11-03 - Seis indicadores en estadísticas
+
+### Cambiado
+
+- Las estadísticas y gráficas usan ahora 6 indicadores: total, accidentes, obras, averías, obstrucciones y meteorología (antes: total, graves, obras, cortes). Son los mismos que las celdas de la pestaña de incidencias.
+- Nuevo módulo `core/indicators.py` con las reglas de clasificación, compartido por `IncidentService` y `statistics`.
+- Menú de consola con 6 opciones de indicador; salir pasa a la opción 7.
+- Service worker y recursos estáticos a la versión 56.
+
 ## 2026-11-03 - Gráficas traducidas
 
 ### Corregido
