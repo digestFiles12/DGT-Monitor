@@ -7,6 +7,12 @@ from dgt_monitor.infrastructure.activity_store import build_activity_store
 
 
 @pytest.fixture(autouse=True)
+def isolated_incident_db(monkeypatch, tmp_path):
+    """Keep the incident SQLite file out of the project directory during tests."""
+    monkeypatch.setenv("INCIDENT_DB_PATH", str(tmp_path / "incidents.db"))
+
+
+@pytest.fixture(autouse=True)
 def init_activity_store(monkeypatch):
     """Initialize activity store for each test.
     
