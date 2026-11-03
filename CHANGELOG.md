@@ -1,6 +1,85 @@
+## [20261103.02] - 2026-11-03
+
+Resumen: seis indicadores en estadísticas, selector de provincias y CCAA en gráficas, filtro por comunidad autónoma y documentación actualizada.
+
+## 2026-11-03 - Filtro por comunidad autónoma
+
+### Añadido
+
+- Filtro «Comunidad autónoma» en el panel de filtros (incidencias, cámaras, favoritas y mapa). Parámetro `community` en `/api/incidents`, `/api/cameras` y `/ws/incidents`.
+- Endpoint `GET /api/regions` con las CCAA y sus provincias.
+- Recursos estáticos a la versión 59.
+
+## 2026-11-03 - Selector de gráficas rediseñado
+
+### Cambiado
+
+- Selector agrupado por CCAA con casilla de CCAA (marca/desmarca todas sus provincias, estado intermedio), píldoras con el número de incidencias, chips de selección quitables y botones «Seleccionar todo» / «Limpiar selección».
+- `/api/stats/grouped` añade `region_provinces` (CCAA → provincias).
+- Recursos estáticos a la versión 58.
+
+## 2026-11-03 - Selector de provincias y CCAA en gráficas
+
+### Añadido
+
+- Selector múltiple con búsqueda y botón de limpiar en la pestaña Gráficas: las gráficas (por nivel, día de la semana o tipo) y el máximo/mínimo se calculan solo con las provincias o CCAA elegidas.
+- Nuevas agrupaciones `by_province_type` y `by_region_type` en `/api/stats/grouped`.
+- Service worker y recursos estáticos a la versión 57.
+
+## 2026-11-03 - Seis indicadores en estadísticas
+
+### Cambiado
+
+- Las estadísticas y gráficas usan ahora 6 indicadores: total, accidentes, obras, averías, obstrucciones y meteorología (antes: total, graves, obras, cortes). Son los mismos que las celdas de la pestaña de incidencias.
+- Nuevo módulo `core/indicators.py` con las reglas de clasificación, compartido por `IncidentService` y `statistics`.
+- Menú de consola con 6 opciones de indicador; salir pasa a la opción 7.
+- Service worker y recursos estáticos a la versión 56.
+
+## 2026-11-03 - Gráficas traducidas
+
+### Corregido
+
+- La leyenda del gráfico por tipo mostraba códigos DATEX II sin traducir; ahora usa `labels.by_type` (es/en) de `/api/stats/grouped`.
+- El grupo `Unknown` se muestra como `Sin datos` / `Unknown` según el idioma.
+- Service worker y recursos estáticos a la versión 55 para invalidar la caché.
+
+## 2026-11-03 - Wiki independiente por idioma
+
+### Añadido
+
+- Wiki en `docs/wiki/es` y `docs/wiki/en` con una página por fichero, guías técnicas y diagramas Mermaid.
+- Memoria del proyecto (`docs/MEMORIA.md`).
+
+### Eliminado
+
+- Documentos técnicos antiguos de `docs/` (API, ARCHITECTURE, HANDOFF, PROJECT_STATUS, etc.), integrados y actualizados en la wiki.
+
+## 2026-11-03 - Pestaña de gráficas
+
+### Añadido
+
+- Nueva vista de gráficas con indicadores de incidencias totales, graves, obras y cortes de carretera.
+- Gráficas de barras, líneas y circulares por provincia/CCAA, día de la semana y tipo, con extremos y selector de nivel.
+- Chart.js local en el shell PWA, gráficos adaptados a los temas claro/oscuro y textos ES/EN.
+
+### Validación
+
+- Tests estáticos de los recursos y controles de la pestaña de gráficas.
+
 # Changelog
 
 Todos los cambios relevantes del proyecto se documentan aqui. El repositorio sigue GitFlow: las features entran en `develop`, se estabilizan en `release` y se publican desde `main`.
+
+## 2026-11-03 - Final project (Project 3)
+
+### Aniadido
+
+- `core/regions.py`: mapa provincia a comunidad autonoma (CCAA) para las 52 provincias.
+- `infrastructure/incident_store.py`: persistencia SQLite de incidencias sin duplicados (clave: id de la DGT).
+- `application/statistics.py`: 4 indicadores agrupados por provincia, CCAA, tipo y dia de la semana, con maximo y minimo.
+- `GET /api/stats` y `GET /api/stats/grouped`.
+- `python -m dgt_monitor.menu`: menu de consola con graficas de barras y de queso (ejercicios 1, 2 y 3).
+- Estructura `src/` y `tests/`, con fixture XML real en `tests/fixtures`.
 
 ## 2026-07-19 - Release 20260719.06 y GUI actualizada
 
@@ -30,7 +109,7 @@ Todos los cambios relevantes del proyecto se documentan aqui. El repositorio sig
 - PR #12 `feature/GUI` -> `develop`: integrada.
 - PR #13 `release` -> `main`: integrada con checks `Test & Validate (3.12)` en `SUCCESS`.
 - Tag `20260719.06`: creado y subido sobre el commit final de `main`.
-- `QT_QPA_PLATFORM=offscreen python -m pytest test -q`: 53 tests pasando.
+- `QT_QPA_PLATFORM=offscreen python -m pytest tests -q`: 53 tests pasando.
 
 ## 2026-07-19 - Dashboard, filtros avanzados y cobertura de camaras
 
@@ -61,8 +140,8 @@ Todos los cambios relevantes del proyecto se documentan aqui. El repositorio sig
 
 ### Validacion
 
-- `python -m pytest test -q`: 53 tests pasando.
-- `python -m compileall -q dgt_monitor dashboard`: sin errores.
+- `python -m pytest tests -q`: 53 tests pasando.
+- `python -m compileall -q src`: sin errores.
 - `git diff --check`: limpio.
 - PR #9 hacia `develop`: checks `Test & Validate (3.12)` en `SUCCESS` y PR mergeable antes de su integracion.
 

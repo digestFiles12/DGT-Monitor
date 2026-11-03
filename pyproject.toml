@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "dgt-monitor"
 version = "0.1.0"
-description = "Monitor modular de incidentes y camaras de trafico de la DGT"
+description = "Modular monitor of DGT traffic incidents and cameras"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -20,15 +20,22 @@ web = [
 gui = [
   "PyQt6>=6.7.0",
 ]
+console = [
+  "matplotlib>=3.9.0",
+]
 dev = [
-  "dgt-monitor[web,gui]",
+  "dgt-monitor[web,gui,console]",
   "pytest>=8.0.0",
   "httpx2>=0.28.0",
 ]
 
 [tool.setuptools.packages.find]
+where = ["src"]
 include = ["dgt_monitor*"]
 
+[tool.setuptools.package-data]
+"dgt_monitor.web" = ["static/*"]
+
 [tool.pytest.ini_options]
-testpaths = ["test"]
+testpaths = ["tests"]
 addopts = "-q"
