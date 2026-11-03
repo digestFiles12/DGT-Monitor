@@ -1,5 +1,11 @@
 const state = {
   view: "incidents",
+  chartLevel: "province",
+  chartMode: "bar",
+  chartIndicator: "total",
+  chartGrouping: "level",
+  chartData: null,
+  chartInstance: null,
   incidents: [],
   cameras: [],
   favoriteCameras: [],
@@ -74,6 +80,7 @@ const uiCopy = {
     cameraImageFullscreen: "Abrir imagen de cámara a pantalla completa", serverStatus: (status) => `El servidor respondió con código ${status}.`, results: (count) => `${count} resultados`, loadMore: (count) => `Mostrar ${count} más`,
     nearbyCameras: (count) => `${count} cámaras cercanas`, cameraAlt: (road, km) => `Cámara ${road || "DGT"} PK ${km || "sin dato"}`, updatedAt: (time) => `Actualizado ${time}`,
     mapPointPrompt: "Selecciona un punto", mapPointPromptText: "Elige una incidencia o cámara en el mapa para ver sus detalles.", mapUnavailable: "Mapa no disponible", mapSummary: (incidents, cameras) => `${incidents} incidencias · ${cameras} cámaras`, incidentPoint: "Incidencia", cameraPoint: "Cámara", yes: "Sí", no: "No",
+    charts: "Gráficas", chartEyebrow: "Estadísticas", chartLevel: "Nivel", provinceLevel: "Provincia", regionLevel: "CCAA", chartGrouping: "Agrupar por", groupLevel: "Provincia / CCAA", weekdays: "Día de la semana", incidentTypes: "Tipo de incidencia", barMode: "Barras", lineMode: "Líneas", pieMode: "Queso", totalIncidents: "Incidencias totales", severeIncidents: "Graves", roadworksIndicator: "Obras", roadClosures: "Cortes de carretera", chartIndicator: "Indicador", chartMode: "Modo de gráfica", loadingCharts: "Cargando estadísticas", chartLoadError: "No se pudieron cargar las estadísticas", noChartData: "No hay datos para mostrar.", maximum: "Máximo", minimum: "Mínimo", unavailableValue: "No disponible", otherGroups: "Otros", weekdayNames: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
   },
   en: {
     brandSubtitle: "Road network status", connecting: "Connecting", online: "Online", offline: "Offline", notUpdated: "Not updated",
@@ -94,6 +101,7 @@ const uiCopy = {
     cameraImageFullscreen: "Open camera image fullscreen", serverStatus: (status) => `The server responded with status ${status}.`, results: (count) => `${count} results`, loadMore: (count) => `Show ${count} more`,
     nearbyCameras: (count) => `${count} nearby cameras`, cameraAlt: (road, km) => `Camera ${road || "DGT"} KP ${km || "unavailable"}`, updatedAt: (time) => `Updated ${time}`,
     mapPointPrompt: "Select a point", mapPointPromptText: "Choose an incident or camera on the map to see its details.", mapUnavailable: "Map unavailable", mapSummary: (incidents, cameras) => `${incidents} incidents · ${cameras} cameras`, incidentPoint: "Incident", cameraPoint: "Camera", yes: "Yes", no: "No",
+    charts: "Charts", chartEyebrow: "Statistics", chartLevel: "Level", provinceLevel: "Province", regionLevel: "Region (CCAA)", chartGrouping: "Group by", groupLevel: "Province / region", weekdays: "Weekday", incidentTypes: "Incident type", barMode: "Bars", lineMode: "Lines", pieMode: "Pie", totalIncidents: "Total incidents", severeIncidents: "Severe", roadworksIndicator: "Roadworks", roadClosures: "Road closures", chartIndicator: "Indicator", chartMode: "Chart mode", loadingCharts: "Loading statistics", chartLoadError: "Could not load statistics", noChartData: "No data to display.", maximum: "Maximum", minimum: "Minimum", unavailableValue: "Unavailable", otherGroups: "Others", weekdayNames: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
   },
 };
 
@@ -105,6 +113,7 @@ const ids = [
   "statAccidents", "statRoadworks", "statStuck", "statObstructions", "statWeather", "incidentTabCount",
   "cameraTabCount", "favoriteTabCount", "mapTabCount", "resultsTitle", "resultEyebrow", "resultCount", "loadingState",
   "errorState", "errorMessage", "emptyState", "incidentResults", "incidentRows",
+  "chartsView", "chartsEyebrow", "chartsViewTitle", "chartLevel", "chartLevelLabel", "chartGrouping", "chartGroupingLabel", "chartLoading", "chartLoadingText", "chartError", "chartErrorTitle", "chartErrorMessage", "chartEmpty", "chartPanel", "chartIndicatorTitle", "chartExtremes", "chartCanvas",
   "cameraResults", "mapResults", "mapStatus", "mapDetail", "trafficMap", "retryButton", "loadMoreWrap", "loadMoreButton", "themeButton", "workspace", "filtersPanel", "filterToggle"
 ];
 
@@ -114,6 +123,32 @@ document.addEventListener("DOMContentLoaded", () => {
   applyTheme(resolveInitialTheme());
   applyLanguage(resolveInitialLanguage(), false);
   document.querySelectorAll(".tab").forEach((tab) => tab.addEventListener("click", () => switchView(tab.dataset.view)));
+  document.querySelectorAll("[data-chart-indicator]").forEach((button) => button.addEventListener("click", () => {
+    state.chartIndicator = button.dataset.chartIndicator;
+    document.querySelectorAll("[data-chart-indicator]").forEach((item) => {
+      const active = item === button;
+      item.classList.toggle("is-active", active);
+      item.setAttribute("aria-pressed", String(active));
+    });
+    renderChart();
+  }));
+  document.querySelectorAll("[data-chart-mode]").forEach((button) => button.addEventListener("click", () => {
+    state.chartMode = button.dataset.chartMode;
+    document.querySelectorAll("[data-chart-mode]").forEach((item) => {
+      const active = item === button;
+      item.classList.toggle("is-active", active);
+      item.setAttribute("aria-pressed", String(active));
+    });
+    renderChart();
+  }));
+  elements.chartLevel.addEventListener("change", () => {
+    state.chartLevel = elements.chartLevel.value;
+    loadCurrentView();
+  });
+  elements.chartGrouping.addEventListener("change", () => {
+    state.chartGrouping = elements.chartGrouping.value;
+    renderChart();
+  });
   document.querySelectorAll(".metric").forEach((metric) => metric.addEventListener("click", () => applyKindFilter(metric.dataset.kind || "")));
   document.querySelectorAll(".language-button").forEach((button) => button.addEventListener("click", () => applyLanguage(button.dataset.language || "es")));
   elements.filterForm.addEventListener("submit", (event) => { event.preventDefault(); loadCurrentView(); });
@@ -185,6 +220,8 @@ function applyStaticLanguage() {
   setTabLabel("cameras", uiText("cameras"));
   setTabLabel("favorites", uiText("favorites"));
   setTabLabel("map", uiText("map"));
+  setTabLabel("charts", uiText("charts"));
+  applyChartsLanguage();
   updateFavoriteTabCount();
   document.querySelector(".filter-heading .eyebrow").textContent = uiText("query");
   document.getElementById("filterTitle").textContent = uiText("filters");
@@ -253,6 +290,8 @@ function setTableHeaders() {
 function switchViewLabelOnly() {
   elements.resultsTitle.textContent = state.view === "favorites" ? uiText("favoriteCameras") : state.view === "cameras" ? uiText("trafficCameras") : state.view === "map" ? uiText("map") : uiText("activeIncidents");
   elements.resultEyebrow.textContent = state.view === "cameras" || state.view === "favorites" ? uiText("visualObservation") : uiText("roadNetwork");
+  elements.chartsViewTitle.textContent = uiText("charts");
+  elements.chartsEyebrow.textContent = uiText("chartEyebrow");
 }
 
 function applyTheme(theme) {
@@ -266,18 +305,24 @@ function applyTheme(theme) {
   elements.themeButton.innerHTML = `<i data-lucide="${dark ? "sun" : "moon"}" aria-hidden="true"></i>`;
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#101820" : "#b91c1c");
   if (window.lucide) window.lucide.createIcons();
+  if (state.view === "charts" && state.chartData) renderChart();
 }
 
 function switchView(view) {
   state.view = view;
   elements.workspace.classList.toggle("is-map-view", view === "map");
+  elements.workspace.classList.toggle("is-charts-view", view === "charts");
+  elements.chartsView.hidden = view !== "charts";
+  document.querySelector(".results").hidden = view === "charts";
+  elements.filtersPanel.hidden = view === "charts" || elements.workspace.classList.contains("is-filters-hidden");
+  elements.filterToggle.hidden = view === "charts";
   document.body.classList.toggle("is-map-view", view === "map");
   document.querySelectorAll(".tab").forEach((tab) => {
     const active = tab.dataset.view === view;
     tab.classList.toggle("is-active", active);
     tab.setAttribute("aria-selected", String(active));
   });
-  elements.incidentFilters.hidden = view === "cameras" || view === "favorites";
+  elements.incidentFilters.hidden = view === "cameras" || view === "favorites" || view === "charts";
   elements.cameraFilters.hidden = view !== "cameras";
   switchViewLabelOnly();
   loadCurrentView();
@@ -301,6 +346,10 @@ function updateFilterToggle() {
 
 async function loadCurrentView() {
   const requestId = ++state.requestId;
+  if (state.view === "charts") {
+    await loadChartsData(requestId);
+    return;
+  }
   if (state.view === "favorites") {
     renderFavoriteCameras();
     return;
@@ -332,6 +381,159 @@ async function loadCurrentView() {
   } finally {
     if (requestId === state.requestId) elements.refreshButton.classList.remove("is-loading");
   }
+}
+
+async function loadChartsData(requestId) {
+  state.chartInstance?.destroy();
+  state.chartInstance = null;
+  elements.chartLoading.hidden = false;
+  elements.chartError.hidden = true;
+  elements.chartEmpty.hidden = true;
+  elements.chartPanel.hidden = true;
+  elements.refreshButton.classList.add("is-loading");
+  try {
+    const statsResponse = await fetch(`/api/stats?level=${encodeURIComponent(state.chartLevel)}&refresh=true`, {
+      headers: { Accept: "application/json" },
+    });
+    if (!statsResponse.ok) {
+      throw new Error(statsResponse.status === 502 ? uiText("serverUnavailable") : uiText("serverStatus", statsResponse.status));
+    }
+    const stats = await statsResponse.json();
+    const groupedResponse = await fetch("/api/stats/grouped", { headers: { Accept: "application/json" } });
+    if (!groupedResponse.ok) {
+      throw new Error(groupedResponse.status === 502 ? uiText("serverUnavailable") : uiText("serverStatus", groupedResponse.status));
+    }
+    const grouped = await groupedResponse.json();
+    if (requestId !== state.requestId) return;
+    state.chartData = { stats, grouped };
+    elements.chartLevel.value = state.chartLevel;
+    elements.chartLoading.hidden = true;
+    renderChart();
+    setConnection(true);
+  } catch (error) {
+    if (requestId !== state.requestId) return;
+    state.chartData = null;
+    elements.chartLoading.hidden = true;
+    elements.chartErrorMessage.textContent = error.message || uiText("connectionRetry");
+    elements.chartError.hidden = false;
+    setConnection(false);
+  } finally {
+    if (requestId === state.requestId) elements.refreshButton.classList.remove("is-loading");
+  }
+}
+
+function applyChartsLanguage() {
+  document.querySelector(".chart-menu[aria-label]").setAttribute("aria-label", uiText("chartIndicator"));
+  document.querySelector(".chart-mode-menu").setAttribute("aria-label", uiText("chartMode"));
+  elements.chartCanvas.setAttribute("aria-label", uiText("charts"));
+  elements.chartLevelLabel.textContent = uiText("chartLevel");
+  elements.chartLevelLabel.closest("label").setAttribute("aria-label", uiText("chartLevel"));
+  elements.chartLevel.options[0].textContent = uiText("provinceLevel");
+  elements.chartLevel.options[1].textContent = uiText("regionLevel");
+  elements.chartGroupingLabel.textContent = uiText("chartGrouping");
+  elements.chartGroupingLabel.closest("label").setAttribute("aria-label", uiText("chartGrouping"));
+  elements.chartGrouping.options[0].textContent = uiText("groupLevel");
+  elements.chartGrouping.options[1].textContent = uiText("weekdays");
+  elements.chartGrouping.options[2].textContent = uiText("incidentTypes");
+  document.querySelector('[data-chart-indicator="total"]').textContent = uiText("totalIncidents");
+  document.querySelector('[data-chart-indicator="severe"]').textContent = uiText("severeIncidents");
+  document.querySelector('[data-chart-indicator="roadworks"]').textContent = uiText("roadworksIndicator");
+  document.querySelector('[data-chart-indicator="road_closures"]').textContent = uiText("roadClosures");
+  document.getElementById("chartModeBar").textContent = uiText("barMode");
+  document.getElementById("chartModeLine").textContent = uiText("lineMode");
+  document.getElementById("chartModePie").textContent = uiText("pieMode");
+  elements.chartLoadingText.textContent = uiText("loadingCharts");
+  elements.chartErrorTitle.textContent = uiText("chartLoadError");
+  if (state.chartData && state.view === "charts") renderChart();
+}
+
+function renderChart() {
+  if (!state.chartData) return;
+  if (!window.Chart) {
+    elements.chartPanel.hidden = true;
+    elements.chartErrorMessage.textContent = uiText("chartLoadError");
+    elements.chartError.hidden = false;
+    return;
+  }
+  const { stats, grouped } = state.chartData;
+  const source = state.chartGrouping === "weekday"
+    ? grouped.by_weekday
+    : state.chartGrouping === "type"
+      ? grouped.by_type
+      : stats.groups;
+  const weekdayKeys = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+  let rows = Object.entries(source || {}).map(([name, values]) => ({
+    name,
+    value: Number(values?.[state.chartIndicator] || 0),
+  }));
+  rows = rows.filter((row) => Number.isFinite(row.value));
+  if (state.chartGrouping === "weekday") {
+    rows.sort((a, b) => weekdayKeys.indexOf(a.name.toLowerCase()) - weekdayKeys.indexOf(b.name.toLowerCase()));
+  } else {
+    rows.sort((a, b) => b.value - a.value || a.name.localeCompare(b.name));
+  }
+  const isPie = state.chartMode === "pie";
+  if (isPie) {
+    const topRows = rows.slice(0, 8);
+    const othersValue = rows.slice(8).reduce((sum, row) => sum + row.value, 0);
+    rows = topRows;
+    if (othersValue > 0) rows.push({ name: uiText("otherGroups"), value: othersValue });
+  } else if (state.chartGrouping !== "weekday") {
+    rows = rows.slice(0, 15);
+  }
+  if (state.chartGrouping === "weekday") {
+    rows = rows.map((row) => {
+      const dayIndex = weekdayKeys.indexOf(row.name.toLowerCase());
+      return { ...row, label: dayIndex >= 0 ? uiText("weekdayNames")[dayIndex] : row.name };
+    });
+  }
+  elements.chartIndicatorTitle.textContent = uiText({
+    total: "totalIncidents", severe: "severeIncidents", roadworks: "roadworksIndicator", road_closures: "roadClosures",
+  }[state.chartIndicator]);
+  elements.chartExtremes.textContent = formatChartExtremes(stats.extremes?.[state.chartIndicator]);
+  elements.chartEmpty.textContent = uiText("noChartData");
+  elements.chartEmpty.hidden = rows.length > 0;
+  elements.chartPanel.hidden = rows.length === 0;
+  if (!rows.length) {
+    state.chartInstance?.destroy();
+    state.chartInstance = null;
+    return;
+  }
+  state.chartInstance?.destroy();
+  const colors = ["--red", "--blue", "--amber", "--green", "--muted"]
+    .map((name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim());
+  const ink = getComputedStyle(document.documentElement).getPropertyValue("--muted").trim();
+  const border = getComputedStyle(document.documentElement).getPropertyValue("--line").trim();
+  const panel = getComputedStyle(document.documentElement).getPropertyValue("--panel").trim();
+  const dataset = {
+    label: uiText({ total: "totalIncidents", severe: "severeIncidents", roadworks: "roadworksIndicator", road_closures: "roadClosures" }[state.chartIndicator]),
+    data: rows.map((row) => row.value),
+    backgroundColor: isPie ? rows.map((_, index) => colors[index % colors.length]) : colors[0],
+    borderColor: isPie ? panel : colors[0],
+    borderWidth: isPie ? 2 : 1,
+    ...(state.chartMode === "line" ? { tension: 0.3, pointRadius: 4, pointHoverRadius: 6, fill: false } : {}),
+  };
+  state.chartInstance = new window.Chart(elements.chartCanvas.getContext("2d"), {
+    type: isPie ? "pie" : state.chartMode,
+    data: { labels: rows.map((row) => row.label || row.name), datasets: [dataset] },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: isPie, position: "bottom", labels: { color: ink, padding: 16 } } },
+      ...(isPie ? {} : { scales: {
+        x: { ticks: { color: ink }, grid: { color: border } },
+        y: { beginAtZero: true, ticks: { color: ink, precision: 0 }, grid: { color: border } },
+      } }),
+    },
+  });
+}
+
+function formatChartExtremes(extremes) {
+  const maximum = extremes?.max;
+  const minimum = extremes?.min;
+  const formatValue = (entry) => entry?.value == null ? uiText("unavailableValue") : entry.value.toLocaleString(state.language);
+  const formatEntry = (entry) => entry?.name == null || entry?.value == null ? uiText("unavailableValue") : `${entry.name} (${formatValue(entry)})`;
+  return `${uiText("maximum")}: ${formatEntry(maximum)} · ${uiText("minimum")}: ${formatEntry(minimum)}`;
 }
 
 function buildParams() {

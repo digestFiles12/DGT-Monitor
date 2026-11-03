@@ -11,10 +11,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="/static/styles.css?v=53">
+  <link rel="stylesheet" href="/static/styles.css?v=54">
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-  <script src="/static/app.js?v=53" defer></script>
+  <script src="/static/chart.umd.min.js?v=1" defer></script>
+  <script src="/static/app.js?v=54" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -60,6 +61,9 @@
       </button>
       <button class="tab" type="button" data-view="favorites" aria-selected="false">
         <i data-lucide="star" aria-hidden="true"></i><span class="tab-label">Favoritas</span><span class="tab-count" id="favoriteTabCount">0</span>
+      </button>
+      <button class="tab" type="button" data-view="charts" aria-selected="false">
+        <i data-lucide="chart-no-axes-column-increasing" aria-hidden="true"></i><span class="tab-label">Gráficas</span>
       </button>
       <button class="tab" type="button" data-view="map" aria-selected="false">
         <i data-lucide="map" aria-hidden="true"></i><span class="tab-label">Mapa</span><span class="tab-count" id="mapTabCount">0</span>
@@ -131,6 +135,37 @@
           </section>
           <p class="map-status" id="mapStatus">OpenStreetMap</p>
         </div>
+      </section>
+
+      <section class="charts-view" id="chartsView" hidden aria-labelledby="chartsViewTitle">
+        <div class="charts-header">
+          <div><p class="eyebrow" id="chartsEyebrow">Estadísticas</p><h2 id="chartsViewTitle">Gráficas</h2></div>
+          <label class="chart-level-label"><span id="chartLevelLabel">Nivel</span><select id="chartLevel"><option value="province">Provincia</option><option value="region">CCAA</option></select></label>
+        </div>
+        <div class="chart-menus">
+          <div class="chart-menu" role="group" aria-label="Indicador">
+            <button type="button" class="chart-menu-button is-active" data-chart-indicator="total" aria-pressed="true">Total</button>
+            <button type="button" class="chart-menu-button" data-chart-indicator="severe" aria-pressed="false">Graves</button>
+            <button type="button" class="chart-menu-button" data-chart-indicator="roadworks" aria-pressed="false">Obras</button>
+            <button type="button" class="chart-menu-button" data-chart-indicator="road_closures" aria-pressed="false">Cortes de carretera</button>
+          </div>
+          <div class="chart-options">
+            <div class="chart-menu chart-mode-menu" role="group" aria-label="Modo de gráfica">
+              <button type="button" class="chart-menu-button is-active" id="chartModeBar" data-chart-mode="bar" aria-pressed="true">Barras</button>
+              <button type="button" class="chart-menu-button" id="chartModeLine" data-chart-mode="line" aria-pressed="false">Líneas</button>
+              <button type="button" class="chart-menu-button" id="chartModePie" data-chart-mode="pie" aria-pressed="false">Queso</button>
+            </div>
+            <label class="chart-group-label"><span id="chartGroupingLabel">Agrupar por</span><select id="chartGrouping"><option value="level">Provincia / CCAA</option><option value="weekday">Día de la semana</option><option value="type">Tipo de incidencia</option></select></label>
+          </div>
+        </div>
+        <div class="chart-state state-panel" id="chartLoading" hidden><span class="loader" aria-hidden="true"></span><strong id="chartLoadingText">Cargando estadísticas</strong></div>
+        <div class="chart-state state-panel state-error" id="chartError" hidden><i data-lucide="cloud-off" aria-hidden="true"></i><strong id="chartErrorTitle">No se pudieron cargar las estadísticas</strong><p id="chartErrorMessage"></p></div>
+        <div class="chart-panel" id="chartPanel">
+          <h3 id="chartIndicatorTitle">Incidencias totales</h3>
+          <div class="chart-canvas-wrap"><canvas id="chartCanvas" aria-label="Gráfica de estadísticas"></canvas></div>
+          <p class="chart-extremes" id="chartExtremes" aria-live="polite"></p>
+        </div>
+        <p class="chart-empty" id="chartEmpty" hidden></p>
       </section>
     </section>
   </main>
