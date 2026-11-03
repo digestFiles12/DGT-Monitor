@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 from dgt_monitor.core.exceptions import DgtParseError
 from dgt_monitor.core.localization import Translator
 from dgt_monitor.core.models import Incident
+from dgt_monitor.core.regions import UNKNOWN_REGION, region_for_province
 from dgt_monitor.core.text import TextCleaner
 from dgt_monitor.infrastructure.parsers.base import Datex2Parser
 
@@ -36,6 +37,10 @@ class IncidentParser(Datex2Parser):
         cause = cause or "Unknown"
         latitude = self.optional_float(get("latitude"))
         longitude = self.optional_float(get("longitude"))
+        province = self._cleaner.clean(get("province"))
+        community = region_for_province(province)
+        if community == UNKNOWN_REGION:
+            community = self._cleaner.clean(get("autonomousCommunity"))
         return Incident(
             id=situation.get("id", ""), record_id=record.get("id", ""), version=record.get("version", ""),
             creation_time=get("situationRecordCreationTime"), source=get("sourceIdentification") or "DGT",
@@ -44,8 +49,8 @@ class IncidentParser(Datex2Parser):
             type_label=self._translator.translate(incident_type), cause=cause,
             cause_label=self._translator.translate_compound(cause),
             road=self._cleaner.clean(get("roadName")) or "Desconocida", destination=self._cleaner.clean(get("roadDestination")),
-            municipality=self._cleaner.clean(get("municipality")), province=self._cleaner.clean(get("province")),
-            community=self._cleaner.clean(get("autonomousCommunity")), km=get("kilometerPoint"),
+            municipality=self._cleaner.clean(get("municipality")),             province=province,
+                        community=community, km=get("kilometerPoint"),
             direction=get("tpegDirection"), direction_label=self._translator.translate(get("tpegDirection")),
             direction_road=get("tpegDirectionRoad"), latitude=latitude, longitude=longitude,
             lane_usage=get("laneUsage"), management_type=get("roadOrCarriagewayOrLaneManagementType"),
