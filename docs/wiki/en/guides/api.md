@@ -94,6 +94,7 @@ Parameter: `refresh` (boolean).
   "by_province": {"Madrid": {"total": 10, "severe": 1, "roadworks": 4, "road_closures": 0}},
   "by_region": {"Comunidad de Madrid": {"total": 10, "severe": 1, "roadworks": 4, "road_closures": 0}},
   "by_type": {"<type>": {"total": 3, "severe": 0, "roadworks": 0, "road_closures": 0}},
+  "labels": {"by_type": {"es": {"<type>": "<Spanish label>"}, "en": {"<type>": "<English label>"}}},
   "by_weekday": {"monday": {"total": 5, "severe": 0, "roadworks": 1, "road_closures": 0}},
   "by_weekday_province": {"monday": {"Madrid": {"total": 2, "severe": 0, "roadworks": 0, "road_closures": 0}}},
   "by_weekday_region": {"monday": {"<region>": {"total": 2, "severe": 0, "roadworks": 0, "road_closures": 0}}}
@@ -152,7 +153,7 @@ Served from `src/dgt_monitor/web/static/`; it consumes these endpoints from the 
 - Tabs: Incidents, Cameras, Favorites (stored in `localStorage`), Charts, and Map.
 - The **Charts** tab uses `/api/stats?level=province|region` and can group by province/region, weekday, or type, as bars, lines, or pie (top eight plus "Others"), with maxima and minima. Chart.js is served locally (`static/chart.umd.min.js`).
 - ES/EN language selector, light/dark mode, and filters with search mode.
-- PWA: the service worker (cache `dgt-monitor-v54`) stores the static shell and never caches `/api/`.
+- PWA: the service worker (cache `dgt-monitor-v55`) stores the static shell and never caches `/api/`.
 ## Development run
 ```powershell
 .\.venv\Scripts\python.exe -m uvicorn dgt_monitor.web.app:app --reload

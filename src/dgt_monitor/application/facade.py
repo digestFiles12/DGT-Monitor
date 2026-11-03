@@ -7,7 +7,7 @@ from typing import Any
 from dgt_monitor.application.cameras import CameraService
 from dgt_monitor.application.incidents import IncidentService
 from dgt_monitor.application.statistics import build_statistics, group_incidents
-from dgt_monitor.core.localization import Translator, normalize_locale
+from dgt_monitor.core.localization import SUPPORTED_LOCALES, Translator, normalize_locale
 from dgt_monitor.core.models import CameraFilters, IncidentFilters
 
 
@@ -72,8 +72,15 @@ class DgtApplicationService:
         return build_statistics(self._incidents.get_all(refresh=refresh), level=level)
 
     def get_grouped_incidents(self, refresh: bool = False) -> dict[str, Any]:
-        """Return incidents grouped by province, region, type and weekday."""
-        return group_incidents(self._incidents.get_all(refresh=refresh))
+        """Return incidents grouped by province, region, type and weekday, plus display labels per locale."""
+        grouped = group_incidents(self._incidents.get_all(refresh=refresh))
+        grouped["labels"] = {
+            "by_type": {
+                locale: {code: Translator(locale).translate(code) for code in grouped["by_type"]}
+                for locale in sorted(SUPPORTED_LOCALES)
+            }
+        }
+        return grouped
 
     def get_cameras(self, filters: CameraFilters | None = None, refresh: bool = False) -> dict[str, Any]:
         filters = filters or CameraFilters()
