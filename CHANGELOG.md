@@ -1,3 +1,11 @@
+## 2026-11-03 - Selector de gráficas rediseñado
+
+### Cambiado
+
+- Selector agrupado por CCAA con casilla de CCAA (marca/desmarca todas sus provincias, estado intermedio), píldoras con el número de incidencias, chips de selección quitables y botones «Seleccionar todo» / «Limpiar selección».
+- `/api/stats/grouped` añade `region_provinces` (CCAA → provincias).
+- Recursos estáticos a la versión 58.
+
 ## 2026-11-03 - Selector de provincias y CCAA en gráficas
 
 ### Añadido

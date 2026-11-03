@@ -157,7 +157,7 @@ Served from `src/dgt_monitor/web/static/`; it consumes these endpoints from the 
 - Tabs: Incidents, Cameras, Favorites (stored in `localStorage`), Charts, and Map.
 - The **Charts** tab uses `/api/stats?level=province|region` and can group by province/region, weekday, or type, as bars, lines, or pie (top eight plus "Others"), with maxima and minima. Chart.js is served locally (`static/chart.umd.min.js`).
 - ES/EN language selector, light/dark mode, and filters with search mode.
-- PWA: the service worker (cache `dgt-monitor-v57`) stores the static shell and never caches `/api/`.
+- PWA: the service worker (cache `dgt-monitor-v58`) stores the static shell and never caches `/api/`.
 ## Development run
 ```powershell
 .\.venv\Scripts\python.exe -m uvicorn dgt_monitor.web.app:app --reload

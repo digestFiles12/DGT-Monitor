@@ -58,6 +58,8 @@ def test_grouped_json_has_all_groupings():
     for key in ("by_province", "by_region", "by_type", "by_weekday", "by_weekday_province", "by_weekday_region", "by_province_type", "by_region_type"):
         assert key in body
     assert sum(day["total"] for day in body["by_weekday"].values()) == body["total"]
+    assert all(isinstance(v, list) and v for v in body["region_provinces"].values())
+    assert sorted(p for v in body["region_provinces"].values() for p in v) == sorted(body["by_province"])
     for key in ("by_province_type", "by_region_type"):
         for kind, groups in body[key].items():
             assert sum(leaf["total"] for leaf in groups.values()) == body["by_type"][kind]["total"]
