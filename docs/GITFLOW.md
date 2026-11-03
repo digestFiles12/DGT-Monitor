@@ -32,8 +32,8 @@ La PR #9 integro `feature/scroll` en `develop`. Ese incremento incluyo scroll ge
 ## Validacion antes de PR
 
 ```powershell
-$env:QT_QPA_PLATFORM='offscreen'; .\.venv\Scripts\python.exe -m pytest test -q
-.\.venv\Scripts\python.exe -m compileall -q dgt_monitor dashboard
+$env:QT_QPA_PLATFORM='offscreen'; .\.venv\Scripts\python.exe -m pytest tests -q
+.\.venv\Scripts\python.exe -m compileall -q src
 git diff --check
 ```
 

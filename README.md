@@ -6,7 +6,7 @@ El dashboard incluye selector ES/EN, modo claro/oscuro, filtros por provincia, m
 
 La cobertura incidencia-camara se calcula por carretera normalizada, provincia compatible y punto kilometrico dentro de `CAMERA_MATCH_RANGE_KM = 2.0`. El dashboard mantiene scroll general en movil/escritorio y scroll interno en tabla de incidencias y grid de camaras, de modo que la navegacion funciona tanto por pagina completa como dentro de cada superficie densa.
 
-Consulta [docs/INDEX.md](docs/INDEX.md) para la documentacion tecnica completa, [CHANGELOG.md](CHANGELOG.md) para el historial de cambios y [docs/CONTINUIDAD_NUEVO_CHAT.md](docs/CONTINUIDAD_NUEVO_CHAT.md) para reanudar el trabajo en otro chat. El flujo de ramas esta definido en [docs/GITFLOW.md](docs/GITFLOW.md).
+Consulta [docs/INDEX.md](docs/INDEX.md) para la documentacion tecnica completa, [CHANGELOG.md](CHANGELOG.md) para el historial de cambios y [docs/HANDOFF.md](docs/HANDOFF.md) para reanudar el trabajo en otro chat. El flujo de ramas esta definido en [docs/GITFLOW.md](docs/GITFLOW.md).
 
 ## Funcionalidades principales
 
@@ -30,7 +30,7 @@ py -3.12 -m venv .venv
 
 ```powershell
 # Dashboard web
-.\.venv\Scripts\python.exe -m uvicorn dashboard.app:app --reload
+.\.venv\Scripts\python.exe -m uvicorn dgt_monitor.web.app:app --reload
 
 # Aplicación de escritorio
 .\.venv\Scripts\python.exe -m dgt_monitor.gui
@@ -52,8 +52,8 @@ Invoke-RestMethod "http://127.0.0.1:8000/api/cameras?road=A-52&incident_coverage
 ## Validacion rapida
 
 ```powershell
-$env:QT_QPA_PLATFORM='offscreen'; .\.venv\Scripts\python.exe -m pytest test -q
-.\.venv\Scripts\python.exe -m compileall -q dgt_monitor dashboard
+$env:QT_QPA_PLATFORM='offscreen'; .\.venv\Scripts\python.exe -m pytest tests -q
+.\.venv\Scripts\python.exe -m compileall -q src
 git diff --check
 ```
 

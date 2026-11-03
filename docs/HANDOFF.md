@@ -19,7 +19,7 @@ Este documento es el punto de entrada para reanudar el proyecto con el contexto 
 - Render y GitHub Actions configurados.
 - 53 tests pasando.
 
-Ver `docs/PHASE_7_COMPLETED.md` para estado completo y checklist de handoff.
+Ver `docs/PROJECT_STATUS.md` para estado completo y checklist de handoff.
 
 ---
 
@@ -49,8 +49,8 @@ Ejecutar desde la raiz del proyecto:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest test\api\test_api.py -q
-$env:QT_QPA_PLATFORM='offscreen'; .\.venv\Scripts\python.exe -m pytest test -q
-.\.venv\Scripts\python.exe -m compileall -q dgt_monitor dashboard
+$env:QT_QPA_PLATFORM='offscreen'; .\.venv\Scripts\python.exe -m pytest tests -q
+.\.venv\Scripts\python.exe -m compileall -q src
 git diff --check
 git status --short --branch
 ```
@@ -71,7 +71,7 @@ working tree limpio
 Arrancar dashboard local:
 
 ```powershell
-.\.venv\Scripts\python.exe -m uvicorn dashboard.app:app --host 127.0.0.1 --port 8766
+.\.venv\Scripts\python.exe -m uvicorn dgt_monitor.web.app:app --host 127.0.0.1 --port 8766
 ```
 
 Abrir:
@@ -125,11 +125,11 @@ Tags relevantes:
 - `README.md`: resumen actualizado, API rapida, validacion y enlaces.
 - `CHANGELOG.md`: historial de cambios de 2026-07-19 y 2026-07-18.
 - `docs/`: documentacion completa actualizada para filtros, cobertura, scroll, Render, GitFlow y pruebas.
-- `dashboard/static/index.html`: filtros de modo de busqueda y camaras con incidencia.
-- `dashboard/static/styles.css`: scroll general, scroll interno y responsive.
-- `dashboard/static/app.js`: i18n, tabs, detalles, fechas humanas, camaras, fallbacks, mapa y filtros avanzados.
-- `dashboard/static/sw.js`: cache PWA `dgt-monitor-v53`.
-- `test/api/test_api.py`: contratos de assets/PWA y filtros API.
+- `src/dgt_monitor/web/static/index.html`: filtros de modo de busqueda y camaras con incidencia.
+- `src/dgt_monitor/web/static/styles.css`: scroll general, scroll interno y responsive.
+- `src/dgt_monitor/web/static/app.js`: i18n, tabs, detalles, fechas humanas, camaras, fallbacks, mapa y filtros avanzados.
+- `src/dgt_monitor/web/static/sw.js`: cache PWA `dgt-monitor-v53`.
+- `tests/api/test_api.py`: contratos de assets/PWA y filtros API.
 
 ---
 
@@ -144,8 +144,8 @@ Tags relevantes:
 Documentacion complementaria:
 
 - `docs/INDEX.md`: indice general.
-- `docs/PHASE_7_COMPLETED.md`: handoff historico y estado completo.
+- `docs/PROJECT_STATUS.md`: handoff historico y estado completo.
 - `docs/GITFLOW.md`: flujo de ramas.
-- `docs/PRUEBAS.md`: guia de pruebas.
-- `docs/DESPLIEGUE.md`: despliegue.
+- `docs/TESTING.md`: guia de pruebas.
+- `docs/DEPLOYMENT.md`: despliegue.
 - `CHANGELOG.md`: historial de cambios.

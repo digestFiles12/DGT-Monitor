@@ -15,7 +15,7 @@ La migración conserva comportamientos esperados de la aplicación anterior: GUI
 | filtros y estadísticas | `application.IncidentService` |
 | Haversine y cámaras cercanas | `application.CameraService` |
 | cachés globales | `infrastructure.TtlCache` |
-| `dashboard/app.py` monolítico | `api.factory` + rutas + wrapper |
+| `src/dgt_monitor/web/app.py` monolítico | `api.factory` + rutas + wrapper |
 
 ## Compatibilidad pendiente
 

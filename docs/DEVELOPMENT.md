@@ -23,8 +23,8 @@ Consulta [GITFLOW.md](GITFLOW.md) para el detalle de ramas, hotfixes y politica 
 
 ```powershell
 $env:QT_QPA_PLATFORM='offscreen'
-.\.venv\Scripts\python.exe -m pytest test -q
-.\.venv\Scripts\python.exe -m compileall -q dgt_monitor dashboard
+.\.venv\Scripts\python.exe -m pytest tests -q
+.\.venv\Scripts\python.exe -m compileall -q src
 git diff --check
 ```
 
@@ -37,7 +37,7 @@ Estado esperado actual: 53 tests pasando. Si se cambia dashboard/API, ejecutar t
 Para probar el dashboard/API local:
 
 ```powershell
-.\.venv\Scripts\python.exe -m uvicorn dashboard.app:app --reload
+.\.venv\Scripts\python.exe -m uvicorn dgt_monitor.web.app:app --reload
 ```
 
 Pruebas manuales recomendadas del dashboard:

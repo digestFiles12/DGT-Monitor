@@ -30,7 +30,7 @@ Todos los cambios relevantes del proyecto se documentan aqui. El repositorio sig
 - PR #12 `feature/GUI` -> `develop`: integrada.
 - PR #13 `release` -> `main`: integrada con checks `Test & Validate (3.12)` en `SUCCESS`.
 - Tag `20260719.06`: creado y subido sobre el commit final de `main`.
-- `QT_QPA_PLATFORM=offscreen python -m pytest test -q`: 53 tests pasando.
+- `QT_QPA_PLATFORM=offscreen python -m pytest tests -q`: 53 tests pasando.
 
 ## 2026-07-19 - Dashboard, filtros avanzados y cobertura de camaras
 
@@ -61,8 +61,8 @@ Todos los cambios relevantes del proyecto se documentan aqui. El repositorio sig
 
 ### Validacion
 
-- `python -m pytest test -q`: 53 tests pasando.
-- `python -m compileall -q dgt_monitor dashboard`: sin errores.
+- `python -m pytest tests -q`: 53 tests pasando.
+- `python -m compileall -q src`: sin errores.
 - `git diff --check`: limpio.
 - PR #9 hacia `develop`: checks `Test & Validate (3.12)` en `SUCCESS` y PR mergeable antes de su integracion.
 
