@@ -66,6 +66,7 @@ class DgtApplicationService:
             severity=filters.severity,
             camera=filters.camera,
             match_mode=filters.match_mode,
+            community=filters.community,
         )
 
     def get_statistics(self, level: str = "province", refresh: bool = False) -> dict[str, Any]:

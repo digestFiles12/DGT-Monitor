@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends
 
 from dgt_monitor.api.dependencies import get_service
 from dgt_monitor.application.facade import DgtApplicationService
+from dgt_monitor.core.regions import PROVINCE_TO_REGION
 
 router = APIRouter(tags=["statistics"])
 
@@ -27,3 +28,11 @@ def grouped(
 ) -> dict:
     """Full grouped JSON: by province, region, type and weekday."""
     return service.get_grouped_incidents(refresh=refresh)
+
+@router.get("/api/regions")
+def regions() -> dict:
+    """Autonomous communities with their provinces, used to populate filters."""
+    mapping: dict[str, list[str]] = {}
+    for province, region in PROVINCE_TO_REGION.items():
+        mapping.setdefault(region, []).append(province)
+    return {"regions": [{"name": name, "provinces": sorted(items)} for name, items in sorted(mapping.items())]}

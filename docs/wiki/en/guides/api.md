@@ -105,6 +105,10 @@ Parameter: `refresh` (boolean).
 }
 ```
 `by_weekday` always contains the seven days (`monday`…`sunday`); `unknown` appears only when some incident has no valid date. The day is derived from `start_time`, falling back to `creation_time`. Unrecognized provinces are grouped as `Unknown`.
+## `GET /api/regions`
+Lists the autonomous communities with their provinces: `{"regions": [{"name": "Andalucía", "provinces": ["Almería", ...]}]}`. It fills the community filter.
+
+`/api/incidents`, `/api/cameras` and `/ws/incidents` also accept `community` (exact community name, case-insensitive).
 ## `GET /api/cameras`
 Parameters:
 - `province`, `road`: text filters subject to `match_mode`.
@@ -157,7 +161,7 @@ Served from `src/dgt_monitor/web/static/`; it consumes these endpoints from the 
 - Tabs: Incidents, Cameras, Favorites (stored in `localStorage`), Charts, and Map.
 - The **Charts** tab uses `/api/stats?level=province|region` and can group by province/region, weekday, or type, as bars, lines, or pie (top eight plus "Others"), with maxima and minima. Chart.js is served locally (`static/chart.umd.min.js`).
 - ES/EN language selector, light/dark mode, and filters with search mode.
-- PWA: the service worker (cache `dgt-monitor-v58`) stores the static shell and never caches `/api/`.
+- PWA: the service worker (cache `dgt-monitor-v59`) stores the static shell and never caches `/api/`.
 ## Development run
 ```powershell
 .\.venv\Scripts\python.exe -m uvicorn dgt_monitor.web.app:app --reload

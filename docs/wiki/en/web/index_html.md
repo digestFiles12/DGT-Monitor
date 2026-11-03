@@ -1,7 +1,7 @@
 # dgt_monitor/web/static/index.html
 Defines the web application's structure: header, metrics, filters, tabs, and incident, camera, map, and chart panels.
 ## Dependencies
-Local `/static/styles.css?v=58`, `/static/app.js?v=58`, and `/manifest.webmanifest`; Lucide and Leaflet, including Leaflet styles, load from CDNs. Chart.js 4.4.7 is bundled locally as `chart.umd.min.js`, with no CDN.
+Local `/static/styles.css?v=59`, `/static/app.js?v=59`, and `/manifest.webmanifest`; Lucide and Leaflet, including Leaflet styles, load from CDNs. Chart.js 4.4.7 is bundled locally as `chart.umd.min.js`, with no CDN.
 ## Contents
 ### Document head
 - Declares Spanish, encoding, viewport, theme color, and description; links fonts, manifest, Leaflet, and CSS. Lucide, Leaflet, Chart.js, and `app.js` scripts use `defer`.

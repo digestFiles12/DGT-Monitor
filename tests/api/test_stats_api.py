@@ -80,3 +80,19 @@ def test_dashboard_script_uses_type_labels_and_unknown_translation():
     script = build_client().get("/static/app.js").text
     assert "grouped.labels?.by_type?.[state.language]" in script
     assert "unknownGroup: \"Sin datos\"" in script and "unknownGroup: \"Unknown\"" in script
+
+def test_regions_endpoint_lists_communities_with_provinces():
+    regions = build_client().get("/api/regions").json()["regions"]
+    by_name = {item["name"]: item["provinces"] for item in regions}
+    assert len(by_name) == 19
+    assert "Madrid" in by_name["Comunidad de Madrid"]
+
+
+def test_incidents_can_be_filtered_by_community():
+    client = build_client()
+    everything = client.get("/api/incidents").json()
+    region = next(item["community"] for item in everything["items"] if item["community"] != "Unknown")
+    filtered = client.get("/api/incidents", params={"community": region}).json()
+    assert 0 < filtered["count"] < everything["count"] or filtered["count"] == everything["count"]
+    assert all(item["community"] == region for item in filtered["items"])
+    assert client.get("/api/incidents", params={"community": "Nowhere"}).json()["count"] == 0

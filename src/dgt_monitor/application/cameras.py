@@ -8,6 +8,7 @@ from dgt_monitor.core.constants import CAMERA_MATCH_RANGE_KM
 from dgt_monitor.core.geometry import DistanceCalculator
 from dgt_monitor.core.models import Camera, CameraFilters, Incident
 from dgt_monitor.core.ports import CameraRepository
+from dgt_monitor.core.regions import region_for_province
 from dgt_monitor.core.text import matches_text, normalize_road, parse_kilometer_point
 from dgt_monitor.infrastructure.cache import TtlCache
 
@@ -30,6 +31,8 @@ class CameraService:
             province_match = matches_text(camera.province, filters.province, filters.match_mode)
             road_match = matches_text(camera.road, filters.road, filters.match_mode)
             if filters.province and not province_match:
+                continue
+            if filters.community and region_for_province(camera.province).casefold() != filters.community.casefold():
                 continue
             if filters.road and not road_match:
                 continue

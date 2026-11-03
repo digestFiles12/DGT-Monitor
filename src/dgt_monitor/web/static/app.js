@@ -64,7 +64,7 @@ const detailLabels = {
 const uiCopy = {
   es: {
     brandSubtitle: "Estado de la red viaria", connecting: "Conectando", online: "En línea", offline: "Sin conexión", notUpdated: "Sin actualizar",
-    provincePlaceholder: "Ej. Madrid", roadPlaceholder: "Ej. A-6", municipalityPlaceholder: "Todos", kmPlaceholder: "Ej. 24.5",
+    communityLabel: "Comunidad autónoma", provincePlaceholder: "Ej. Madrid", roadPlaceholder: "Ej. A-6", municipalityPlaceholder: "Todos", kmPlaceholder: "Ej. 24.5",
     darkOn: "Activar modo oscuro", darkOff: "Activar modo claro", refresh: "Actualizar datos", operations: "Panel operativo",
     title: "Tráfico en tiempo real", intro: "Consulta incidencias activas y cámaras de la red estatal desde una única vista.",
     total: "Total", accidents: "Accidentes", roadworks: "Obras", stuck: "Averías", obstructions: "Obstrucciones", weather: "Meteorología",
@@ -86,7 +86,7 @@ const uiCopy = {
   },
   en: {
     brandSubtitle: "Road network status", connecting: "Connecting", online: "Online", offline: "Offline", notUpdated: "Not updated",
-    provincePlaceholder: "E.g. Madrid", roadPlaceholder: "E.g. A-6", municipalityPlaceholder: "All", kmPlaceholder: "E.g. 24.5",
+    communityLabel: "Autonomous community", provincePlaceholder: "E.g. Madrid", roadPlaceholder: "E.g. A-6", municipalityPlaceholder: "All", kmPlaceholder: "E.g. 24.5",
     darkOn: "Enable dark mode", darkOff: "Enable light mode", refresh: "Refresh data", operations: "Operations panel",
     title: "Real-time traffic", intro: "Check active incidents and traffic cameras across the state road network from one view.",
     total: "Total", accidents: "Accidents", roadworks: "Roadworks", stuck: "Breakdowns", obstructions: "Obstructions", weather: "Weather",
@@ -111,7 +111,7 @@ const uiCopy = {
 const elements = {};
 const ids = [
   "connectionStatus", "lastUpdate", "refreshButton", "filterForm", "clearFilters",
-  "matchModeFilter", "provinceFilter", "roadFilter", "municipalityFilter", "severityFilter", "cameraCoverageFilter", "kmFilter",
+  "matchModeFilter", "communityFilter", "provinceFilter", "roadFilter", "municipalityFilter", "severityFilter", "cameraCoverageFilter", "kmFilter",
   "cameraIncidentFilter", "limitFilter", "incidentFilters", "cameraFilters", "autoRefresh", "statTotal",
   "statAccidents", "statRoadworks", "statStuck", "statObstructions", "statWeather", "incidentTabCount",
   "cameraTabCount", "favoriteTabCount", "mapTabCount", "resultsTitle", "resultEyebrow", "resultCount", "loadingState",
@@ -181,6 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   document.querySelectorAll(".metric").forEach((metric) => metric.addEventListener("click", () => applyKindFilter(metric.dataset.kind || "")));
   document.querySelectorAll(".language-button").forEach((button) => button.addEventListener("click", () => applyLanguage(button.dataset.language || "es")));
+  elements.communityFilter.addEventListener("change", loadCurrentView);
   elements.filterForm.addEventListener("submit", (event) => { event.preventDefault(); loadCurrentView(); });
   elements.clearFilters.addEventListener("click", clearFilters);
   elements.refreshButton.addEventListener("click", loadCurrentView);
@@ -197,6 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("resize", () => { if (state.map) state.map.invalidateSize(); });
   if (window.lucide) window.lucide.createIcons();
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
+  loadCommunities();
   loadCurrentView();
   scheduleRefresh();
 });
@@ -256,6 +258,7 @@ function applyStaticLanguage() {
   document.querySelector(".filter-heading .eyebrow").textContent = uiText("query");
   document.getElementById("filterTitle").textContent = uiText("filters");
   updateFilterToggle();
+  setLabelText(elements.communityFilter, uiText("communityLabel"));
   setLabelText(elements.provinceFilter, uiText("province"));
   setLabelText(elements.matchModeFilter, uiText("searchMode"));
   setLabelText(elements.roadFilter, uiText("road"));
@@ -269,6 +272,7 @@ function applyStaticLanguage() {
   elements.roadFilter.placeholder = uiText("roadPlaceholder");
   elements.municipalityFilter.placeholder = uiText("municipalityPlaceholder");
   elements.kmFilter.placeholder = uiText("kmPlaceholder");
+  setSelectOptions(elements.communityFilter, [""], [uiText("all")]);
   setSelectOptions(elements.severityFilter, ["", "highest", "high", "medium", "low"], [uiText("all"), uiText("severityHighest"), uiText("severityHigh"), uiText("severityMedium"), uiText("severityLow")]);
   setSelectOptions(elements.cameraCoverageFilter, ["", "with", "without"], [uiText("all"), uiText("withCamera"), uiText("withoutCamera")]);
   setSelectOptions(elements.matchModeFilter, ["contains", "exact", "regex"], [uiText("searchContains"), uiText("searchExact"), uiText("searchRegex")]);
@@ -303,6 +307,20 @@ function setLabelText(control, label) {
 function setSubmitButtonText() {
   const button = elements.filterForm.querySelector(".primary-button");
   button.lastChild.textContent = ` ${uiText("applyFilters")}`;
+}
+
+async function loadCommunities() {
+  try {
+    const response = await fetch("/api/regions", { headers: { Accept: "application/json" } });
+    if (!response.ok) return;
+    const { regions } = await response.json();
+    const select = elements.communityFilter;
+    const current = select.value;
+    regions.forEach(({ name }) => select.add(new Option(name, name)));
+    select.value = current;
+  } catch {
+    // The filter simply stays on "All" if the list cannot be loaded.
+  }
 }
 
 function setSelectOptions(select, values, labels) {
@@ -708,6 +726,7 @@ function formatChartExtremes(extremes) {
 function buildParams() {
   const params = new URLSearchParams();
   addParam(params, "match_mode", elements.matchModeFilter.value === "contains" ? "" : elements.matchModeFilter.value);
+  addParam(params, "community", elements.communityFilter.value);
   addParam(params, "province", elements.provinceFilter.value);
   addParam(params, "road", elements.roadFilter.value.toUpperCase());
   if (state.view !== "cameras") {
@@ -944,17 +963,18 @@ function mapCameraScopes(incidents) {
   const road = elements.roadFilter.value.trim().toUpperCase();
   const municipality = elements.municipalityFilter.value.trim();
   const province = elements.provinceFilter.value.trim();
+  const community = elements.communityFilter.value;
   const incidentCoverage = elements.cameraCoverageFilter.value === "with";
   const matchMode = elements.matchModeFilter.value;
   if (incidentCoverage) {
     if (!incidents.length) return [];
-    if (road || province) return [{ road, province, incidentCoverage, matchMode }];
+    if (road || province || community) return [{ road, province, community, incidentCoverage, matchMode }];
     if (municipality) return mapMunicipalityCameraScopes(incidents).map((scope) => ({ ...scope, incidentCoverage, matchMode }));
     return [{ incidentCoverage, matchMode }];
   }
-  if (road) return [{ road, matchMode }];
+  if (road) return [{ road, community, matchMode }];
   if (municipality) return mapMunicipalityCameraScopes(incidents);
-  if (province) return [{ province, matchMode }];
+  if (province || community) return [{ province, community, matchMode }];
   return [{ matchMode }];
 }
 
@@ -972,6 +992,7 @@ function mapMunicipalityCameraScopes(incidents) {
 
 async function fetchMapCameraScope(scope) {
   const params = new URLSearchParams();
+  addParam(params, "community", scope.community);
   addParam(params, "province", scope.province);
   addParam(params, "road", scope.road);
   addParam(params, "match_mode", scope.matchMode === "contains" ? "" : scope.matchMode);
