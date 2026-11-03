@@ -105,6 +105,10 @@ Parámetro: `refresh` (booleano).
 }
 ```
 `by_weekday` siempre contiene los siete días (`monday`…`sunday`); aparece `unknown` solo si alguna incidencia no tiene fecha válida. El día se calcula a partir de `start_time` y, en su defecto, de `creation_time`. Las provincias no reconocidas se agrupan como `Unknown`.
+## `GET /api/regions`
+Lista las comunidades autónomas con sus provincias: `{"regions": [{"name": "Andalucía", "provinces": ["Almería", ...]}]}`. Se usa para rellenar el filtro de comunidad.
+
+Los endpoints `/api/incidents`, `/api/cameras` y `/ws/incidents` aceptan además `community` (nombre exacto de la comunidad, sin distinguir mayúsculas).
 ## `GET /api/cameras`
 Parámetros:
 - `province`, `road`: filtros de texto sujetos a `match_mode`.
@@ -157,7 +161,7 @@ Se sirve desde `src/dgt_monitor/web/static/` y consume estos endpoints desde el 
 - Pestañas: Incidencias, Cámaras, Favoritas (guardadas en `localStorage`), Gráficas y Mapa.
 - La pestaña **Gráficas** usa `/api/stats?level=province|region` y permite agrupar por provincia/comunidad, día de la semana o tipo, en barras, líneas o queso (los ocho mayores y «Otros»), con máximos y mínimos. Chart.js se sirve localmente (`static/chart.umd.min.js`).
 - Selector de idioma ES/EN, modo claro/oscuro y filtros con modo de búsqueda.
-- PWA: el service worker (caché `dgt-monitor-v58`) guarda el shell estático y nunca cachea `/api/`.
+- PWA: el service worker (caché `dgt-monitor-v59`) guarda el shell estático y nunca cachea `/api/`.
 ## Ejecución en desarrollo
 ```powershell
 .\.venv\Scripts\python.exe -m uvicorn dgt_monitor.web.app:app --reload

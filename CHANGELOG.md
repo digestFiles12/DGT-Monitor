@@ -1,3 +1,11 @@
+## 2026-11-03 - Filtro por comunidad autónoma
+
+### Añadido
+
+- Filtro «Comunidad autónoma» en el panel de filtros (incidencias, cámaras, favoritas y mapa). Parámetro `community` en `/api/incidents`, `/api/cameras` y `/ws/incidents`.
+- Endpoint `GET /api/regions` con las CCAA y sus provincias.
+- Recursos estáticos a la versión 59.
+
 ## 2026-11-03 - Selector de gráficas rediseñado
 
 ### Cambiado
