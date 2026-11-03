@@ -16,7 +16,7 @@ Represents a camera with an identifier, road, province, kilometer point, image U
 
 `IncidentStats` is an immutable value with six counters: total, accidents, roadworks, stuck vehicles, obstructions, and weather conditions.
 
-`IncidentFilters` carries province, municipality, road, severity, kind, camera coverage, and match mode. `CameraFilters` carries province, road, kilometer point, coordinates, result limit, distance thresholds, incident coverage, and match mode. Both are immutable dataclasses; the services apply their criteria.
+`IncidentFilters` carries province, municipality, road, severity, kind, camera coverage, and match mode; its final optional `community` field matches the incident community case-insensitively. `CameraFilters` carries province, road, kilometer point, coordinates, result limit, distance thresholds, incident coverage, and match mode; its final optional `community` field is derived from the camera province. Both are immutable dataclasses; the services apply their criteria.
 
 ## Dictionary conversion
 

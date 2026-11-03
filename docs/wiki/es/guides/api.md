@@ -17,6 +17,7 @@ Referencia de los endpoints expuestos por FastAPI. La aplicación se construye c
 | WS | `/ws/incidents` | Incidencias con refresco periódico. |
 | GET | `/api/stats` | Indicadores por provincia o comunidad. |
 | GET | `/api/stats/grouped` | Agrupación completa de incidencias. |
+| GET | `/api/regions` | Catálogo de comunidades autónomas y provincias. |
 | GET | `/api/cameras` | Cámaras filtradas. |
 | GET | `/api/activity/` | Registro de actividad paginado (requiere clave). |
 | GET | `/api/activity/csv` | Exportación CSV (requiere clave). |
@@ -29,7 +30,7 @@ Respuesta:
 ```
 ## `GET /api/incidents`
 Parámetros de consulta (todos opcionales):
-- `province`, `municipality`, `road`: filtros de texto, sujetos a `match_mode`.
+- `province`, `municipality`, `road`: filtros de texto, sujetos a `match_mode`; `community`: comunidad autónoma, comparada sin distinguir mayúsculas.
 - `severity`: igualdad sin distinguir mayúsculas (`highest`, `high`, `medium`, `low`).
 - `kind`: `accident`, `roadworks`, `stuck`, `obstruction` o `weather`.
 - `camera`: `with` (con cobertura de cámara) o `without`.
@@ -62,7 +63,7 @@ Forma de la respuesta:
 ## `WS /ws/incidents`
 Envía el primer mensaje al conectar y repite cada `interval` segundos.
 
-Parámetros de consulta: `province`, `municipality`, `road`, `severity`, `kind`, `camera`, `match_mode`, `lang` (igual que REST) e `interval` (segundos; por defecto 120, limitado al rango 5–300).
+Parámetros de consulta: `province`, `municipality`, `road`, `severity`, `kind`, `camera`, `community`, `match_mode`, `lang` (igual que REST) e `interval` (segundos; por defecto 120, limitado al rango 5–300).
 
 Cada mensaje es el payload de `/api/incidents` más `"transport": "websocket"` y `"refresh_interval_seconds": <interval>`. Ante un `DgtError` transitorio envía `{"error": "<mensaje>"}` y mantiene la conexión abierta.
 ## `GET /api/stats`
@@ -100,8 +101,8 @@ Parámetro: `refresh` (booleano).
   "by_weekday": {"monday": {"total": 5, "accidents": 0, "roadworks": 1, "breakdowns": 0, "obstructions": 0, "weather": 0}},
   "by_weekday_province": {"monday": {"Madrid": {"total": 2, "accidents": 0, "roadworks": 0, "breakdowns": 0, "obstructions": 0, "weather": 0}}},
   "by_weekday_region": {"monday": {"<comunidad>": {"total": 2, "accidents": 0, "roadworks": 0, "breakdowns": 0, "obstructions": 0, "weather": 0}}},
-  "by_province_type": {"<type>": {"Madrid": {"total": 1, "accidents": 0, "roadworks": 0, "breakdowns": 0, "obstructions": 0, "weather": 0}}},
-  "by_region_type": {"<type>": {"<region>": {"total": 1, "accidents": 0, "roadworks": 0, "breakdowns": 0, "obstructions": 0, "weather": 0}}}
+  "by_province_type": {"<tipo>": {"Madrid": {"total": 1, "accidents": 0, "roadworks": 0, "breakdowns": 0, "obstructions": 0, "weather": 0}}},
+  "by_region_type": {"<tipo>": {"<comunidad>": {"total": 1, "accidents": 0, "roadworks": 0, "breakdowns": 0, "obstructions": 0, "weather": 0}}}, "region_provinces": {"<comunidad>": ["<provincia>"]}
 }
 ```
 `by_weekday` siempre contiene los siete días (`monday`…`sunday`); aparece `unknown` solo si alguna incidencia no tiene fecha válida. El día se calcula a partir de `start_time` y, en su defecto, de `creation_time`. Las provincias no reconocidas se agrupan como `Unknown`.

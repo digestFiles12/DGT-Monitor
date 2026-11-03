@@ -22,6 +22,6 @@ Importa `asdict`, `dataclass` y `Any`; importa `CAMERA_MATCH_RANGE_KM` de [const
 ### `IncidentStats.to_dict(self) -> dict[str, int]`
 - Convierte los contadores de estadísticas a un diccionario.
 ### `IncidentFilters`
-- Filtros inmutables opcionales de provincia, municipio, carretera, gravedad, tipo y cámara; `match_mode` predeterminado es `contains`.
+- Filtros inmutables opcionales de provincia, municipio, carretera, gravedad, tipo y cámara; `match_mode` predeterminado es `contains` y el último campo opcional, `community`, filtra por comunidad sin distinguir mayúsculas.
 ### `CameraFilters`
-- Filtros inmutables de provincia, carretera, kilómetro y coordenadas, con límite predeterminado 12, rango kilométrico predeterminado compartido, distancia máxima opcional, indicador de cobertura de incidente y modo `contains`.
+- Filtros inmutables de provincia, carretera, kilómetro y coordenadas, con límite predeterminado 12, rango kilométrico predeterminado compartido, distancia máxima opcional e indicador de cobertura de incidente; `community` es el último campo opcional y filtra la comunidad derivada de la provincia de la cámara.

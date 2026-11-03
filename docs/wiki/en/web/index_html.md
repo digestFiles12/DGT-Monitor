@@ -8,8 +8,8 @@ Local `/static/styles.css?v=59`, `/static/app.js?v=59`, and `/manifest.webmanife
 ### Header and summary metrics
 - The header groups branding, connection (`connectionStatus`), update time (`lastUpdate`), language, theme (`themeButton`), and refresh (`refreshButton`). `data-kind` metrics and IDs `statTotal`, `statAccidents`, `statRoadworks`, `statStuck`, `statObstructions`, and `statWeather` display values and provide filters.
 ### Tabs and filters
-- `data-view` tabs open Incidents, Cameras, Favorites, Charts, or Map; `filterToggle` collapses filters. `filtersPanel` contains `filterForm` and fields `provinceFilter`, `roadFilter`, `municipalityFilter`, `severityFilter`, `cameraCoverageFilter`, `kmFilter`, `cameraIncidentFilter`, and `limitFilter`; `incidentFilters` and `cameraFilters` group view-specific controls.
+- `data-view` tabs open Incidents, Cameras, Favorites, Charts, or Map; `filterToggle` collapses filters. `filtersPanel` contains `filterForm` and fields `matchModeFilter`, `communityFilter`, `provinceFilter`, `roadFilter`, `municipalityFilter`, `severityFilter`, `cameraCoverageFilter`, `kmFilter`, `cameraIncidentFilter`, and `limitFilter`; `communityFilter` is populated from `/api/regions`, and `incidentFilters`/`cameraFilters` group view-specific controls.
 ### Results, map, and charts
-- `.results` contains loading/error/empty states, the `incidentResults` table with `incidentRows`, `loadMoreButton`, `cameraResults` cards, and `mapResults` (`trafficMap`, `mapDetail`). `chartsView` includes `chartLevel`, `chartGrouping`, indicator/mode menus, states, `chartCanvas`, and `chartExtremes`.
+- `.results` contains loading/error/empty states, the `incidentResults` table with `incidentRows`, `loadMoreButton`, `cameraResults` cards, and `mapResults` (`trafficMap`, `mapDetail`). `chartsView` includes `chartLevel`, `chartGrouping`, indicator/mode menus, the multi-select `chartSelector` (`chartSelectorSearch`, `chartSelectorAll`, `chartSelectorClear`, `chartSelectorChips`, and `chartSelectorList`), states, `chartCanvas`, and `chartExtremes`.
 ### Footer
 - Links to API documentation (`/docs`) and service health (`/api/health`).

@@ -16,4 +16,4 @@ Usa modelos y puertos de `core`, las reglas compartidas de [core.indicators](../
 ### `IncidentService.stats(incidents)`
 - Calcula total, accidentes, obras/mantenimiento, vehículos averiados o atascados, obstrucciones y eventos meteorológicos con los predicados compartidos de `core.indicators`; los recuentos se exponen como `total`, `accidents`, `roadworks`, `stuck`, `obstructions` y `weather`.
 ### `IncidentService._matches(item, filters)`
-- Aplica coincidencias de texto a provincia, municipio y carretera; compara severidad sin distinguir mayúsculas y filtra causa (`kind`) mediante los mismos predicados de `core.indicators` y cobertura (`camera`). Un valor `kind` o `camera` desconocido no excluye el incidente.
+- Aplica coincidencias de texto a provincia, municipio y carretera; compara comunidad (`community`) y severidad sin distinguir mayúsculas y filtra causa (`kind`) mediante los mismos predicados de `core.indicators` y cobertura (`camera`). Un valor `kind` o `camera` desconocido no excluye el incidente.

@@ -10,7 +10,7 @@ Imports core models and ports, normalization and text-matching functions, distan
 ### `CameraService.get_all(refresh=False)`
 - Returns cached cameras, loading them from the repository when needed; `refresh=True` first invalidates the `cameras` cache key.
 ### `CameraService.filter(cameras, filters)`
-- Filters by province/road and kilometer and/or coordinate distance, adds `km_delta` and `distance_km`, sorts by distance (uncomputed values last), and applies `limit`. An unparseable kilometer point cannot satisfy an active kilometer filter.
+- Filters by province, community (derived from `camera.province` with `region_for_province`, case-insensitively), road, and kilometer and/or coordinate distance; adds `km_delta` and `distance_km`, sorts by distance (uncomputed values last), and applies `limit`. An unparseable kilometer point cannot satisfy an active kilometer filter.
 ### `CameraService.with_incident_coverage(cameras, incidents, range_km=CAMERA_MATCH_RANGE_KM)`
 - Returns cameras with at least one incident on the same normalized road and within range; when both provinces exist, they must also match. Incidents or cameras without a parseable kilometer are ignored.
 ### `CameraService.annotate_coverage(incidents, cameras, range_km=CAMERA_MATCH_RANGE_KM)`

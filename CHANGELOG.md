@@ -1,3 +1,7 @@
+## [20261103.02] - 2026-11-03
+
+Resumen: seis indicadores en estadísticas, selector de provincias y CCAA en gráficas, filtro por comunidad autónoma y documentación actualizada.
+
 ## 2026-11-03 - Filtro por comunidad autónoma
 
 ### Añadido
