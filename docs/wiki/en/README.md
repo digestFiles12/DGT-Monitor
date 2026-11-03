@@ -5,6 +5,7 @@ Per-file and per-function documentation. Standalone English version; the Spanish
 | Area | Index | Contents |
 |---|---|---|
 | Diagrams | [diagrams](diagrams.md) | architecture, data flow, sequences, deployment |
+| Guides | [guide index](guides/README.md) | architecture, models, services, DATEX II, API, GUI, testing, development, deployment, GitFlow and decisions |
 | Core | [core](core/README.md) | models, regions, text, ports |
 | Infrastructure | [infrastructure](infrastructure/README.md) | HTTP, parsers, cache, SQLite stores |
 | Application | [application](application/README.md) | facade, incidents, cameras, statistics |

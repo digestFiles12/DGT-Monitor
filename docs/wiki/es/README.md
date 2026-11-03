@@ -5,6 +5,7 @@ Documentación por fichero y función. Versión independiente en español; la ve
 | Área | Índice | Contenido |
 |---|---|---|
 | Diagramas | [diagrams](diagrams.md) | arquitectura, flujo de datos, secuencias, despliegue |
+| Guías | [índice de guías](guides/README.md) | arquitectura, modelos, servicios, DATEX II, API, GUI, pruebas, desarrollo, despliegue, GitFlow y decisiones |
 | Core | [core](core/README.md) | modelos, regiones, texto, puertos |
 | Infraestructura | [infrastructure](infrastructure/README.md) | HTTP, parsers, caché, almacenes SQLite |
 | Aplicación | [application](application/README.md) | fachada, incidencias, cámaras, estadísticas |

@@ -88,6 +88,6 @@ Menú de referencia:
 - Cambios simples, legibles y fáciles de explicar por el alumno; evitar sobreingeniería.
 - No depender de la red real de la DGT en tests ni CI.
 - Mantener la arquitectura por capas existente (`core`, `infrastructure`, `application`, `api`, `dashboard`).
-- Actualizar la documentación afectada (wiki, memoria, `docs/INDEX.md`) con cada cambio.
+- Actualizar la documentación afectada (wiki, memoria, `docs/wiki/README.md`) con cada cambio.
 - Ejecutar los tests antes de dar una tarea por terminada:
   `$env:QT_QPA_PLATFORM='offscreen'; .\.venv\Scripts\python.exe -m pytest tests -q`
