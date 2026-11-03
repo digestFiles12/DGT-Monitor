@@ -32,6 +32,11 @@ py -3.12 -m venv .venv
 # Dashboard web
 .\.venv\Scripts\python.exe -m uvicorn dgt_monitor.web.app:app --reload
 
+# Menu de consola (proyecto final): descarga el XML, genera grouped_incidents.json y muestra el menu
+.\.venv\Scripts\python.exe -m dgt_monitor.menu
+# Sin conexion, con un XML local
+.\.venv\Scripts\python.exe -m dgt_monitor.menu --xml tests\fixtures\incidents_sample.xml
+
 # Aplicación de escritorio
 .\.venv\Scripts\python.exe -m dgt_monitor.gui
 ```

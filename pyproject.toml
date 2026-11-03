@@ -20,8 +20,11 @@ web = [
 gui = [
   "PyQt6>=6.7.0",
 ]
+console = [
+  "matplotlib>=3.9.0",
+]
 dev = [
-  "dgt-monitor[web,gui]",
+  "dgt-monitor[web,gui,console]",
   "pytest>=8.0.0",
   "httpx2>=0.28.0",
 ]

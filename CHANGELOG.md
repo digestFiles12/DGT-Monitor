@@ -2,6 +2,17 @@
 
 Todos los cambios relevantes del proyecto se documentan aqui. El repositorio sigue GitFlow: las features entran en `develop`, se estabilizan en `release` y se publican desde `main`.
 
+## 2026-11-03 - Final project (Project 3)
+
+### Aniadido
+
+- `core/regions.py`: mapa provincia a comunidad autonoma (CCAA) para las 52 provincias.
+- `infrastructure/incident_store.py`: persistencia SQLite de incidencias sin duplicados (clave: id de la DGT).
+- `application/statistics.py`: 4 indicadores agrupados por provincia, CCAA, tipo y dia de la semana, con maximo y minimo.
+- `GET /api/stats` y `GET /api/stats/grouped`.
+- `python -m dgt_monitor.menu`: menu de consola con graficas de barras y de queso (ejercicios 1, 2 y 3).
+- Estructura `src/` y `tests/`, con fixture XML real en `tests/fixtures`.
+
 ## 2026-07-19 - Release 20260719.06 y GUI actualizada
 
 ### Aniadido
