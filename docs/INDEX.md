@@ -12,7 +12,7 @@ Estado actual: API FastAPI, dashboard web/PWA, GUI PyQt6 local, Activity API, Re
 ## Guia por tema
 
 - [Memoria del proyecto](MEMORIA.md): informe final (ES/EN).
-- [Wiki por fichero](wiki/README.md): documentación bilingüe de cada módulo y función.
+- Wiki por fichero y función, independiente por idioma: [Español](wiki/es/README.md) · [English](wiki/en/README.md). Incluye [diagramas de arquitectura y flujo](wiki/es/diagrams.md).
 - [Arquitectura](ARCHITECTURE.md): capas, dependencias y fronteras de responsabilidad.
 - [Modelos](MODELS.md): `Incident`, `Camera`, filtros, estadisticas y serializacion.
 - [Servicios](SERVICES.md): reglas de filtrado, cobertura, cache y fachada de aplicacion.

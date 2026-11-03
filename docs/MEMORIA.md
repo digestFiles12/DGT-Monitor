@@ -52,10 +52,10 @@ src/dgt_monitor/
   gui/             interfaz PyQt6 (opcional, solo local)
   menu.py          menú de consola
 tests/             pruebas (unit, integration, api, gui) y fixtures
-docs/              documentación, requisitos y wiki bilingüe
+docs/              documentación, requisitos y wiki (es/ y en/ independientes)
 ```
 
-Cada capa solo depende de las inferiores (`core` no depende de nada). Esto permite probar la lógica sin red ni servidor. La wiki detallada, con una página por fichero y cada función explicada en español e inglés, está en [docs/wiki/](wiki/README.md).
+Cada capa solo depende de las inferiores (`core` no depende de nada). Esto permite probar la lógica sin red ni servidor. La wiki detallada, con una página por fichero y cada función explicada, está en [docs/wiki/es/](wiki/es/README.md) (español) y [docs/wiki/en/](wiki/en/README.md) (inglés), dos árboles independientes, con [diagramas de arquitectura y flujo](wiki/es/diagrams.md).
 
 ## 4. Decisiones técnicas
 

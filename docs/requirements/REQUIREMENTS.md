@@ -65,7 +65,7 @@ Menú de referencia:
 
 ## 6. Documentación
 
-- **Wiki bilingüe (ES/EN)** en `docs/wiki/`: una página por fichero del código; para cada función, una explicación breve en español y en inglés.
+- **Wiki en dos árboles independientes** `docs/wiki/es/` y `docs/wiki/en/` (misma estructura, sin mezclar idiomas ni etiquetas ES/EN): una página por fichero; cada función explicada; más `diagrams.md` con diagramas Mermaid de arquitectura y flujo.
 - **Memoria** en `docs/MEMORIA.md`, que debe incluir:
   - Para qué se han usado herramientas de IA (breve).
   - Limitación de Render gratuito: el disco no es persistente, la base SQLite se pierde en cada reinicio/despliegue; la app recarga datos al arrancar. Explicarlo.
@@ -79,7 +79,7 @@ Menú de referencia:
 3. Pestaña de gráficas en el dashboard con menú.
 4. Script de consola opcional con menú `input()`.
 5. Tests con el XML de ejemplo.
-6. Wiki bilingüe y memoria.
+6. Wiki (es/en independientes), diagramas y memoria.
 7. Fase 2 (extras).
 
 ## 8. Reglas para agentes
