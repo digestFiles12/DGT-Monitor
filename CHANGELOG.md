@@ -1,3 +1,11 @@
+## 2026-11-03 - Gráficas traducidas
+
+### Corregido
+
+- La leyenda del gráfico por tipo mostraba códigos DATEX II sin traducir; ahora usa `labels.by_type` (es/en) de `/api/stats/grouped`.
+- El grupo `Unknown` se muestra como `Sin datos` / `Unknown` según el idioma.
+- Service worker y recursos estáticos a la versión 55 para invalidar la caché.
+
 ## 2026-11-03 - Wiki independiente por idioma
 
 ### Añadido

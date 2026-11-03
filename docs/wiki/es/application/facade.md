@@ -16,6 +16,6 @@ Compone `IncidentService` y `CameraService`, usa modelos de filtros y utilidades
 ### `DgtApplicationService.get_statistics(level="province", refresh=False)`
 - Devuelve los cuatro indicadores agrupados por provincia o región, incluidos máximos y mínimos; rechaza niveles distintos mediante la función delegada.
 ### `DgtApplicationService.get_grouped_incidents(refresh=False)`
-- Devuelve la estructura completa de agrupación de incidentes por geografía, tipo y día de semana.
+- Devuelve la estructura completa de agrupación de incidentes por geografía, tipo y día de semana, más `labels.by_type` con la etiqueta de cada tipo en español e inglés (las claves del JSON siguen siendo los códigos DATEX II).
 ### `DgtApplicationService.get_cameras(filters=None, refresh=False)`
 - Filtra cámaras y devuelve hora UTC, cantidad y elementos. Si se pide cobertura de incidentes, difiere el límite hasta después de esa selección y luego lo aplica.

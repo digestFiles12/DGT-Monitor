@@ -122,8 +122,8 @@ def test_dashboard_and_pwa_assets_are_served():
     assert client.get("/manifest.webmanifest").headers["content-type"].startswith("application/manifest+json")
     service_worker = client.get("/sw.js")
     assert service_worker.status_code == 200
-    assert "dgt-monitor-v54" in service_worker.text
-    assert "/static/app.js?v=54" in service_worker.text
+    assert "dgt-monitor-v55" in service_worker.text
+    assert "/static/app.js?v=55" in service_worker.text
     assert "/static/chart.umd.min.js?v=1" in service_worker.text
 
 
