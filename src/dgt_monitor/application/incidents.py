@@ -1,22 +1,41 @@
 """Incident use cases."""
 
 from collections.abc import Sequence
+import logging
 
 from dgt_monitor.core.models import Incident, IncidentFilters, IncidentStats
-from dgt_monitor.core.ports import IncidentRepository
+from dgt_monitor.core.ports import IncidentRepository, IncidentStore
 from dgt_monitor.core.text import matches_text
 from dgt_monitor.infrastructure.cache import TtlCache
 
+logger = logging.getLogger(__name__)
+
 
 class IncidentService:
-    def __init__(self, repository: IncidentRepository, cache: TtlCache[list[Incident]]) -> None:
+    def __init__(
+        self,
+        repository: IncidentRepository,
+        cache: TtlCache[list[Incident]],
+        store: IncidentStore | None = None,
+    ) -> None:
         self._repository = repository
         self._cache = cache
+        self._store = store
 
     def get_all(self, refresh: bool = False) -> list[Incident]:
         if refresh:
             self._cache.invalidate("incidents")
-        return self._cache.get_or_load("incidents", lambda: list(self._repository.fetch()))
+
+        def load_incidents() -> list[Incident]:
+            incidents = list(self._repository.fetch())
+            if self._store is not None:
+                try:
+                    self._store.save(incidents)
+                except Exception:
+                    logger.exception("Could not persist incidents")
+            return incidents
+
+        return self._cache.get_or_load("incidents", load_incidents)
 
     def filter(self, incidents: Sequence[Incident], filters: IncidentFilters) -> list[Incident]:
         return [item for item in incidents if self._matches(item, filters)]

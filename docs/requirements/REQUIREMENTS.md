@@ -34,7 +34,7 @@ Menú de referencia:
 |---|---|
 | CSV | XML DATEX II de la DGT (descargado con `requests`) |
 | Fichero JSON agrupado | `incidencias_agrupadas.json` (también se puede guardar como `.txt`) |
-| Agrupar por día de la semana y provincia | Agrupar por **provincia**, **tipo** y **día de la semana** |
+| Agrupar por día de la semana y provincia | Agrupar por **comunidad autónoma (CCAA)**, **provincia**, **tipo** y **día de la semana** |
 | 4 indicadores (def., casos, hosp., UCI) | 4 indicadores: **total de incidencias**, **graves**, **obras**, **cortes de carretera** (pendiente de confirmar con el alumno; si cambian, actualizar este documento) |
 | 4 gráficas + menú | ≥ 4 gráficas (barras/líneas) con menú de pestañas en el dashboard |
 | 4 gráficas de queso + máx/mín | 4 gráficas circulares, una por indicador, indicando provincia máxima y mínima |
@@ -47,9 +47,14 @@ Menú de referencia:
 3. Generar el **JSON agrupado** (provincia, tipo, día de la semana) con los acumulados de cada indicador.
 4. Exponer los datos y las estadísticas con **FastAPI** (endpoint de estadísticas, p. ej. `/api/stats`, con máximo y mínimo por indicador).
 5. Dashboard web con **al menos 4 gráficas**, incluyendo **gráficas de queso (circulares)**, y un **menú de navegación** entre ellas.
-6. Cada indicador muestra la **provincia con el máximo y la del mínimo**.
-7. Librería de gráficas: **Chart.js descargado en `dashboard/static`** (sin CDN, funciona sin internet).
-8. Tests con un **XML real de ejemplo** guardado en `test/fixtures`. Los tests y GitHub Actions **no dependen** de que responda el servidor de la DGT.
+6. Cada indicador muestra la **provincia con el máximo y la del mínimo**, y lo mismo por **CCAA**.
+7. **Reconocimiento de CCAA**: un mapa estático provincia → CCAA (las 17 comunidades más Ceuta y Melilla) en `src/dgt_monitor/core/regions.py`.
+   - Normalizar los nombres de provincia antes de buscarlos (tildes, mayúsculas, variantes bilingües como «Alava/Araba», «Valencia/València», «Alicante/Alacant», «Castellón/Castelló»; arreglar problemas de codificación).
+   - Una provincia desconocida se agrupa como `Unknown` (no debe romper el proceso) y se registra un aviso.
+   - Las estadísticas, el JSON agrupado y las gráficas permiten elegir el nivel: provincia o CCAA (parámetro `level=province|region` en la API).
+   - Test que comprueba que las 52 provincias (50 más Ceuta y Melilla) tienen CCAA.
+8. Librería de gráficas: **Chart.js descargado en `dashboard/static`** (sin CDN, funciona sin internet).
+9. Tests con un **XML real de ejemplo** guardado en `test/fixtures`. Los tests y GitHub Actions **no dependen** de que responda el servidor de la DGT.
 
 ## 5. Requisitos extra (Fase 2, después de la Fase 1)
 
@@ -69,7 +74,7 @@ Menú de referencia:
 
 ## 7. Orden de trabajo
 
-1. Persistencia SQLite sin duplicados + JSON agrupado.
+1. Mapa provincia → CCAA (`core/regions.py`) + persistencia SQLite sin duplicados + JSON agrupado.
 2. Endpoint `/api/stats` con máximos y mínimos.
 3. Pestaña de gráficas en el dashboard con menú.
 4. Script de consola opcional con menú `input()`.
