@@ -6,6 +6,7 @@ from typing import Any
 
 from dgt_monitor.application.cameras import CameraService
 from dgt_monitor.application.incidents import IncidentService
+from dgt_monitor.application.statistics import build_statistics, group_incidents
 from dgt_monitor.core.localization import Translator, normalize_locale
 from dgt_monitor.core.models import CameraFilters, IncidentFilters
 
@@ -65,6 +66,14 @@ class DgtApplicationService:
             camera=filters.camera,
             match_mode=filters.match_mode,
         )
+
+    def get_statistics(self, level: str = "province", refresh: bool = False) -> dict[str, Any]:
+        """Return the 4 indicators grouped by province or region, with max/min per indicator."""
+        return build_statistics(self._incidents.get_all(refresh=refresh), level=level)
+
+    def get_grouped_incidents(self, refresh: bool = False) -> dict[str, Any]:
+        """Return incidents grouped by province, region, type and weekday."""
+        return group_incidents(self._incidents.get_all(refresh=refresh))
 
     def get_cameras(self, filters: CameraFilters | None = None, refresh: bool = False) -> dict[str, Any]:
         filters = filters or CameraFilters()

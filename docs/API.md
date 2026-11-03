@@ -10,6 +10,8 @@ La aplicación se construye con `dgt_monitor.api.factory.create_app()`. En produ
 - `GET /static/*`: assets web versionados por el service worker.
 - `GET /api/health`: estado y hora UTC.
 - `GET /api/incidents`: filtros `province`, `municipality`, `road`, `severity`, `kind`, `camera` (`with`/`without`), `match_mode` (`contains`/`exact`/`regex`) y `lang` (`es`/`en`).
+- `GET /api/stats`: los 4 indicadores (`total`, `severe`, `roadworks`, `road_closures`) agrupados según `level` (`province` por defecto, o `region` para comunidades autónomas), con la provincia/CCAA máxima y mínima de cada indicador (`extremes`). El mínimo ignora grupos con 0 incidencias. `refresh=true` fuerza una nueva consulta a la DGT.
+- `GET /api/stats/grouped`: JSON agrupado completo por provincia, CCAA, tipo y día de la semana (`by_province`, `by_region`, `by_type`, `by_weekday`, `by_weekday_province`, `by_weekday_region`).
 - `GET /api/cameras`: filtros `province`, `road`, `km`, `lat`, `lon`, `limit`, `all`, `max_km_delta`, `max_distance_km`, `incident_coverage` y `match_mode`.
 - `GET /api/activity/`: log de actividad paginado; requiere `X-API-Key`.
 - `GET /api/activity/stream`: stream SSE de actividad; soporta `replay` y `once=true`.

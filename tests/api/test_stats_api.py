@@ -1,0 +1,57 @@
+from pathlib import Path
+
+from fastapi.testclient import TestClient
+
+from dgt_monitor.api.factory import create_app
+from dgt_monitor.application.cameras import CameraService
+from dgt_monitor.application.facade import DgtApplicationService
+from dgt_monitor.application.incidents import IncidentService
+from dgt_monitor.core.regions import UNKNOWN_REGION
+from dgt_monitor.infrastructure.cache import TtlCache
+from dgt_monitor.infrastructure.parsers import IncidentParser
+
+SAMPLE_XML = Path(__file__).resolve().parents[1] / "fixtures" / "incidents_sample.xml"
+
+
+class StaticRepository:
+    def __init__(self, items):
+        self._items = items
+
+    def fetch(self):
+        return self._items
+
+
+def build_client() -> TestClient:
+    incidents = IncidentParser().parse(SAMPLE_XML.read_text(encoding="utf-8"))
+    incident_service = IncidentService(StaticRepository(incidents), TtlCache(60))
+    camera_service = CameraService(StaticRepository([]), TtlCache(60))
+    return TestClient(create_app(DgtApplicationService(incident_service, camera_service)))
+
+
+def test_stats_by_province_has_indicators_and_extremes():
+    body = build_client().get("/api/stats").json()
+    assert body["level"] == "province"
+    assert body["total"] == 90
+    assert sum(group["total"] for group in body["groups"].values()) == 90
+    for indicator in ("total", "severe", "roadworks", "road_closures"):
+        extreme = body["extremes"][indicator]
+        assert extreme["max"]["value"] >= extreme["min"]["value"] >= 1
+
+
+def test_stats_by_region_groups_provinces_into_communities():
+    body = build_client().get("/api/stats", params={"level": "region"}).json()
+    assert body["level"] == "region"
+    assert UNKNOWN_REGION not in body["groups"]
+    assert "Andalucía" in body["groups"]
+    assert len(body["groups"]) < 20
+
+
+def test_stats_rejects_invalid_level():
+    assert build_client().get("/api/stats", params={"level": "city"}).status_code == 422
+
+
+def test_grouped_json_has_all_groupings():
+    body = build_client().get("/api/stats/grouped").json()
+    for key in ("by_province", "by_region", "by_type", "by_weekday", "by_weekday_province", "by_weekday_region"):
+        assert key in body
+    assert sum(day["total"] for day in body["by_weekday"].values()) == body["total"]
