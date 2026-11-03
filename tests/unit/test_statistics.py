@@ -11,12 +11,10 @@ from dgt_monitor.application.statistics import (
     count_indicators,
     find_extremes,
     group_incidents,
-    is_road_closure,
-    is_roadworks,
-    is_severe,
     weekday_of,
     write_grouped_json,
 )
+from dgt_monitor.core.indicators import is_accident, is_breakdown, is_obstruction, is_roadworks, is_weather
 from dgt_monitor.core.models import Incident
 from dgt_monitor.infrastructure.parsers.incident import IncidentParser
 
@@ -25,20 +23,31 @@ def make_incident(**values):
     return Incident(**values)
 
 
+def zeros(**values):
+    return {"total": 0, "accidents": 0, "roadworks": 0, "breakdowns": 0, "obstructions": 0, "weather": 0, **values}
+
+
 def test_indicator_counts_and_classifiers():
     incidents = [
-        make_incident(severity="Highest", cause="roadMaintenance - roadworks", management_type="roadClosed"),
-        make_incident(severity="high", cause="Routine maintenance", management_type="carriagewayClosures"),
-        make_incident(severity="highest", cause="accident", management_type="laneRestrictions"),
+        make_incident(cause="roadMaintenance - roadworks"),
+        make_incident(cause="Routine maintenance"),
+        make_incident(cause="accident"),
+        make_incident(cause="vehicleStuck"),
+        make_incident(cause="Breakdown"),
+        make_incident(cause="obstruction"),
+        make_incident(cause="fog"),
+        make_incident(cause="other"),
     ]
 
-    assert [is_severe(item) for item in incidents] == [True, False, True]
-    assert [is_roadworks(item) for item in incidents] == [True, True, False]
-    assert [is_road_closure(item) for item in incidents] == [True, True, False]
-    assert count_indicators(incidents) == {
-        "total": 3, "severe": 2, "roadworks": 2, "road_closures": 2,
-    }
-
+    assert [is_roadworks(item) for item in incidents] == [True, True, False, False, False, False, False, False]
+    assert [is_accident(item) for item in incidents] == [False, False, True, False, False, False, False, False]
+    assert [is_breakdown(item) for item in incidents] == [False, False, False, True, True, False, False, False]
+    assert [is_obstruction(item) for item in incidents] == [False] * 5 + [True, False, False]
+    assert [is_weather(item) for item in incidents] == [False] * 6 + [True, False]
+    assert INDICATORS == ("total", "accidents", "roadworks", "breakdowns", "obstructions", "weather")
+    assert count_indicators(incidents) == zeros(
+        total=8, accidents=1, roadworks=2, breakdowns=2, obstructions=1, weather=1,
+    )
 
 def test_weekday_uses_start_time_then_creation_time():
     assert weekday_of(make_incident(start_time="2025-12-12T08:05:19.000+01:00")) == "friday"
@@ -48,8 +57,8 @@ def test_weekday_uses_start_time_then_creation_time():
 
 def test_grouping_has_expected_shape_and_region_counts():
     incidents = [
-        make_incident(province="Madrid", type="Accident", severity="highest", cause="roadworks", start_time="2025-12-12T08:00:00+01:00"),
-        make_incident(province="Barcelona", type="Roadworks", management_type="roadClosed", start_time="2025-12-13T08:00:00+01:00"),
+        make_incident(province="Madrid", type="Accident", cause="roadworks", start_time="2025-12-12T08:00:00+01:00"),
+        make_incident(province="Barcelona", type="Roadworks", cause="accident", start_time="2025-12-13T08:00:00+01:00"),
         make_incident(province="", type="Roadworks", cause="maintenance", creation_time="invalid"),
     ]
 
@@ -57,15 +66,15 @@ def test_grouping_has_expected_shape_and_region_counts():
 
     assert set(data) == {
         "generated_at", "total", "indicators", "by_province", "by_region", "by_type",
-        "by_weekday", "by_weekday_province", "by_weekday_region",
+        "by_weekday", "by_weekday_province", "by_weekday_region", "by_province_type", "by_region_type",
     }
     assert data["generated_at"] == "2025-12-15T10:00:00+01:00"
     assert data["indicators"] == list(INDICATORS)
     assert data["total"] == 3
     assert data["by_province"] == {
-        "Barcelona": {"total": 1, "severe": 0, "roadworks": 0, "road_closures": 1},
-        "Madrid": {"total": 1, "severe": 1, "roadworks": 1, "road_closures": 0},
-        "Unknown": {"total": 1, "severe": 0, "roadworks": 1, "road_closures": 0},
+        "Barcelona": zeros(total=1, accidents=1),
+        "Madrid": zeros(total=1, roadworks=1),
+        "Unknown": zeros(total=1, roadworks=1),
     }
     assert data["by_region"]["Cataluña"]["total"] == 1
     assert data["by_region"]["Comunidad de Madrid"]["total"] == 1
@@ -79,16 +88,16 @@ def test_grouping_has_expected_shape_and_region_counts():
 
 def test_extremes_handle_max_min_ties_zero_and_empty_groups():
     groups = {
-        "Zulu": {"total": 2, "severe": 1, "roadworks": 0, "road_closures": 0},
-        "Alpha": {"total": 2, "severe": 0, "roadworks": 3, "road_closures": 0},
-        "Beta": {"total": 0, "severe": 0, "roadworks": 0, "road_closures": 0},
+        "Zulu": zeros(total=2, accidents=1),
+        "Alpha": zeros(total=2, roadworks=3),
+        "Beta": zeros(),
     }
     extremes = find_extremes(groups)
 
     assert extremes["total"] == {"max": {"name": "Alpha", "value": 2}, "min": {"name": "Alpha", "value": 2}}
-    assert extremes["severe"] == {"max": {"name": "Zulu", "value": 1}, "min": {"name": "Zulu", "value": 1}}
+    assert extremes["accidents"] == {"max": {"name": "Zulu", "value": 1}, "min": {"name": "Zulu", "value": 1}}
     assert extremes["roadworks"] == {"max": {"name": "Alpha", "value": 3}, "min": {"name": "Alpha", "value": 3}}
-    assert extremes["road_closures"] == {"max": {"name": "Alpha", "value": 0}, "min": None}
+    assert extremes["weather"] == {"max": {"name": "Alpha", "value": 0}, "min": None}
     assert find_extremes({}) == {indicator: {"max": None, "min": None} for indicator in INDICATORS}
 
 

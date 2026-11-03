@@ -22,6 +22,6 @@ Imports `asdict`, `dataclass`, and `Any`; imports `CAMERA_MATCH_RANGE_KM` from [
 ### `IncidentStats.to_dict(self) -> dict[str, int]`
 - Converts the statistics counters to a dictionary.
 ### `IncidentFilters`
-- Immutable optional filters for province, municipality, road, severity, kind, and camera; `match_mode` defaults to `contains`.
+- Immutable optional filters for province, municipality, road, severity, kind, and camera; `match_mode` defaults to `contains`, and the final optional `community` field matches community names case-insensitively.
 ### `CameraFilters`
-- Immutable filters for province, road, kilometer, and coordinates, with a default limit of 12, shared default kilometer range, optional maximum distance, incident-coverage flag, and `contains` matching mode.
+- Immutable filters for province, road, kilometer, and coordinates, with a default limit of 12, shared default kilometer range, optional maximum distance, and incident-coverage flag; the final optional `community` field filters by the community derived from the camera province.

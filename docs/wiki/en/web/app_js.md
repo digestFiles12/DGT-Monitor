@@ -4,7 +4,7 @@ Controls the web interface: state, language and theme, views, data loading, inci
 Browser JavaScript (DOM, `fetch`, `URLSearchParams`, `localStorage`, timers, and canvas); JSON endpoints `/api/incidents`, `/api/cameras`, `/api/stats`, and `/api/stats/grouped`; `Chart`, `L` (Leaflet), and `lucide` globals when available.
 ## Contents
 ### State, startup, language, and theme
-The `DOMContentLoaded` listener resolves elements by ID, loads favorites, applies language and theme, wires controls, registers `/sw.js`, performs the initial load, and schedules refreshes. `state` stores view/options, data, map, theme, filters, and request counter; `uiCopy` and `detailLabels` hold translations.
+The `DOMContentLoaded` listener resolves elements by ID, loads favorites, applies language and theme, wires controls, registers `/sw.js`, performs the initial load, and schedules refreshes. `state` stores view/options, data, map, theme, filters, request counter, and `chartSelection` (a `Set` of selected geographies); `uiCopy`/`detailLabels` hold translations, including `communityLabel` and the `selector*` strings.
 #### `resolveInitialTheme()`
 - Returns the saved (`dark`/`light`) theme or the system preference.
 #### `toggleTheme()`
@@ -24,7 +24,7 @@ The `DOMContentLoaded` listener resolves elements by ID, loads favorites, applie
 #### `setSubmitButtonText()`
 - Updates the filter form's primary button text.
 #### `setSelectOptions(select, values, labels)`
-- Assigns labels to existing `<select>` options by their values.
+- Assigns labels to existing `<select>` options by their values; `loadCommunities()` fetches `/api/regions` to populate the community selector and leaves “All” selected if it fails.
 #### `setTableHeaders()`
 - Translates the six incident-table headings.
 #### `switchViewLabelOnly()`
@@ -42,7 +42,7 @@ The `DOMContentLoaded` listener resolves elements by ID, loads favorites, applie
 #### `loadCurrentView()`
 - Loads incidents or cameras for the current view, handles responses/errors, and ignores stale requests.
 #### `buildParams()`
-- Builds query parameters from the filters, including those specific to each view.
+- Builds query parameters from the filters, sends the selected `community`, and adds view-specific parameters; the community filter also scopes cameras used by the map.
 #### `addParam(params, key, value)`
 - Trims `value` and adds it to `URLSearchParams` when non-empty.
 
@@ -52,7 +52,7 @@ The `DOMContentLoaded` listener resolves elements by ID, loads favorites, applie
 #### `applyChartsLanguage()`
 - Translates Charts controls and states, and redraws when data is loaded.
 #### `renderChart()`
-- Selects group and indicator, sorts and limits rows, and draws a bar, line, or pie chart with Chart.js.
+- `chartSource()` selects level, weekday, or type data; `selectedExtremes()` recomputes the selection maximum/minimum; `renderChartSelector()`/`selectorToggle()` implement search, multi-select, select-all/clear, removable chips, and regions with indeterminate state. `renderChart()` restricts level/weekday/type charts and extremes to the selection, then draws with Chart.js.
 #### `formatChartExtremes(extremes)`
 - Formats statistics' maximum and minimum as localized text or indicates missing values.
 

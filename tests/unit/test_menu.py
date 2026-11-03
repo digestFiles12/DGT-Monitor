@@ -53,7 +53,7 @@ def test_pie_menu_loops_until_exit(data):
     shown, lines = [], []
     menu.run_chart_menu(
         data["by_province"], "pie",
-        ask=scripted(["1", "x", "4", "5"]), say=lines.append, show=lambda figure: shown.append(figure),
+        ask=scripted(["1", "x", "4", "7"]), say=lines.append, show=lambda figure: shown.append(figure),
     )
     assert len(shown) == 2
     assert any("no válida" in line for line in lines)
@@ -64,7 +64,7 @@ def test_pie_menu_loops_until_exit(data):
 def test_main_menu_bar_charts_by_region(data):
     shown, lines = [], []
     menu.run_main_menu(
-        data, ask=scripted(["1", "2", "2", "5", "3"]), say=lines.append, show=lambda figure: shown.append(figure)
+        data, ask=scripted(["1", "2", "2", "7", "3"]), say=lines.append, show=lambda figure: shown.append(figure)
     )
     assert len(shown) == 1
     assert lines[-1] == "Hasta luego."

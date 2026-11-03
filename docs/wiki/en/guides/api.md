@@ -17,6 +17,7 @@ Reference for the endpoints exposed by FastAPI. The application is built with `d
 | WS | `/ws/incidents` | Incidents with periodic refresh. |
 | GET | `/api/stats` | Indicators per province or region. |
 | GET | `/api/stats/grouped` | Full incident grouping. |
+| GET | `/api/regions` | Autonomous communities and their provinces. |
 | GET | `/api/cameras` | Filtered cameras. |
 | GET | `/api/activity/` | Paginated activity log (key required). |
 | GET | `/api/activity/csv` | CSV export (key required). |
@@ -29,7 +30,7 @@ Response:
 ```
 ## `GET /api/incidents`
 Query parameters (all optional):
-- `province`, `municipality`, `road`: text filters, subject to `match_mode`.
+- `province`, `municipality`, `road`: text filters, subject to `match_mode`; `community`: autonomous-community name, matched case-insensitively.
 - `severity`: case-insensitive equality (`highest`, `high`, `medium`, `low`).
 - `kind`: `accident`, `roadworks`, `stuck`, `obstruction`, or `weather`.
 - `camera`: `with` (camera coverage) or `without`.
@@ -62,7 +63,7 @@ Response shape:
 ## `WS /ws/incidents`
 Sends the first message on connect and repeats every `interval` seconds.
 
-Query parameters: `province`, `municipality`, `road`, `severity`, `kind`, `camera`, `match_mode`, `lang` (same as REST), and `interval` (seconds; default 120, clamped to 5–300).
+Query parameters: `province`, `municipality`, `road`, `severity`, `kind`, `camera`, `community`, `match_mode`, `lang` (same as REST), and `interval` (seconds; default 120, clamped to 5–300).
 
 Each message is the `/api/incidents` payload plus `"transport": "websocket"` and `"refresh_interval_seconds": <interval>`. On a transient `DgtError` it sends `{"error": "<message>"}` and keeps the connection open.
 ## `GET /api/stats`
@@ -74,33 +75,41 @@ Parameters:
 {
   "level": "province",
   "total": 120,
-  "groups": {"Madrid": {"total": 10, "severe": 1, "roadworks": 4, "road_closures": 0}},
+  "groups": {"Madrid": {"total": 10, "accidents": 1, "roadworks": 4, "breakdowns": 2, "obstructions": 1, "weather": 0}},
   "extremes": {
     "total": {"max": {"name": "Madrid", "value": 10}, "min": {"name": "Soria", "value": 1}},
-    "severe": {"max": {"name": "Madrid", "value": 1}, "min": null},
+    "accidents": {"max": {"name": "Madrid", "value": 1}, "min": null},
     "roadworks": {"max": {"name": "Madrid", "value": 4}, "min": {"name": "Soria", "value": 1}},
-    "road_closures": {"max": null, "min": null}
+    "breakdowns": {"max": {"name": "Madrid", "value": 2}, "min": {"name": "Madrid", "value": 2}},
+    "obstructions": {"max": {"name": "Madrid", "value": 1}, "min": {"name": "Madrid", "value": 1}},
+    "weather": {"max": {"name": "Madrid", "value": 0}, "min": null}
   }
 }
 ```
-The indicators are `total`, `severe` (`highest` severity), `roadworks` (roadworks or maintenance), and `road_closures` (`roadClosed` or `carriagewayClosures`). `max` breaks ties alphabetically and `min` ignores groups with value 0; both are `null` when there is no data.
+The six indicators are `total`, `accidents`, `roadworks`, `breakdowns`, `obstructions`, and `weather`; their shared rules are documented in [core.indicators](../core/indicators.md). `max` breaks ties alphabetically and `min` ignores groups with value 0; if `weather` is 0 in every group, its minimum is `null`.
 ## `GET /api/stats/grouped`
 Parameter: `refresh` (boolean).
 ```json
 {
   "generated_at": "2026-11-03T11:14:18+01:00",
   "total": 120,
-  "indicators": ["total", "severe", "roadworks", "road_closures"],
-  "by_province": {"Madrid": {"total": 10, "severe": 1, "roadworks": 4, "road_closures": 0}},
-  "by_region": {"Comunidad de Madrid": {"total": 10, "severe": 1, "roadworks": 4, "road_closures": 0}},
-  "by_type": {"<type>": {"total": 3, "severe": 0, "roadworks": 0, "road_closures": 0}},
+  "indicators": ["total", "accidents", "roadworks", "breakdowns", "obstructions", "weather"],
+  "by_province": {"Madrid": {"total": 10, "accidents": 1, "roadworks": 4, "breakdowns": 2, "obstructions": 1, "weather": 0}},
+  "by_region": {"Comunidad de Madrid": {"total": 10, "accidents": 1, "roadworks": 4, "breakdowns": 2, "obstructions": 1, "weather": 0}},
+  "by_type": {"<type>": {"total": 3, "accidents": 0, "roadworks": 0, "breakdowns": 0, "obstructions": 0, "weather": 0}},
   "labels": {"by_type": {"es": {"<type>": "<Spanish label>"}, "en": {"<type>": "<English label>"}}},
-  "by_weekday": {"monday": {"total": 5, "severe": 0, "roadworks": 1, "road_closures": 0}},
-  "by_weekday_province": {"monday": {"Madrid": {"total": 2, "severe": 0, "roadworks": 0, "road_closures": 0}}},
-  "by_weekday_region": {"monday": {"<region>": {"total": 2, "severe": 0, "roadworks": 0, "road_closures": 0}}}
+  "by_weekday": {"monday": {"total": 5, "accidents": 0, "roadworks": 1, "breakdowns": 0, "obstructions": 0, "weather": 0}},
+  "by_weekday_province": {"monday": {"Madrid": {"total": 2, "accidents": 0, "roadworks": 0, "breakdowns": 0, "obstructions": 0, "weather": 0}}},
+  "by_weekday_region": {"monday": {"<region>": {"total": 2, "accidents": 0, "roadworks": 0, "breakdowns": 0, "obstructions": 0, "weather": 0}}},
+  "by_province_type": {"<type>": {"Madrid": {"total": 1, "accidents": 0, "roadworks": 0, "breakdowns": 0, "obstructions": 0, "weather": 0}}},
+  "by_region_type": {"<type>": {"<region>": {"total": 1, "accidents": 0, "roadworks": 0, "breakdowns": 0, "obstructions": 0, "weather": 0}}}, "region_provinces": {"<region>": ["<province>"]}
 }
 ```
 `by_weekday` always contains the seven days (`monday`…`sunday`); `unknown` appears only when some incident has no valid date. The day is derived from `start_time`, falling back to `creation_time`. Unrecognized provinces are grouped as `Unknown`.
+## `GET /api/regions`
+Lists the autonomous communities with their provinces: `{"regions": [{"name": "Andalucía", "provinces": ["Almería", ...]}]}`. It fills the community filter.
+
+`/api/incidents`, `/api/cameras` and `/ws/incidents` also accept `community` (exact community name, case-insensitive).
 ## `GET /api/cameras`
 Parameters:
 - `province`, `road`: text filters subject to `match_mode`.
@@ -153,7 +162,7 @@ Served from `src/dgt_monitor/web/static/`; it consumes these endpoints from the 
 - Tabs: Incidents, Cameras, Favorites (stored in `localStorage`), Charts, and Map.
 - The **Charts** tab uses `/api/stats?level=province|region` and can group by province/region, weekday, or type, as bars, lines, or pie (top eight plus "Others"), with maxima and minima. Chart.js is served locally (`static/chart.umd.min.js`).
 - ES/EN language selector, light/dark mode, and filters with search mode.
-- PWA: the service worker (cache `dgt-monitor-v55`) stores the static shell and never caches `/api/`.
+- PWA: the service worker (cache `dgt-monitor-v59`) stores the static shell and never caches `/api/`.
 ## Development run
 ```powershell
 .\.venv\Scripts\python.exe -m uvicorn dgt_monitor.web.app:app --reload

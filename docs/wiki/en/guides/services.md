@@ -8,13 +8,13 @@ Application use cases coordinate repositories, caches, persistence, and models. 
 
 ## Cameras
 
-`CameraService` loads and filters cameras by province, road, kilometer point, and, when coordinates are supplied, geographic distance. Road and province matching use the filter's text mode. `annotate_coverage()` associates cameras and incidents using normalized roads, compatible provinces, and a difference no greater than `CAMERA_MATCH_RANGE_KM` (2 km by default). `with_incident_coverage()` uses the same criteria to select cameras covering active incidents.
+`CameraService` loads and filters cameras by province, the autonomous community derived from `camera.province`, road, kilometer point, and, when coordinates are supplied, geographic distance. Road and province matching use the filter's text mode; community matching is case-insensitive. `annotate_coverage()` associates cameras and incidents using normalized roads, compatible provinces, and a difference no greater than `CAMERA_MATCH_RANGE_KM` (2 km by default). `with_incident_coverage()` uses the same criteria to select cameras covering active incidents.
 
 ## Facade and statistics
 
-`DgtApplicationService.get_incident_payload()` calculates coverage, filters incidents, and prepares localized labels. `get_cameras()` returns filtered cameras; when incident coverage is requested, it applies the result limit after selecting coverage. `get_statistics()` returns four indicators by province or autonomous community, with maximum and minimum values. `get_grouped_incidents()` builds groupings by province, autonomous community, type, and weekday.
+`DgtApplicationService.get_incident_payload()` calculates coverage, filters incidents, and prepares localized labels. `get_cameras()` returns filtered cameras; when incident coverage is requested, it applies the result limit after selecting coverage. `get_statistics()` returns six indicators by province or autonomous community, with maximum and minimum values. `get_grouped_incidents()` builds groupings by province, autonomous community, type, and weekday, adds indicators by type and geography (`by_province_type`, `by_region_type`), and lists feed provinces by community (`region_provinces`).
 
-The `GET /api/stats` and `GET /api/stats/grouped` routes expose those results. `application.statistics` defines total incidents, severe incidents, roadworks, and road closures; it derives the weekday from the start time (or creation time when the start time is absent) and writes grouped JSON as UTF-8. See [DATEX II](datex2.md) for the data source and parsing process.
+The `GET /api/stats` and `GET /api/stats/grouped` routes expose those results. `application.statistics` groups `total`, `accidents`, `roadworks`, `breakdowns`, `obstructions`, and `weather` using the shared rules in [core.indicators](../core/indicators.md); it derives the weekday from the start time (or creation time when the start time is absent) and writes grouped JSON as UTF-8. See [DATEX II](datex2.md) for the data source and parsing process.
 
 ## Cache and persistence
 

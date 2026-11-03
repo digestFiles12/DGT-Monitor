@@ -89,6 +89,7 @@ class IncidentFilters:
     kind: str | None = None
     camera: str | None = None
     match_mode: str = "contains"
+    community: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -103,3 +104,4 @@ class CameraFilters:
     max_distance_km: float | None = None
     incident_coverage: bool = False
     match_mode: str = "contains"
+    community: str | None = None

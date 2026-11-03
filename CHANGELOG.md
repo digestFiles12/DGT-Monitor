@@ -1,3 +1,40 @@
+## [20261103.02] - 2026-11-03
+
+Resumen: seis indicadores en estadísticas, selector de provincias y CCAA en gráficas, filtro por comunidad autónoma y documentación actualizada.
+
+## 2026-11-03 - Filtro por comunidad autónoma
+
+### Añadido
+
+- Filtro «Comunidad autónoma» en el panel de filtros (incidencias, cámaras, favoritas y mapa). Parámetro `community` en `/api/incidents`, `/api/cameras` y `/ws/incidents`.
+- Endpoint `GET /api/regions` con las CCAA y sus provincias.
+- Recursos estáticos a la versión 59.
+
+## 2026-11-03 - Selector de gráficas rediseñado
+
+### Cambiado
+
+- Selector agrupado por CCAA con casilla de CCAA (marca/desmarca todas sus provincias, estado intermedio), píldoras con el número de incidencias, chips de selección quitables y botones «Seleccionar todo» / «Limpiar selección».
+- `/api/stats/grouped` añade `region_provinces` (CCAA → provincias).
+- Recursos estáticos a la versión 58.
+
+## 2026-11-03 - Selector de provincias y CCAA en gráficas
+
+### Añadido
+
+- Selector múltiple con búsqueda y botón de limpiar en la pestaña Gráficas: las gráficas (por nivel, día de la semana o tipo) y el máximo/mínimo se calculan solo con las provincias o CCAA elegidas.
+- Nuevas agrupaciones `by_province_type` y `by_region_type` en `/api/stats/grouped`.
+- Service worker y recursos estáticos a la versión 57.
+
+## 2026-11-03 - Seis indicadores en estadísticas
+
+### Cambiado
+
+- Las estadísticas y gráficas usan ahora 6 indicadores: total, accidentes, obras, averías, obstrucciones y meteorología (antes: total, graves, obras, cortes). Son los mismos que las celdas de la pestaña de incidencias.
+- Nuevo módulo `core/indicators.py` con las reglas de clasificación, compartido por `IncidentService` y `statistics`.
+- Menú de consola con 6 opciones de indicador; salir pasa a la opción 7.
+- Service worker y recursos estáticos a la versión 56.
+
 ## 2026-11-03 - Gráficas traducidas
 
 ### Corregido

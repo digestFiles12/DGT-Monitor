@@ -10,6 +10,6 @@ Standard CSS; uses classes/attributes from `index.html` and its own CSS variable
 ### Filters, results, and incidents
 - `.workspace`, `.filters`, and their controls form the filter panel. `.results`, `.table-wrap`, rows, expandable details, badges, coverage menus, and state panels organize results.
 ### Charts, cameras, and map
-- `.charts-view`, `.chart-menu`, `.chart-panel`, and `.chart-canvas-wrap` lay out charts. `.camera-grid`, `.camera-card`, `.camera-media`, `.camera-favorite`, and `.image-viewer` style camera cards/viewer; `.map-results`, `.map-shell`, `.map-detail`, and `.map-marker` lay out the map.
+- `.charts-view`, `.chart-menu`, `.chart-panel`, and `.chart-canvas-wrap` lay out charts; `.chart-selector` styles the multi-select, `.selector-group` groups regions/provinces, `.selector-items` arranges options, `.selector-pill` shows counts and checked/indeterminate states, and `.selector-chip` displays removable selections. `.camera-grid`, `.camera-card`, `.camera-media`, `.camera-favorite`, and `.image-viewer` style camera cards/viewer; `.map-results`, `.map-shell`, `.map-detail`, and `.map-marker` lay out the map.
 ### Footer and responsive layout
 - `footer` follows theme colors. `@keyframes spin` animates loading indicators; media queries at 1050 px, 760 px, and mobile orientations rearrange grids, filters, table, map, and footer.

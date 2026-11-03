@@ -16,7 +16,7 @@ Representa una cámara con identificador, carretera, provincia, punto kilométri
 
 `IncidentStats` es un valor inmutable con seis contadores: total, accidentes, obras, vehículos averiados, obstrucciones y condiciones meteorológicas.
 
-`IncidentFilters` transporta provincia, municipio, carretera, severidad, tipo, cobertura de cámara y modo de coincidencia. `CameraFilters` transporta provincia, carretera, punto kilométrico, coordenadas, límite, umbrales de distancia, cobertura de incidencias y modo de coincidencia. Ambos son dataclasses inmutables; los servicios aplican los criterios.
+`IncidentFilters` transporta provincia, municipio, carretera, severidad, tipo, cobertura de cámara y modo de coincidencia; su último campo opcional, `community`, compara la comunidad de la incidencia sin distinguir mayúsculas. `CameraFilters` transporta provincia, carretera, punto kilométrico, coordenadas, límite, umbrales de distancia, cobertura de incidencias y modo de coincidencia; su último campo opcional `community` se deriva de la provincia de la cámara. Ambos son dataclasses inmutables; los servicios aplican los criterios.
 
 ## Conversión a diccionario
 

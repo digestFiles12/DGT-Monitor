@@ -24,6 +24,7 @@ def cameras(
     max_distance_km: float | None = Query(None, ge=1, le=100),
     incident_coverage: bool = False,
     match_mode: str = "contains",
+    community: str | None = None,
 ) -> dict:
     return service.get_cameras(CameraFilters(
         province=province,
@@ -36,4 +37,5 @@ def cameras(
         max_distance_km=max_distance_km,
         incident_coverage=incident_coverage,
         match_mode=match_mode,
+        community=community,
     ))

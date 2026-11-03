@@ -11,11 +11,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="/static/styles.css?v=55">
+  <link rel="stylesheet" href="/static/styles.css?v=59">
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
   <script src="/static/chart.umd.min.js?v=1" defer></script>
-  <script src="/static/app.js?v=55" defer></script>
+  <script src="/static/app.js?v=59" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -78,6 +78,7 @@
         </div>
         <form id="filterForm">
           <label>Modo de búsqueda<select id="matchModeFilter" name="match_mode"><option value="contains">Contiene</option><option value="exact">Exacta</option><option value="regex">Regex</option></select></label>
+          <label>Comunidad autónoma<select id="communityFilter" name="community"><option value="">Todas</option></select></label>
           <label>Provincia<input id="provinceFilter" name="province" type="search" placeholder="Ej. Madrid" autocomplete="off"></label>
           <label>Carretera<input id="roadFilter" name="road" type="search" placeholder="Ej. A-6" autocomplete="off"></label>
           <div id="incidentFilters">
@@ -145,9 +146,11 @@
         <div class="chart-menus">
           <div class="chart-menu" role="group" aria-label="Indicador">
             <button type="button" class="chart-menu-button is-active" data-chart-indicator="total" aria-pressed="true">Total</button>
-            <button type="button" class="chart-menu-button" data-chart-indicator="severe" aria-pressed="false">Graves</button>
+            <button type="button" class="chart-menu-button" data-chart-indicator="accidents" aria-pressed="false">Accidentes</button>
             <button type="button" class="chart-menu-button" data-chart-indicator="roadworks" aria-pressed="false">Obras</button>
-            <button type="button" class="chart-menu-button" data-chart-indicator="road_closures" aria-pressed="false">Cortes de carretera</button>
+            <button type="button" class="chart-menu-button" data-chart-indicator="breakdowns" aria-pressed="false">Averías</button>
+            <button type="button" class="chart-menu-button" data-chart-indicator="obstructions" aria-pressed="false">Obstrucciones</button>
+            <button type="button" class="chart-menu-button" data-chart-indicator="weather" aria-pressed="false">Meteorología</button>
           </div>
           <div class="chart-options">
             <div class="chart-menu chart-mode-menu" role="group" aria-label="Modo de gráfica">
@@ -158,6 +161,18 @@
             <label class="chart-group-label"><span id="chartGroupingLabel">Agrupar por</span><select id="chartGrouping"><option value="level">Provincia / CCAA</option><option value="weekday">Día de la semana</option><option value="type">Tipo de incidencia</option></select></label>
           </div>
         </div>
+        <details class="chart-selector" id="chartSelector">
+          <summary id="chartSelectorSummary">Todas las provincias</summary>
+          <div class="chart-selector-body">
+            <div class="chart-selector-tools">
+              <input type="search" id="chartSelectorSearch" autocomplete="off" placeholder="Buscar">
+              <button type="button" class="chart-menu-button" id="chartSelectorAll">Seleccionar todo</button>
+              <button type="button" class="chart-menu-button" id="chartSelectorClear">Limpiar selección</button>
+            </div>
+            <div class="selector-chips" id="chartSelectorChips" hidden></div>
+            <div class="chart-selector-list" id="chartSelectorList"></div>
+          </div>
+        </details>
         <div class="chart-state state-panel" id="chartLoading" hidden><span class="loader" aria-hidden="true"></span><strong id="chartLoadingText">Cargando estadísticas</strong></div>
         <div class="chart-state state-panel state-error" id="chartError" hidden><i data-lucide="cloud-off" aria-hidden="true"></i><strong id="chartErrorTitle">No se pudieron cargar las estadísticas</strong><p id="chartErrorMessage"></p></div>
         <div class="chart-panel" id="chartPanel">

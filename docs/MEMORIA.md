@@ -13,7 +13,7 @@ DGT Monitor consulta las incidencias de tráfico que publica la Dirección Gener
 2. Lo interpreta con `xml.etree.ElementTree` (con espacios de nombres) y lo convierte en objetos `Incident`.
 3. Asigna a cada incidencia su comunidad autónoma (CCAA) a partir de la provincia.
 4. Guarda las incidencias en SQLite usando el identificador de la DGT como clave, para no duplicarlas.
-5. Agrupa los datos por CCAA, provincia, tipo y día de la semana y calcula 4 indicadores.
+5. Agrupa los datos por CCAA, provincia, tipo y día de la semana y calcula 6 indicadores.
 6. Expone todo con FastAPI y lo muestra en el dashboard (pestaña **Gráficas**) y en un menú de consola.
 
 ## 2. Cómo se cumple el enunciado
@@ -21,20 +21,24 @@ DGT Monitor consulta las incidencias de tráfico que publica la Dirección Gener
 | Enunciado | Dónde está | Cómo se cumple |
 |---|---|---|
 | Datos desde un fichero (`csv.DictReader`) | `infrastructure/http.py`, `infrastructure/parsers/incident.py` | La fuente es el XML de la DGT, que se descarga con `requests` y se parsea. El fichero de ejemplo `tests/fixtures/incidents_sample.xml` permite trabajar sin conexión. |
-| **Ejercicio 1**: JSON agrupado por día de la semana y provincia, con 4 indicadores | `application/statistics.py` (`group_incidents`, `write_grouped_json`), `GET /api/stats/grouped` | El JSON incluye `by_weekday_province`, `by_weekday_region`, `by_province`, `by_region` y `by_type`. Cada grupo lleva `total`, `severe`, `roadworks` y `road_closures`. |
-| **Ejercicio 2**: 4 gráficas con menú en bucle infinito | `menu.py` (`run_chart_menu`), pestaña **Gráficas** del dashboard | Una gráfica de barras por indicador. El dashboard añade líneas y agrupación por día de la semana y por tipo. |
+| **Ejercicio 1**: JSON agrupado por día de la semana y provincia, con 6 indicadores (el enunciado pide 4; se amplían) | `application/statistics.py` (`group_incidents`, `write_grouped_json`), `GET /api/stats/grouped` | El JSON incluye `by_weekday_province`, `by_weekday_region`, `by_province`, `by_region` y `by_type`. Cada grupo lleva `total`, `accidents`, `roadworks`, `breakdowns`, `obstructions` y `weather`. |
+| **Ejercicio 2**: 4 gráficas con menú en bucle infinito | `menu.py` (`run_chart_menu`), pestaña **Gráficas** del dashboard | Una gráfica de barras por indicador. El dashboard añade líneas, agrupación por día de la semana y por tipo, y un selector manual de provincias y CCAA (con casilla por comunidad, buscador y chips) que recalcula las gráficas y el máximo/mínimo solo con lo elegido. |
 | **Ejercicio 3**: 4 gráficas de queso y provincia máxima y mínima | `menu.py` (`build_pie_chart`, `describe_extremes`), pestaña **Gráficas** (modo queso) | Un gráfico circular por indicador. Debajo de cada gráfica se indica el máximo y el mínimo. |
-| Menú con `input()` y opción de salir | `python -m dgt_monitor.menu` | Mismo esquema 1–4 gráficas, 5 salir. |
+| Menú con `input()` y opción de salir | `python -m dgt_monitor.menu` | Una opción por indicador (1–6 gráficas) y 7 para salir. |
 | Provincia y CCAA | `core/regions.py` | Todo se puede ver por provincia o por CCAA (`level=province\|region`). |
 
-### Los 4 indicadores
+### Los 6 indicadores
 
 | Indicador | Regla |
 |---|---|
 | `total` | Todas las incidencias. |
-| `severe` | Incidencias con gravedad `highest`. |
+| `accidents` | La causa contiene `accident`. |
 | `roadworks` | La causa contiene `roadworks` o `maintenance`. |
-| `road_closures` | El tipo de gestión es `roadClosed` o `carriagewayClosures`. |
+| `breakdowns` | La causa contiene `stuck` o `breakdown` (averías). |
+| `obstructions` | La causa contiene `obstruction`. |
+| `weather` | La causa contiene `weather`, `fog`, `snow`, `flooding`, `ice` o `rain`. |
+
+Son los mismos seis indicadores y reglas que las celdas de la pestaña de incidencias (`core/indicators.py`), de modo que ambas pantallas cuentan siempre lo mismo. Si en el feed no hay ninguna incidencia de un indicador (por ejemplo `weather`), todos los grupos valen 0 y el mínimo se muestra «sin datos».
 
 ### Máximo y mínimo
 
@@ -86,13 +90,13 @@ Además, el plan gratuito pone la aplicación en suspensión tras un rato sin vi
 
 ## 7. Pruebas
 
-- Más de 140 pruebas automáticas (`pytest tests -q`) y GitHub Actions en cada push y pull request.
+- Más de 150 pruebas automáticas (`pytest tests -q`) y GitHub Actions en cada push y pull request.
 - Las pruebas cubren modelos, parsers, regiones, SQLite sin duplicados, estadísticas, API, menú de consola (con entradas simuladas), recursos estáticos del dashboard y la interfaz PyQt6.
-- La pestaña de gráficas se comprobó además en un navegador real (Edge sin ventana) con el XML de ejemplo: se dibujan las 4 gráficas de barras y las 4 de queso, y funcionan el cambio de nivel y de agrupación.
+- La pestaña de gráficas se comprobó además en un navegador real (Edge sin ventana) con el XML de ejemplo: se dibujan las 4 gráficas de barras y las 4 de queso, y funcionan el cambio de nivel y de agrupación, el selector de provincias/CCAA y el filtro por comunidad autónoma.
 
 ## 8. Flujo de trabajo
 
-Se ha usado GitFlow: `feature/*` → `develop` mediante pull requests → `release` → `main`. Cada paso del proyecto fue un PR con CI en verde (por ejemplo: SQLite y CCAA, API de estadísticas, menú de consola, gráficas del dashboard, wiki y memoria).
+Se ha usado GitFlow: `feature/*` → `develop` mediante pull requests → `release` → `main`. Las versiones se etiquetan con fecha y número (p. ej. `20261103.02`). Cada paso del proyecto fue un PR con CI en verde (por ejemplo: SQLite y CCAA, API de estadísticas, menú de consola, gráficas del dashboard, wiki y memoria).
 
 ## 9. Uso de herramientas de IA
 
@@ -116,7 +120,7 @@ He usado GitHub Copilot (asistente de IA en VS Code y agentes en paralelo) para:
 
 ## English summary
 
-DGT Monitor downloads the DGT (Spanish traffic authority) DATEX II XML with `requests`, parses it with `xml.etree.ElementTree`, maps each province to its autonomous community, stores incidents in SQLite keyed by the DGT id (upsert, no duplicates), groups them by region, province, type and weekday, and serves four indicators (total, severe, roadworks, road closures) through FastAPI. The dashboard has a **Charts** tab with an indicator menu, bar/line/pie charts and the maximum and minimum group under each chart. A console menu (`python -m dgt_monitor.menu`) reproduces exercises 1–3 of the assignment. Tests use a real, trimmed XML fixture and never call the DGT.
+DGT Monitor downloads the DGT (Spanish traffic authority) DATEX II XML with `requests`, parses it with `xml.etree.ElementTree`, maps each province to its autonomous community, stores incidents in SQLite keyed by the DGT id (upsert, no duplicates), groups them by region, province, type and weekday, and serves six indicators (total, accidents, roadworks, breakdowns, obstructions, weather) through FastAPI. The dashboard has a **Charts** tab with an indicator menu, bar/line/pie charts and the maximum and minimum group under each chart. A console menu (`python -m dgt_monitor.menu`) reproduces exercises 1–3 of the assignment. The filter panel can also restrict incidents, cameras and the map by autonomous community. Tests use a real, trimmed XML fixture and never call the DGT.
 
 **Source terms:** data from the DGT National Access Point is published free of charge under the DGT legal notice and must be attributed; it is pulled on demand, the feed does not cover all of Spain (e.g. Basque Country and Catalonia have their own services).
 

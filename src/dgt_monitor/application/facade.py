@@ -9,6 +9,7 @@ from dgt_monitor.application.incidents import IncidentService
 from dgt_monitor.application.statistics import build_statistics, group_incidents
 from dgt_monitor.core.localization import SUPPORTED_LOCALES, Translator, normalize_locale
 from dgt_monitor.core.models import CameraFilters, IncidentFilters
+from dgt_monitor.core.regions import region_for_province
 
 
 class DgtApplicationService:
@@ -65,6 +66,7 @@ class DgtApplicationService:
             severity=filters.severity,
             camera=filters.camera,
             match_mode=filters.match_mode,
+            community=filters.community,
         )
 
     def get_statistics(self, level: str = "province", refresh: bool = False) -> dict[str, Any]:
@@ -80,6 +82,10 @@ class DgtApplicationService:
                 for locale in sorted(SUPPORTED_LOCALES)
             }
         }
+        region_provinces: dict[str, list[str]] = {}
+        for province in grouped["by_province"]:
+            region_provinces.setdefault(region_for_province(province), []).append(province)
+        grouped["region_provinces"] = {region: sorted(names) for region, names in sorted(region_provinces.items())}
         return grouped
 
     def get_cameras(self, filters: CameraFilters | None = None, refresh: bool = False) -> dict[str, Any]:

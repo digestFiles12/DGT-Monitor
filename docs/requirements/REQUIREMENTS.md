@@ -13,7 +13,7 @@ Documento de referencia para humanos y agentes. Todo trabajo debe cumplir estos 
 
 Datos originales: CSV con `num_def`, `new_cases`, `num_hosp`, `num_uci`, por provincia y fecha.
 
-1. **Ejercicio 1**: guardar los datos en un fichero `.txt` en formato JSON, agrupados por día de la semana y por provincia, con los acumulados de los 4 indicadores. Leer con el módulo `csv` (`csv.DictReader`).
+1. **Ejercicio 1**: guardar los datos en un fichero `.txt` en formato JSON, agrupados por día de la semana y por provincia, con los acumulados de los indicadores (6 en esta adaptación). Leer con el módulo `csv` (`csv.DictReader`).
 2. **Ejercicio 2**: 4 gráficas de los datos del fichero del ejercicio 1, con un menú en bucle infinito para acceder a cada una.
 3. **Ejercicio 3**: a partir del fichero del ejercicio 1, obtener la provincia con más defunciones, casos, hospitalizados y UCI. Mostrar 4 gráficas de queso (circulares) con menú como el anterior. Tras mostrar cada gráfica, indicar la provincia con el **máximo** y la del **mínimo** de la variable.
 
@@ -35,7 +35,7 @@ Menú de referencia:
 | CSV | XML DATEX II de la DGT (descargado con `requests`) |
 | Fichero JSON agrupado | `incidencias_agrupadas.json` (también se puede guardar como `.txt`) |
 | Agrupar por día de la semana y provincia | Agrupar por **comunidad autónoma (CCAA)**, **provincia**, **tipo** y **día de la semana** |
-| 4 indicadores (def., casos, hosp., UCI) | 4 indicadores: **total de incidencias**, **graves**, **obras**, **cortes de carretera** (pendiente de confirmar con el alumno; si cambian, actualizar este documento) |
+| 4 indicadores (def., casos, hosp., UCI) | 6 indicadores (el enunciado pide 4; se amplía a petición del alumno): **total**, **accidentes**, **obras**, **averías**, **obstrucciones**, **meteorología**; mismas reglas que las celdas de la pestaña de incidencias (`core/indicators.py`) |
 | 4 gráficas + menú | ≥ 4 gráficas (barras/líneas) con menú de pestañas en el dashboard |
 | 4 gráficas de queso + máx/mín | 4 gráficas circulares, una por indicador, indicando provincia máxima y mínima |
 | Menú `input()` con bucle infinito | Menú del dashboard + script de consola opcional `python -m dgt_monitor.menu` con el bucle literal del enunciado |

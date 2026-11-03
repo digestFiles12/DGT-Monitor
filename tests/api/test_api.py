@@ -98,7 +98,8 @@ def test_dashboard_and_pwa_assets_are_served():
     assert "renderChart" in app_js.text
     assert "by_weekday" in app_js.text
     assert "by_type" in app_js.text
-    assert "road_closures" in app_js.text
+    assert "obstructions" in app_js.text
+    assert "chartSelection" in app_js.text
     assert "toggleCameraFavorite" in app_js.text
     assert "coverage-camera-preview" in app_js.text
     assert "image-viewer-favorite" in app_js.text
@@ -122,8 +123,8 @@ def test_dashboard_and_pwa_assets_are_served():
     assert client.get("/manifest.webmanifest").headers["content-type"].startswith("application/manifest+json")
     service_worker = client.get("/sw.js")
     assert service_worker.status_code == 200
-    assert "dgt-monitor-v55" in service_worker.text
-    assert "/static/app.js?v=55" in service_worker.text
+    assert "dgt-monitor-v59" in service_worker.text
+    assert "/static/app.js?v=59" in service_worker.text
     assert "/static/chart.umd.min.js?v=1" in service_worker.text
 
 
