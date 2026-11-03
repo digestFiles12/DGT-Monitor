@@ -55,3 +55,20 @@ def test_grouped_json_has_all_groupings():
     for key in ("by_province", "by_region", "by_type", "by_weekday", "by_weekday_province", "by_weekday_region"):
         assert key in body
     assert sum(day["total"] for day in body["by_weekday"].values()) == body["total"]
+
+
+def test_grouped_type_labels_are_translated_in_both_languages():
+    body = build_client().get("/api/stats/grouped").json()
+    labels = body["labels"]["by_type"]
+    assert set(labels) == {"es", "en"}
+    for code in body["by_type"]:
+        assert set(labels["es"]) >= {code} and set(labels["en"]) >= {code}
+        assert labels["es"][code] and labels["en"][code]
+    assert labels["es"]["RoadOrCarriagewayOrLaneManagement"] == "Gestión de vía o carril"
+    assert labels["en"]["RoadOrCarriagewayOrLaneManagement"] == "Road, carriageway or lane management"
+
+
+def test_dashboard_script_uses_type_labels_and_unknown_translation():
+    script = build_client().get("/static/app.js").text
+    assert "grouped.labels?.by_type?.[state.language]" in script
+    assert "unknownGroup: \"Sin datos\"" in script and "unknownGroup: \"Unknown\"" in script

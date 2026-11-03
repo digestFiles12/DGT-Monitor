@@ -94,6 +94,7 @@ Parámetro: `refresh` (booleano).
   "by_province": {"Madrid": {"total": 10, "severe": 1, "roadworks": 4, "road_closures": 0}},
   "by_region": {"Comunidad de Madrid": {"total": 10, "severe": 1, "roadworks": 4, "road_closures": 0}},
   "by_type": {"<tipo>": {"total": 3, "severe": 0, "roadworks": 0, "road_closures": 0}},
+  "labels": {"by_type": {"es": {"<tipo>": "<etiqueta en español>"}, "en": {"<tipo>": "<label in English>"}}},
   "by_weekday": {"monday": {"total": 5, "severe": 0, "roadworks": 1, "road_closures": 0}},
   "by_weekday_province": {"monday": {"Madrid": {"total": 2, "severe": 0, "roadworks": 0, "road_closures": 0}}},
   "by_weekday_region": {"monday": {"<comunidad>": {"total": 2, "severe": 0, "roadworks": 0, "road_closures": 0}}}
@@ -152,7 +153,7 @@ Se sirve desde `src/dgt_monitor/web/static/` y consume estos endpoints desde el 
 - Pestañas: Incidencias, Cámaras, Favoritas (guardadas en `localStorage`), Gráficas y Mapa.
 - La pestaña **Gráficas** usa `/api/stats?level=province|region` y permite agrupar por provincia/comunidad, día de la semana o tipo, en barras, líneas o queso (los ocho mayores y «Otros»), con máximos y mínimos. Chart.js se sirve localmente (`static/chart.umd.min.js`).
 - Selector de idioma ES/EN, modo claro/oscuro y filtros con modo de búsqueda.
-- PWA: el service worker (caché `dgt-monitor-v54`) guarda el shell estático y nunca cachea `/api/`.
+- PWA: el service worker (caché `dgt-monitor-v55`) guarda el shell estático y nunca cachea `/api/`.
 ## Ejecución en desarrollo
 ```powershell
 .\.venv\Scripts\python.exe -m uvicorn dgt_monitor.web.app:app --reload
