@@ -6,7 +6,7 @@ El dashboard incluye selector ES/EN, modo claro/oscuro, filtros por provincia, m
 
 La cobertura incidencia-camara se calcula por carretera normalizada, provincia compatible y punto kilometrico dentro de `CAMERA_MATCH_RANGE_KM = 2.0`. El dashboard mantiene scroll general en movil/escritorio y scroll interno en tabla de incidencias y grid de camaras, de modo que la navegacion funciona tanto por pagina completa como dentro de cada superficie densa.
 
-Consulta [docs/INDEX.md](docs/INDEX.md) para la documentacion tecnica completa, [CHANGELOG.md](CHANGELOG.md) para el historial de cambios y [docs/CONTINUIDAD_NUEVO_CHAT.md](docs/CONTINUIDAD_NUEVO_CHAT.md) para reanudar el trabajo en otro chat. El flujo de ramas esta definido en [docs/GITFLOW.md](docs/GITFLOW.md).
+Documentacion: wiki en [espanol](docs/wiki/es/README.md) y [English](docs/wiki/en/README.md) (guias, diagramas y una pagina por fichero), [memoria del proyecto](docs/MEMORIA.md) y [requisitos](docs/requirements/REQUIREMENTS.md). Historial de cambios en [CHANGELOG.md](CHANGELOG.md). El flujo de ramas esta en la guia de GitFlow ([es](docs/wiki/es/guides/gitflow.md) / [en](docs/wiki/en/guides/gitflow.md)).
 
 ## Funcionalidades principales
 
@@ -30,7 +30,12 @@ py -3.12 -m venv .venv
 
 ```powershell
 # Dashboard web
-.\.venv\Scripts\python.exe -m uvicorn dashboard.app:app --reload
+.\.venv\Scripts\python.exe -m uvicorn dgt_monitor.web.app:app --reload
+
+# Menu de consola (proyecto final): descarga el XML, genera grouped_incidents.json y muestra el menu
+.\.venv\Scripts\python.exe -m dgt_monitor.menu
+# Sin conexion, con un XML local
+.\.venv\Scripts\python.exe -m dgt_monitor.menu --xml tests\fixtures\incidents_sample.xml
 
 # Aplicación de escritorio
 .\.venv\Scripts\python.exe -m dgt_monitor.gui
@@ -52,8 +57,8 @@ Invoke-RestMethod "http://127.0.0.1:8000/api/cameras?road=A-52&incident_coverage
 ## Validacion rapida
 
 ```powershell
-$env:QT_QPA_PLATFORM='offscreen'; .\.venv\Scripts\python.exe -m pytest test -q
-.\.venv\Scripts\python.exe -m compileall -q dgt_monitor dashboard
+$env:QT_QPA_PLATFORM='offscreen'; .\.venv\Scripts\python.exe -m pytest tests -q
+.\.venv\Scripts\python.exe -m compileall -q src
 git diff --check
 ```
 

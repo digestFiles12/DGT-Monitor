@@ -8,3 +8,5 @@ htmlcov/
 .env
 .idea/
 .vscode/
+data/
+grouped_incidents.json

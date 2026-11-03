@@ -33,20 +33,20 @@ jobs:
           pip install -e ".[dev]"
       
       - name: Lint with Pylance (syntax check)
-        run: python -m compileall -q dgt_monitor dashboard
+        run: python -m compileall -q src
         continue-on-error: true
       
       - name: Run tests with pytest
         run: |
           export QT_QPA_PLATFORM=offscreen
-          python -m pytest test -v --tb=short --durations=10
+          python -m pytest tests -v --tb=short --durations=10
       
       - name: Check code formatting (whitespace)
         run: git diff --check
         continue-on-error: true
       
       - name: Test imports
-        run: python -c "import dgt_monitor; import dashboard"
+        run: python -c "import dgt_monitor; import dgt_monitor.web"
 
   deploy:
     name: Deploy to Render

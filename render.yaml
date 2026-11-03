@@ -3,8 +3,8 @@ services:
     name: dgt-monitor
     runtime: python
     plan: free
-    buildCommand: pip install -e ".[dev]" && python -m pytest test -q --tb=no && python -m compileall -q dgt_monitor dashboard
-    startCommand: uvicorn dashboard.app:app --host 0.0.0.0 --port $PORT
+    buildCommand: pip install -e ".[dev]" && python -m pytest tests -q --tb=no && python -m compileall -q src
+    startCommand: uvicorn dgt_monitor.web.app:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.0"
@@ -14,6 +14,8 @@ services:
         sync: false
       - key: ACTIVITY_REVOKED_API_KEYS
         sync: false
+      - key: INCIDENT_DB_PATH
+        value: "/tmp/incidents.db"  # Ephemeral on the free plan; refilled from the DGT on first request
       - key: ACTIVITY_DB_PATH
         value: "/tmp/activity.db"  # Temporary storage per deployment
     healthCheckPath: /api/health

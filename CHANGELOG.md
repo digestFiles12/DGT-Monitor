@@ -1,6 +1,40 @@
+## 2026-11-03 - Wiki independiente por idioma
+
+### Añadido
+
+- Wiki en `docs/wiki/es` y `docs/wiki/en` con una página por fichero, guías técnicas y diagramas Mermaid.
+- Memoria del proyecto (`docs/MEMORIA.md`).
+
+### Eliminado
+
+- Documentos técnicos antiguos de `docs/` (API, ARCHITECTURE, HANDOFF, PROJECT_STATUS, etc.), integrados y actualizados en la wiki.
+
+## 2026-11-03 - Pestaña de gráficas
+
+### Añadido
+
+- Nueva vista de gráficas con indicadores de incidencias totales, graves, obras y cortes de carretera.
+- Gráficas de barras, líneas y circulares por provincia/CCAA, día de la semana y tipo, con extremos y selector de nivel.
+- Chart.js local en el shell PWA, gráficos adaptados a los temas claro/oscuro y textos ES/EN.
+
+### Validación
+
+- Tests estáticos de los recursos y controles de la pestaña de gráficas.
+
 # Changelog
 
 Todos los cambios relevantes del proyecto se documentan aqui. El repositorio sigue GitFlow: las features entran en `develop`, se estabilizan en `release` y se publican desde `main`.
+
+## 2026-11-03 - Final project (Project 3)
+
+### Aniadido
+
+- `core/regions.py`: mapa provincia a comunidad autonoma (CCAA) para las 52 provincias.
+- `infrastructure/incident_store.py`: persistencia SQLite de incidencias sin duplicados (clave: id de la DGT).
+- `application/statistics.py`: 4 indicadores agrupados por provincia, CCAA, tipo y dia de la semana, con maximo y minimo.
+- `GET /api/stats` y `GET /api/stats/grouped`.
+- `python -m dgt_monitor.menu`: menu de consola con graficas de barras y de queso (ejercicios 1, 2 y 3).
+- Estructura `src/` y `tests/`, con fixture XML real en `tests/fixtures`.
 
 ## 2026-07-19 - Release 20260719.06 y GUI actualizada
 
@@ -8,6 +42,8 @@ Todos los cambios relevantes del proyecto se documentan aqui. El repositorio sig
 
 - Pestaña `Favoritas` en el dashboard para conservar cámaras marcadas aunque las incidencias cambien.
 - Estrella amarilla sobre la imagen de cada cámara para marcar/desmarcar favoritos persistidos en `localStorage`.
+- Estrella de favoritos tambien en detalle de camara del mapa, visor fullscreen y menu de camaras cercanas de incidencias.
+- Miniatura clicable en el menu de camaras de incidencias para abrir la imagen en pantalla completa.
 - Modo de busqueda `contains`/`exact`/`regex` disponible tambien en la GUI PyQt6.
 - Fechas de detalle en GUI formateadas como fecha/hora humana.
 - Pruebas de GUI para modo de busqueda, reseteo de filtros, fechas y click de visor fullscreen.
@@ -15,7 +51,7 @@ Todos los cambios relevantes del proyecto se documentan aqui. El repositorio sig
 ### Cambiado
 
 - El dialogo de camaras de la GUI usa el rango compartido `CAMERA_MATCH_RANGE_KM` para alinearse con dashboard/API.
-- El service worker del dashboard pasa a `dgt-monitor-v52` para publicar los assets con favoritos.
+- El service worker del dashboard pasa a `dgt-monitor-v53` para publicar los assets con favoritos ampliados.
 - La rama `release` se actualizo desde `develop` y se promociono a `main` mediante PR #13.
 - `main` quedo en el merge commit `5d75d6f91ba3b79c72c6d0ab2632621873d54f7c`.
 
@@ -28,7 +64,7 @@ Todos los cambios relevantes del proyecto se documentan aqui. El repositorio sig
 - PR #12 `feature/GUI` -> `develop`: integrada.
 - PR #13 `release` -> `main`: integrada con checks `Test & Validate (3.12)` en `SUCCESS`.
 - Tag `20260719.06`: creado y subido sobre el commit final de `main`.
-- `QT_QPA_PLATFORM=offscreen python -m pytest test -q`: 53 tests pasando.
+- `QT_QPA_PLATFORM=offscreen python -m pytest tests -q`: 53 tests pasando.
 
 ## 2026-07-19 - Dashboard, filtros avanzados y cobertura de camaras
 
@@ -59,8 +95,8 @@ Todos los cambios relevantes del proyecto se documentan aqui. El repositorio sig
 
 ### Validacion
 
-- `python -m pytest test -q`: 53 tests pasando.
-- `python -m compileall -q dgt_monitor dashboard`: sin errores.
+- `python -m pytest tests -q`: 53 tests pasando.
+- `python -m compileall -q src`: sin errores.
 - `git diff --check`: limpio.
 - PR #9 hacia `develop`: checks `Test & Validate (3.12)` en `SUCCESS` y PR mergeable antes de su integracion.
 
