@@ -81,7 +81,7 @@ const uiCopy = {
     cameraImageFullscreen: "Abrir imagen de cámara a pantalla completa", serverStatus: (status) => `El servidor respondió con código ${status}.`, results: (count) => `${count} resultados`, loadMore: (count) => `Mostrar ${count} más`,
     nearbyCameras: (count) => `${count} cámaras cercanas`, cameraAlt: (road, km) => `Cámara ${road || "DGT"} PK ${km || "sin dato"}`, updatedAt: (time) => `Actualizado ${time}`,
     mapPointPrompt: "Selecciona un punto", mapPointPromptText: "Elige una incidencia o cámara en el mapa para ver sus detalles.", mapUnavailable: "Mapa no disponible", mapSummary: (incidents, cameras) => `${incidents} incidencias · ${cameras} cámaras`, incidentPoint: "Incidencia", cameraPoint: "Cámara", yes: "Sí", no: "No",
-    selectorAllProvinces: "Todas las provincias", selectorAllRegions: "Todas las CCAA", selectorSelected: (count) => `${count} seleccionadas`, selectorSearch: "Buscar", selectorClear: "Limpiar selección",
+    selectorAllProvinces: "Todas las provincias", selectorAllRegions: "Todas las CCAA", selectorSelected: (count) => `${count} seleccionadas`, selectorSearch: "Buscar", selectorClear: "Limpiar selección", selectorAll: "Seleccionar todo", selectorRemove: "Quitar",
     charts: "Gráficas", chartEyebrow: "Estadísticas", chartLevel: "Nivel", provinceLevel: "Provincia", regionLevel: "CCAA", chartGrouping: "Agrupar por", groupLevel: "Provincia / CCAA", weekdays: "Día de la semana", incidentTypes: "Tipo de incidencia", barMode: "Barras", lineMode: "Líneas", pieMode: "Queso", totalIncidents: "Incidencias totales", accidentsIndicator: "Accidentes", roadworksIndicator: "Obras", breakdownsIndicator: "Averías", obstructionsIndicator: "Obstrucciones", weatherIndicator: "Meteorología", chartIndicator: "Indicador", chartMode: "Modo de gráfica", loadingCharts: "Cargando estadísticas", chartLoadError: "No se pudieron cargar las estadísticas", noChartData: "No hay datos para mostrar.", maximum: "Máximo", minimum: "Mínimo", unavailableValue: "No disponible", otherGroups: "Otros", unknownGroup: "Sin datos", weekdayNames: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
   },
   en: {
@@ -103,7 +103,7 @@ const uiCopy = {
     cameraImageFullscreen: "Open camera image fullscreen", serverStatus: (status) => `The server responded with status ${status}.`, results: (count) => `${count} results`, loadMore: (count) => `Show ${count} more`,
     nearbyCameras: (count) => `${count} nearby cameras`, cameraAlt: (road, km) => `Camera ${road || "DGT"} KP ${km || "unavailable"}`, updatedAt: (time) => `Updated ${time}`,
     mapPointPrompt: "Select a point", mapPointPromptText: "Choose an incident or camera on the map to see its details.", mapUnavailable: "Map unavailable", mapSummary: (incidents, cameras) => `${incidents} incidents · ${cameras} cameras`, incidentPoint: "Incident", cameraPoint: "Camera", yes: "Yes", no: "No",
-    selectorAllProvinces: "All provinces", selectorAllRegions: "All regions", selectorSelected: (count) => `${count} selected`, selectorSearch: "Search", selectorClear: "Clear selection",
+    selectorAllProvinces: "All provinces", selectorAllRegions: "All regions", selectorSelected: (count) => `${count} selected`, selectorSearch: "Search", selectorClear: "Clear selection", selectorAll: "Select all", selectorRemove: "Remove",
     charts: "Charts", chartEyebrow: "Statistics", chartLevel: "Level", provinceLevel: "Province", regionLevel: "Region (CCAA)", chartGrouping: "Group by", groupLevel: "Province / region", weekdays: "Weekday", incidentTypes: "Incident type", barMode: "Bars", lineMode: "Lines", pieMode: "Pie", totalIncidents: "Total incidents", accidentsIndicator: "Accidents", roadworksIndicator: "Roadworks", breakdownsIndicator: "Breakdowns", obstructionsIndicator: "Obstructions", weatherIndicator: "Weather", chartIndicator: "Indicator", chartMode: "Chart mode", loadingCharts: "Loading statistics", chartLoadError: "Could not load statistics", noChartData: "No data to display.", maximum: "Maximum", minimum: "Minimum", unavailableValue: "Unavailable", otherGroups: "Others", unknownGroup: "Unknown", weekdayNames: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
   },
 };
@@ -116,7 +116,7 @@ const ids = [
   "statAccidents", "statRoadworks", "statStuck", "statObstructions", "statWeather", "incidentTabCount",
   "cameraTabCount", "favoriteTabCount", "mapTabCount", "resultsTitle", "resultEyebrow", "resultCount", "loadingState",
   "errorState", "errorMessage", "emptyState", "incidentResults", "incidentRows",
-  "chartsView", "chartsEyebrow", "chartsViewTitle", "chartLevel", "chartLevelLabel", "chartGrouping", "chartGroupingLabel", "chartSelector", "chartSelectorSummary", "chartSelectorSearch", "chartSelectorClear", "chartSelectorList", "chartLoading", "chartLoadingText", "chartError", "chartErrorTitle", "chartErrorMessage", "chartEmpty", "chartPanel", "chartIndicatorTitle", "chartExtremes", "chartCanvas",
+  "chartsView", "chartsEyebrow", "chartsViewTitle", "chartLevel", "chartLevelLabel", "chartGrouping", "chartGroupingLabel", "chartSelector", "chartSelectorSummary", "chartSelectorSearch", "chartSelectorClear", "chartSelectorAll", "chartSelectorChips", "chartSelectorList", "chartLoading", "chartLoadingText", "chartError", "chartErrorTitle", "chartErrorMessage", "chartEmpty", "chartPanel", "chartIndicatorTitle", "chartExtremes", "chartCanvas",
   "cameraResults", "mapResults", "mapStatus", "mapDetail", "trafficMap", "retryButton", "loadMoreWrap", "loadMoreButton", "themeButton", "workspace", "filtersPanel", "filterToggle"
 ];
 
@@ -159,8 +159,20 @@ document.addEventListener("DOMContentLoaded", () => {
   elements.chartSelectorList.addEventListener("change", (event) => {
     const box = event.target;
     if (!(box instanceof HTMLInputElement)) return;
-    if (box.checked) state.chartSelection.add(box.value); else state.chartSelection.delete(box.value);
-    updateChartSelectorSummary();
+    selectorToggle(box);
+    renderChartSelector();
+    renderChart();
+  });
+  elements.chartSelectorChips.addEventListener("click", (event) => {
+    const chip = event.target.closest("[data-remove]");
+    if (!chip) return;
+    state.chartSelection.delete(chip.dataset.remove);
+    renderChartSelector();
+    renderChart();
+  });
+  elements.chartSelectorAll.addEventListener("click", () => {
+    Object.keys(state.chartData?.stats?.groups || {}).forEach((name) => state.chartSelection.add(name));
+    renderChartSelector();
     renderChart();
   });
   elements.chartGrouping.addEventListener("change", () => {
@@ -467,6 +479,7 @@ function applyChartsLanguage() {
   elements.chartErrorTitle.textContent = uiText("chartLoadError");
   elements.chartSelectorSearch.placeholder = uiText("selectorSearch");
   elements.chartSelectorClear.textContent = uiText("selectorClear");
+  elements.chartSelectorAll.textContent = uiText("selectorAll");
   if (state.chartData) renderChartSelector();
   if (state.chartData && state.view === "charts") renderChart();
 }
@@ -513,30 +526,96 @@ function selectedExtremes(stats) {
   return { max: entries[0] || null, min: positive[0] || null };
 }
 
+function selectorEntries() {
+  const grouped = state.chartData?.grouped;
+  const groups = state.chartData?.stats?.groups || {};
+  const total = (name) => Number(groups[name]?.total || 0);
+  const query = elements.chartSelectorSearch.value.trim().toLowerCase();
+  const matches = (name) => name.toLowerCase().includes(query);
+  if (state.chartLevel === "region") {
+    return Object.keys(groups).filter(matches).map((name) => ({
+      region: name, count: total(name), items: [],
+    }));
+  }
+  return Object.entries(grouped?.region_provinces || {}).map(([region, provinces]) => {
+    const regionMatch = matches(region);
+    const items = provinces.filter((name) => regionMatch || matches(name));
+    return { region, count: provinces.reduce((sum, name) => sum + total(name), 0), items: items.map((name) => ({ name, count: total(name) })), provinces };
+  }).filter((entry) => entry.items.length);
+}
+
+function selectorLabel(name) {
+  return name === "Unknown" ? uiText("unknownGroup") : name;
+}
+
 function updateChartSelectorSummary() {
   const count = state.chartSelection.size;
   elements.chartSelectorSummary.textContent = count
     ? uiText("selectorSelected", count)
     : uiText(state.chartLevel === "region" ? "selectorAllRegions" : "selectorAllProvinces");
+  elements.chartSelectorChips.replaceChildren(...[...state.chartSelection].sort((a, b) => a.localeCompare(b)).map((name) => {
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "selector-chip";
+    chip.dataset.remove = name;
+    chip.setAttribute("aria-label", `${uiText("selectorRemove")} ${selectorLabel(name)}`);
+    chip.textContent = `${selectorLabel(name)} ×`;
+    return chip;
+  }));
+  elements.chartSelectorChips.hidden = count === 0;
+}
+
+function selectorPill(name, count, checked, kind) {
+  const label = document.createElement("label");
+  label.className = `selector-pill${kind === "region" ? " is-region" : ""}`;
+  const box = document.createElement("input");
+  box.type = "checkbox";
+  box.className = "selector-box";
+  box.value = name;
+  box.dataset.kind = kind;
+  box.checked = checked;
+  const text = document.createElement("span");
+  text.textContent = selectorLabel(name);
+  const badge = document.createElement("b");
+  badge.textContent = String(count);
+  label.append(box, text, badge);
+  return label;
 }
 
 function renderChartSelector() {
-  const names = Object.keys(state.chartData?.stats?.groups || {});
-  const query = elements.chartSelectorSearch.value.trim().toLowerCase();
-  elements.chartSelectorList.replaceChildren(...names
-    .filter((name) => name.toLowerCase().includes(query))
-    .map((name) => {
-      const label = document.createElement("label");
-      const box = document.createElement("input");
-      box.type = "checkbox";
-      box.value = name;
-      box.checked = state.chartSelection.has(name);
-      label.append(box, document.createTextNode(name === "Unknown" ? uiText("unknownGroup") : name));
-      return label;
-    }));
+  const selected = state.chartSelection;
+  const nodes = selectorEntries().map((entry) => {
+    const group = document.createElement("section");
+    group.className = "selector-group";
+    if (state.chartLevel === "region") {
+      group.append(selectorPill(entry.region, entry.count, selected.has(entry.region), "region"));
+      return group;
+    }
+    const picked = entry.provinces.filter((name) => selected.has(name)).length;
+    const head = selectorPill(entry.region, entry.count, picked === entry.provinces.length, "region");
+    head.querySelector("input").indeterminate = picked > 0 && picked < entry.provinces.length;
+    const body = document.createElement("div");
+    body.className = "selector-items";
+    body.append(...entry.items.map((item) => selectorPill(item.name, item.count, selected.has(item.name), "province")));
+    if (entry.provinces.length === 1 && entry.provinces[0] === entry.region) {
+      group.append(head);
+      return group;
+    }
+    group.append(head, body);
+    return group;
+  });
+  elements.chartSelectorList.classList.toggle("is-flat", state.chartLevel === "region");
+  elements.chartSelectorList.replaceChildren(...nodes);
   updateChartSelectorSummary();
 }
 
+function selectorToggle(box) {
+  const regionProvinces = state.chartData?.grouped?.region_provinces || {};
+  const names = box.dataset.kind === "region" && state.chartLevel === "province"
+    ? regionProvinces[box.value] || []
+    : [box.value];
+  names.forEach((name) => { if (box.checked) state.chartSelection.add(name); else state.chartSelection.delete(name); });
+}
 function renderChart() {
   if (!state.chartData) return;
   if (!window.Chart) {

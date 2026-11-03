@@ -11,11 +11,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="/static/styles.css?v=57">
+  <link rel="stylesheet" href="/static/styles.css?v=58">
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
   <script src="/static/chart.umd.min.js?v=1" defer></script>
-  <script src="/static/app.js?v=57" defer></script>
+  <script src="/static/app.js?v=58" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -165,8 +165,10 @@
           <div class="chart-selector-body">
             <div class="chart-selector-tools">
               <input type="search" id="chartSelectorSearch" autocomplete="off" placeholder="Buscar">
+              <button type="button" class="chart-menu-button" id="chartSelectorAll">Seleccionar todo</button>
               <button type="button" class="chart-menu-button" id="chartSelectorClear">Limpiar selección</button>
             </div>
+            <div class="selector-chips" id="chartSelectorChips" hidden></div>
             <div class="chart-selector-list" id="chartSelectorList"></div>
           </div>
         </details>
