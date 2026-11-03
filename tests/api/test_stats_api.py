@@ -55,9 +55,12 @@ def test_stats_rejects_invalid_level():
 
 def test_grouped_json_has_all_groupings():
     body = build_client().get("/api/stats/grouped").json()
-    for key in ("by_province", "by_region", "by_type", "by_weekday", "by_weekday_province", "by_weekday_region"):
+    for key in ("by_province", "by_region", "by_type", "by_weekday", "by_weekday_province", "by_weekday_region", "by_province_type", "by_region_type"):
         assert key in body
     assert sum(day["total"] for day in body["by_weekday"].values()) == body["total"]
+    for key in ("by_province_type", "by_region_type"):
+        for kind, groups in body[key].items():
+            assert sum(leaf["total"] for leaf in groups.values()) == body["by_type"][kind]["total"]
 
 
 def test_grouped_type_labels_are_translated_in_both_languages():

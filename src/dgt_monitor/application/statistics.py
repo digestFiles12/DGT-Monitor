@@ -65,6 +65,8 @@ def group_incidents(
     weekdays: dict[str, dict[str, int]] = {day: _empty_leaf() for day in WEEKDAYS}
     weekday_provinces: dict[str, dict[str, dict[str, int]]] = {day: {} for day in WEEKDAYS}
     weekday_regions: dict[str, dict[str, dict[str, int]]] = {day: {} for day in WEEKDAYS}
+    province_types: dict[str, dict[str, dict[str, int]]] = {}
+    region_types: dict[str, dict[str, dict[str, int]]] = {}
     total = 0
 
     for incident in incidents:
@@ -81,6 +83,8 @@ def group_incidents(
         _add_incident(weekdays, day, incident)
         _add_incident(weekday_provinces[day], province, incident)
         _add_incident(weekday_regions[day], region, incident)
+        _add_incident(province_types.setdefault(incident.type, {}), province, incident)
+        _add_incident(region_types.setdefault(incident.type, {}), region, incident)
         total += 1
 
     if "unknown" not in weekdays or weekdays["unknown"]["total"] == 0:
@@ -102,6 +106,8 @@ def group_incidents(
         "by_weekday_region": {
             day: _sorted_groups(groups) for day, groups in weekday_regions.items()
         },
+        "by_province_type": {kind: _sorted_groups(g) for kind, g in sorted(province_types.items())},
+        "by_region_type": {kind: _sorted_groups(g) for kind, g in sorted(region_types.items())},
     }
 
 

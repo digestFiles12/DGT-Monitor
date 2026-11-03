@@ -1,3 +1,11 @@
+## 2026-11-03 - Selector de provincias y CCAA en gráficas
+
+### Añadido
+
+- Selector múltiple con búsqueda y botón de limpiar en la pestaña Gráficas: las gráficas (por nivel, día de la semana o tipo) y el máximo/mínimo se calculan solo con las provincias o CCAA elegidas.
+- Nuevas agrupaciones `by_province_type` y `by_region_type` en `/api/stats/grouped`.
+- Service worker y recursos estáticos a la versión 57.
+
 ## 2026-11-03 - Seis indicadores en estadísticas
 
 ### Cambiado

@@ -66,7 +66,7 @@ def test_grouping_has_expected_shape_and_region_counts():
 
     assert set(data) == {
         "generated_at", "total", "indicators", "by_province", "by_region", "by_type",
-        "by_weekday", "by_weekday_province", "by_weekday_region",
+        "by_weekday", "by_weekday_province", "by_weekday_region", "by_province_type", "by_region_type",
     }
     assert data["generated_at"] == "2025-12-15T10:00:00+01:00"
     assert data["indicators"] == list(INDICATORS)

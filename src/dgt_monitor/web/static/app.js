@@ -4,6 +4,7 @@ const state = {
   chartMode: "bar",
   chartIndicator: "total",
   chartGrouping: "level",
+  chartSelection: new Set(),
   chartData: null,
   chartInstance: null,
   incidents: [],
@@ -80,6 +81,7 @@ const uiCopy = {
     cameraImageFullscreen: "Abrir imagen de cámara a pantalla completa", serverStatus: (status) => `El servidor respondió con código ${status}.`, results: (count) => `${count} resultados`, loadMore: (count) => `Mostrar ${count} más`,
     nearbyCameras: (count) => `${count} cámaras cercanas`, cameraAlt: (road, km) => `Cámara ${road || "DGT"} PK ${km || "sin dato"}`, updatedAt: (time) => `Actualizado ${time}`,
     mapPointPrompt: "Selecciona un punto", mapPointPromptText: "Elige una incidencia o cámara en el mapa para ver sus detalles.", mapUnavailable: "Mapa no disponible", mapSummary: (incidents, cameras) => `${incidents} incidencias · ${cameras} cámaras`, incidentPoint: "Incidencia", cameraPoint: "Cámara", yes: "Sí", no: "No",
+    selectorAllProvinces: "Todas las provincias", selectorAllRegions: "Todas las CCAA", selectorSelected: (count) => `${count} seleccionadas`, selectorSearch: "Buscar", selectorClear: "Limpiar selección",
     charts: "Gráficas", chartEyebrow: "Estadísticas", chartLevel: "Nivel", provinceLevel: "Provincia", regionLevel: "CCAA", chartGrouping: "Agrupar por", groupLevel: "Provincia / CCAA", weekdays: "Día de la semana", incidentTypes: "Tipo de incidencia", barMode: "Barras", lineMode: "Líneas", pieMode: "Queso", totalIncidents: "Incidencias totales", accidentsIndicator: "Accidentes", roadworksIndicator: "Obras", breakdownsIndicator: "Averías", obstructionsIndicator: "Obstrucciones", weatherIndicator: "Meteorología", chartIndicator: "Indicador", chartMode: "Modo de gráfica", loadingCharts: "Cargando estadísticas", chartLoadError: "No se pudieron cargar las estadísticas", noChartData: "No hay datos para mostrar.", maximum: "Máximo", minimum: "Mínimo", unavailableValue: "No disponible", otherGroups: "Otros", unknownGroup: "Sin datos", weekdayNames: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
   },
   en: {
@@ -101,6 +103,7 @@ const uiCopy = {
     cameraImageFullscreen: "Open camera image fullscreen", serverStatus: (status) => `The server responded with status ${status}.`, results: (count) => `${count} results`, loadMore: (count) => `Show ${count} more`,
     nearbyCameras: (count) => `${count} nearby cameras`, cameraAlt: (road, km) => `Camera ${road || "DGT"} KP ${km || "unavailable"}`, updatedAt: (time) => `Updated ${time}`,
     mapPointPrompt: "Select a point", mapPointPromptText: "Choose an incident or camera on the map to see its details.", mapUnavailable: "Map unavailable", mapSummary: (incidents, cameras) => `${incidents} incidents · ${cameras} cameras`, incidentPoint: "Incident", cameraPoint: "Camera", yes: "Yes", no: "No",
+    selectorAllProvinces: "All provinces", selectorAllRegions: "All regions", selectorSelected: (count) => `${count} selected`, selectorSearch: "Search", selectorClear: "Clear selection",
     charts: "Charts", chartEyebrow: "Statistics", chartLevel: "Level", provinceLevel: "Province", regionLevel: "Region (CCAA)", chartGrouping: "Group by", groupLevel: "Province / region", weekdays: "Weekday", incidentTypes: "Incident type", barMode: "Bars", lineMode: "Lines", pieMode: "Pie", totalIncidents: "Total incidents", accidentsIndicator: "Accidents", roadworksIndicator: "Roadworks", breakdownsIndicator: "Breakdowns", obstructionsIndicator: "Obstructions", weatherIndicator: "Weather", chartIndicator: "Indicator", chartMode: "Chart mode", loadingCharts: "Loading statistics", chartLoadError: "Could not load statistics", noChartData: "No data to display.", maximum: "Maximum", minimum: "Minimum", unavailableValue: "Unavailable", otherGroups: "Others", unknownGroup: "Unknown", weekdayNames: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
   },
 };
@@ -113,7 +116,7 @@ const ids = [
   "statAccidents", "statRoadworks", "statStuck", "statObstructions", "statWeather", "incidentTabCount",
   "cameraTabCount", "favoriteTabCount", "mapTabCount", "resultsTitle", "resultEyebrow", "resultCount", "loadingState",
   "errorState", "errorMessage", "emptyState", "incidentResults", "incidentRows",
-  "chartsView", "chartsEyebrow", "chartsViewTitle", "chartLevel", "chartLevelLabel", "chartGrouping", "chartGroupingLabel", "chartLoading", "chartLoadingText", "chartError", "chartErrorTitle", "chartErrorMessage", "chartEmpty", "chartPanel", "chartIndicatorTitle", "chartExtremes", "chartCanvas",
+  "chartsView", "chartsEyebrow", "chartsViewTitle", "chartLevel", "chartLevelLabel", "chartGrouping", "chartGroupingLabel", "chartSelector", "chartSelectorSummary", "chartSelectorSearch", "chartSelectorClear", "chartSelectorList", "chartLoading", "chartLoadingText", "chartError", "chartErrorTitle", "chartErrorMessage", "chartEmpty", "chartPanel", "chartIndicatorTitle", "chartExtremes", "chartCanvas",
   "cameraResults", "mapResults", "mapStatus", "mapDetail", "trafficMap", "retryButton", "loadMoreWrap", "loadMoreButton", "themeButton", "workspace", "filtersPanel", "filterToggle"
 ];
 
@@ -143,7 +146,22 @@ document.addEventListener("DOMContentLoaded", () => {
   }));
   elements.chartLevel.addEventListener("change", () => {
     state.chartLevel = elements.chartLevel.value;
+    state.chartSelection.clear();
     loadCurrentView();
+  });
+  elements.chartSelectorSearch.addEventListener("input", renderChartSelector);
+  elements.chartSelectorClear.addEventListener("click", () => {
+    state.chartSelection.clear();
+    elements.chartSelectorSearch.value = "";
+    renderChartSelector();
+    renderChart();
+  });
+  elements.chartSelectorList.addEventListener("change", (event) => {
+    const box = event.target;
+    if (!(box instanceof HTMLInputElement)) return;
+    if (box.checked) state.chartSelection.add(box.value); else state.chartSelection.delete(box.value);
+    updateChartSelectorSummary();
+    renderChart();
   });
   elements.chartGrouping.addEventListener("change", () => {
     state.chartGrouping = elements.chartGrouping.value;
@@ -408,6 +426,7 @@ async function loadChartsData(requestId) {
     state.chartData = { stats, grouped };
     elements.chartLevel.value = state.chartLevel;
     elements.chartLoading.hidden = true;
+    renderChartSelector();
     renderChart();
     setConnection(true);
   } catch (error) {
@@ -446,6 +465,9 @@ function applyChartsLanguage() {
   document.getElementById("chartModePie").textContent = uiText("pieMode");
   elements.chartLoadingText.textContent = uiText("loadingCharts");
   elements.chartErrorTitle.textContent = uiText("chartLoadError");
+  elements.chartSelectorSearch.placeholder = uiText("selectorSearch");
+  elements.chartSelectorClear.textContent = uiText("selectorClear");
+  if (state.chartData) renderChartSelector();
   if (state.chartData && state.view === "charts") renderChart();
 }
 
@@ -453,6 +475,67 @@ const CHART_INDICATOR_TEXT = {
   total: "totalIncidents", accidents: "accidentsIndicator", roadworks: "roadworksIndicator",
   breakdowns: "breakdownsIndicator", obstructions: "obstructionsIndicator", weather: "weatherIndicator",
 };
+
+function sumLeaves(groups) {
+  const total = {};
+  Object.values(groups).forEach((leaf) => {
+    Object.entries(leaf).forEach(([key, value]) => { total[key] = (total[key] || 0) + Number(value || 0); });
+  });
+  return total;
+}
+
+function pickSelected(groups) {
+  const selected = state.chartSelection;
+  return Object.fromEntries(Object.entries(groups || {}).filter(([name]) => !selected.size || selected.has(name)));
+}
+
+function chartSource(stats, grouped) {
+  const geo = state.chartLevel === "region" ? "region" : "province";
+  if (state.chartGrouping === "weekday") {
+    if (!state.chartSelection.size) return grouped.by_weekday;
+    return Object.fromEntries(Object.entries(grouped[`by_weekday_${geo}`] || {})
+      .map(([day, groups]) => [day, sumLeaves(pickSelected(groups))]));
+  }
+  if (state.chartGrouping === "type") {
+    if (!state.chartSelection.size) return grouped.by_type;
+    return Object.fromEntries(Object.entries(grouped[`by_${geo}_type`] || {})
+      .map(([kind, groups]) => [kind, sumLeaves(pickSelected(groups))]));
+  }
+  return pickSelected(stats.groups);
+}
+
+function selectedExtremes(stats) {
+  if (!state.chartSelection.size) return null;
+  const entries = Object.entries(pickSelected(stats.groups))
+    .map(([name, leaf]) => ({ name, value: Number(leaf?.[state.chartIndicator] || 0) }))
+    .sort((a, b) => b.value - a.value || a.name.localeCompare(b.name));
+  const positive = entries.filter((entry) => entry.value > 0).sort((a, b) => a.value - b.value || a.name.localeCompare(b.name));
+  return { max: entries[0] || null, min: positive[0] || null };
+}
+
+function updateChartSelectorSummary() {
+  const count = state.chartSelection.size;
+  elements.chartSelectorSummary.textContent = count
+    ? uiText("selectorSelected", count)
+    : uiText(state.chartLevel === "region" ? "selectorAllRegions" : "selectorAllProvinces");
+}
+
+function renderChartSelector() {
+  const names = Object.keys(state.chartData?.stats?.groups || {});
+  const query = elements.chartSelectorSearch.value.trim().toLowerCase();
+  elements.chartSelectorList.replaceChildren(...names
+    .filter((name) => name.toLowerCase().includes(query))
+    .map((name) => {
+      const label = document.createElement("label");
+      const box = document.createElement("input");
+      box.type = "checkbox";
+      box.value = name;
+      box.checked = state.chartSelection.has(name);
+      label.append(box, document.createTextNode(name === "Unknown" ? uiText("unknownGroup") : name));
+      return label;
+    }));
+  updateChartSelectorSummary();
+}
 
 function renderChart() {
   if (!state.chartData) return;
@@ -463,11 +546,8 @@ function renderChart() {
     return;
   }
   const { stats, grouped } = state.chartData;
-  const source = state.chartGrouping === "weekday"
-    ? grouped.by_weekday
-    : state.chartGrouping === "type"
-      ? grouped.by_type
-      : stats.groups;
+  const source = chartSource(stats, grouped);
+
   const weekdayKeys = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
   let rows = Object.entries(source || {}).map(([name, values]) => ({
     name,
@@ -500,7 +580,7 @@ function renderChart() {
   elements.chartIndicatorTitle.textContent = uiText(CHART_INDICATOR_TEXT[state.chartIndicator]);
 
 
-  elements.chartExtremes.textContent = formatChartExtremes(stats.extremes?.[state.chartIndicator]);
+  elements.chartExtremes.textContent = formatChartExtremes(selectedExtremes(stats) || stats.extremes?.[state.chartIndicator]);
   elements.chartEmpty.textContent = uiText("noChartData");
   elements.chartEmpty.hidden = rows.length > 0;
   elements.chartPanel.hidden = rows.length === 0;
