@@ -14,6 +14,8 @@ services:
         sync: false
       - key: ACTIVITY_REVOKED_API_KEYS
         sync: false
+      - key: INCIDENT_DB_PATH
+        value: "/tmp/incidents.db"  # Ephemeral on the free plan; refilled from the DGT on first request
       - key: ACTIVITY_DB_PATH
         value: "/tmp/activity.db"  # Temporary storage per deployment
     healthCheckPath: /api/health
