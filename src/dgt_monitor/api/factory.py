@@ -16,7 +16,7 @@ from dgt_monitor.core.exceptions import DgtError
 def create_app(service: DgtApplicationService | None = None) -> FastAPI:
     app = FastAPI(title="DGT Monitor API", version="0.1.0")
     app.state.dgt_service = service or build_application()
-    static_dir = Path(__file__).resolve().parents[2] / "dashboard" / "static"
+    static_dir = Path(__file__).resolve().parents[1] / "web" / "static"
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"], allow_credentials=False,

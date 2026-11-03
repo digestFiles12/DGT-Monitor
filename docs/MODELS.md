@@ -1,6 +1,6 @@
 # Modelos
 
-Los modelos de dominio viven en `dgt_monitor/core/models.py` y no dependen de FastAPI, PyQt6 ni `requests`.
+Los modelos de dominio viven en `src/dgt_monitor/core/models.py` y no dependen de FastAPI, PyQt6 ni `requests`.
 
 ## Incident
 

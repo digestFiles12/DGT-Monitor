@@ -20,7 +20,7 @@ El flujo compartido, la API modular, el dashboard web/PWA y la GUI modular ya fu
 
 ## Compatibilidad
 
-`dashboard/app.py` ya se conserva como wrapper ASGI estable. Quedan por crear los wrappers de escritorio `DGT.py` y `DGT_V2.py` sobre `gui.entrypoints`.
+`src/dgt_monitor/web/app.py` ya se conserva como wrapper ASGI estable. Quedan por crear los wrappers de escritorio `DGT.py` y `DGT_V2.py` sobre `gui.entrypoints`.
 
 ## Criterios de aceptacion
 

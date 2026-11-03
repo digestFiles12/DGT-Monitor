@@ -5,7 +5,7 @@
 - Incidentes: `SituationPublication/datex2_v36.xml`.
 - Cámaras: `DevicePublication/camaras_datex2_v36.xml`.
 
-Las URL, cabeceras, timeout y tiempos de caché están centralizados en `dgt_monitor/core/constants.py`.
+Las URL, cabeceras, timeout y tiempos de caché están centralizados en `src/dgt_monitor/core/constants.py`.
 
 ## Flujo
 

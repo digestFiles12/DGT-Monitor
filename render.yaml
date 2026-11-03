@@ -3,8 +3,8 @@ services:
     name: dgt-monitor
     runtime: python
     plan: free
-    buildCommand: pip install -e ".[dev]" && python -m pytest test -q --tb=no && python -m compileall -q dgt_monitor dashboard
-    startCommand: uvicorn dashboard.app:app --host 0.0.0.0 --port $PORT
+    buildCommand: pip install -e ".[dev]" && python -m pytest tests -q --tb=no && python -m compileall -q src
+    startCommand: uvicorn dgt_monitor.web.app:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.0"

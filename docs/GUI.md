@@ -5,7 +5,7 @@ La GUI modular esta operativa. Consume `DgtApplicationService` mediante workers 
 ## Estructura actual
 
 ```text
-dgt_monitor/gui/
+src/dgt_monitor/gui/
   __main__.py
   dialogs/{__init__,cameras}.py
   entrypoints.py

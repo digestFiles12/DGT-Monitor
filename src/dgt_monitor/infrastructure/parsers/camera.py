@@ -16,7 +16,7 @@ class CameraParser(Datex2Parser):
         try:
             root = ET.fromstring(xml_content)
         except ET.ParseError as exc:
-            raise DgtParseError(f"XML de cámaras no válido: {exc}") from exc
+            raise DgtParseError(f"Invalid cameras XML: {exc}") from exc
         cameras: list[Camera] = []
         for node in root.iter():
             xsi_type = node.get("{http://www.w3.org/2001/XMLSchema-instance}type", "")

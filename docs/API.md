@@ -1,6 +1,6 @@
 # API HTTP y WebSocket
 
-La aplicación se construye con `dgt_monitor.api.factory.create_app()`. En producción, `dashboard/app.py` mantiene el punto ASGI `dashboard.app:app`.
+La aplicación se construye con `dgt_monitor.api.factory.create_app()`. En producción, `src/dgt_monitor/web/app.py` mantiene el punto ASGI `dgt_monitor.web.app:app`.
 
 ## Endpoints
 
@@ -62,5 +62,5 @@ Al pulsar la imagen del visor, se expande a pantalla completa; si la imagen fall
 ## Desarrollo
 
 ```powershell
-.\.venv\Scripts\python.exe -m uvicorn dashboard.app:app --reload
+.\.venv\Scripts\python.exe -m uvicorn dgt_monitor.web.app:app --reload
 ```

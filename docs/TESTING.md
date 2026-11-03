@@ -7,12 +7,12 @@ La suite actual contiene 53 pruebas y cubre modelos, texto, distancia, parsers, 
 ## Comandos
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest test -q
+.\.venv\Scripts\python.exe -m pytest tests -q
 .\.venv\Scripts\python.exe -m pytest test\unit -q
 .\.venv\Scripts\python.exe -m pytest test\integration -q
 .\.venv\Scripts\python.exe -m pytest test\api -q
 $env:QT_QPA_PLATFORM='offscreen'; .\.venv\Scripts\python.exe -m pytest test\gui -q
-.\.venv\Scripts\python.exe -m compileall -q dgt_monitor dashboard
+.\.venv\Scripts\python.exe -m compileall -q src
 git diff --check
 ```
 
@@ -41,12 +41,12 @@ git diff --check
 Ultima validacion local documentada, 2026-07-19:
 
 ```powershell
-$env:QT_QPA_PLATFORM='offscreen'; .\.venv\Scripts\python.exe -m pytest test -q
+$env:QT_QPA_PLATFORM='offscreen'; .\.venv\Scripts\python.exe -m pytest tests -q
 # 53 passed
 
 .\.venv\Scripts\python.exe -m pytest --collect-only | Select-String "collected"
 # 53 tests collected
 
-.\.venv\Scripts\python.exe -m compileall -q dgt_monitor dashboard
+.\.venv\Scripts\python.exe -m compileall -q src
 git diff --check
 ```
