@@ -9,3 +9,4 @@ htmlcov/
 .idea/
 .vscode/
 data/
+grouped_incidents.json
