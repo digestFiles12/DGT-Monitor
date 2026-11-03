@@ -6,7 +6,7 @@ El dashboard incluye selector ES/EN, modo claro/oscuro, filtros por provincia, m
 
 La cobertura incidencia-camara se calcula por carretera normalizada, provincia compatible y punto kilometrico dentro de `CAMERA_MATCH_RANGE_KM = 2.0`. El dashboard mantiene scroll general en movil/escritorio y scroll interno en tabla de incidencias y grid de camaras, de modo que la navegacion funciona tanto por pagina completa como dentro de cada superficie densa.
 
-Consulta [docs/INDEX.md](docs/INDEX.md) para la documentacion tecnica completa, [CHANGELOG.md](CHANGELOG.md) para el historial de cambios y [docs/HANDOFF.md](docs/HANDOFF.md) para reanudar el trabajo en otro chat. El flujo de ramas esta definido en [docs/GITFLOW.md](docs/GITFLOW.md).
+Documentacion: wiki en [espanol](docs/wiki/es/README.md) y [English](docs/wiki/en/README.md) (guias, diagramas y una pagina por fichero), [memoria del proyecto](docs/MEMORIA.md) y [requisitos](docs/requirements/REQUIREMENTS.md). Historial de cambios en [CHANGELOG.md](CHANGELOG.md). El flujo de ramas esta en la guia de GitFlow ([es](docs/wiki/es/guides/gitflow.md) / [en](docs/wiki/en/guides/gitflow.md)).
 
 ## Funcionalidades principales
 

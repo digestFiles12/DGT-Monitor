@@ -1,3 +1,14 @@
+## 2026-11-03 - Wiki independiente por idioma
+
+### Añadido
+
+- Wiki en `docs/wiki/es` y `docs/wiki/en` con una página por fichero, guías técnicas y diagramas Mermaid.
+- Memoria del proyecto (`docs/MEMORIA.md`).
+
+### Eliminado
+
+- Documentos técnicos antiguos de `docs/` (API, ARCHITECTURE, HANDOFF, PROJECT_STATUS, etc.), integrados y actualizados en la wiki.
+
 ## 2026-11-03 - Pestaña de gráficas
 
 ### Añadido
